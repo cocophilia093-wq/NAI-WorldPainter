@@ -1,17 +1,16 @@
-# nai_huishi
+# 绘世
 
-A new Flutter project.
+绘世是一个基于 Flutter 开发的 Android APK 客户端，用于 NovelAI 图片生成相关功能。
 
-## Getting Started
+## APK
 
-This project is a starting point for a Flutter application.
+已构建 APK 可在仓库的 `release/app-release.apk` 中获取。
 
-A few resources to get you started if this is your first Flutter project:
+## 致谢 / Credits
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+本项目的 NovelAI 绘图接口适配基于/参考了 [tt-P607](https://github.com/tt-P607) 的相关项目：
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- [novelai-gateway](https://github.com/tt-P607/novelai-gateway)
+- [new-api](https://github.com/tt-P607/new-api)
+
+感谢原作者提供 NovelAI 绘图转 New API 相关接口方案。本项目主要提供 Android APK 客户端封装与界面实现，接口相关能力与原始方案归原作者所有。
