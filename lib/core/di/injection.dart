@@ -1,0 +1,109 @@
+import 'package:get_it/get_it.dart';
+import 'package:sqflite/sqflite.dart';
+import 'package:dio/dio.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import 'package:nai_huishi/data/datasources/local/database_helper.dart';
+import 'package:nai_huishi/data/datasources/local/llm_chat_local_datasource.dart';
+import 'package:nai_huishi/data/datasources/local/settings_local_datasource.dart';
+import 'package:nai_huishi/data/datasources/remote/llm_api_service.dart';
+import 'package:nai_huishi/data/datasources/remote/novelai_api_service.dart';
+import 'package:nai_huishi/data/datasources/remote/gpt_api_service.dart';
+import 'package:nai_huishi/data/datasources/remote/nano_banana_api_service.dart';
+import 'package:nai_huishi/data/datasources/remote/bing_search_service.dart';
+import 'package:nai_huishi/data/repositories/generation_repository_impl.dart';
+import 'package:nai_huishi/data/repositories/history_repository_impl.dart';
+import 'package:nai_huishi/data/repositories/llm_chat_repository_impl.dart';
+import 'package:nai_huishi/data/repositories/preset_repository_impl.dart';
+import 'package:nai_huishi/data/repositories/prompt_template_repository_impl.dart';
+import 'package:nai_huishi/data/repositories/settings_repository_impl.dart';
+import 'package:nai_huishi/domain/repositories/generation_repository.dart';
+import 'package:nai_huishi/domain/repositories/history_repository.dart';
+import 'package:nai_huishi/domain/repositories/llm_chat_repository.dart';
+import 'package:nai_huishi/domain/repositories/preset_repository.dart';
+import 'package:nai_huishi/domain/repositories/prompt_template_repository.dart';
+import 'package:nai_huishi/domain/repositories/settings_repository.dart';
+import 'package:nai_huishi/domain/usecases/generate_image.dart';
+import 'package:nai_huishi/domain/usecases/get_history.dart';
+import 'package:nai_huishi/domain/usecases/manage_llm_chat.dart';
+import 'package:nai_huishi/domain/usecases/manage_presets.dart';
+import 'package:nai_huishi/domain/usecases/manage_prompt_templates.dart';
+import 'package:nai_huishi/domain/usecases/manage_settings.dart';
+import 'package:nai_huishi/domain/usecases/save_image.dart';
+import 'package:nai_huishi/core/queue/generation_queue.dart';
+import 'package:nai_huishi/core/network/robust_http_adapter.dart';
+import 'package:nai_huishi/presentation/viewmodels/generation_viewmodel.dart';
+import 'package:nai_huishi/presentation/viewmodels/history_viewmodel.dart';
+import 'package:nai_huishi/presentation/viewmodels/llm_chat_viewmodel.dart';
+import 'package:nai_huishi/presentation/viewmodels/preset_viewmodel.dart';
+import 'package:nai_huishi/presentation/viewmodels/prompt_template_viewmodel.dart';
+import 'package:nai_huishi/presentation/viewmodels/settings_viewmodel.dart';
+
+final sl = GetIt.instance;
+
+Future<void> configureDependencies() async {
+  final prefs = await SharedPreferences.getInstance();
+  sl.registerSingleton<SharedPreferences>(prefs);
+
+  final db = await DatabaseHelper.instance.database;
+  sl.registerSingleton<Database>(db);
+
+  sl.registerSingleton<Dio>(createRobustDio());
+
+  sl.registerSingleton<SettingsLocalDatasource>(SettingsLocalDatasource(sl<SharedPreferences>()));
+  sl.registerSingleton<NovelAiApiService>(NovelAiApiService(sl<Dio>()));
+  sl.registerSingleton<GptApiService>(GptApiService(sl<Dio>()));
+  sl.registerSingleton<NanoBananaApiService>(NanoBananaApiService(sl<Dio>()));
+  sl.registerSingleton<LlmApiService>(LlmApiService(sl<Dio>()));
+  sl.registerSingleton<BingSearchService>(BingSearchService());
+  sl.registerSingleton<LlmChatLocalDatasource>(LlmChatLocalDatasource(sl<Database>()));
+
+  final settingsRepo = SettingsRepositoryImpl(sl<SettingsLocalDatasource>());
+  settingsRepo.setApiService(sl<NovelAiApiService>());
+  sl.registerSingleton<SettingsRepository>(settingsRepo);
+
+  sl.registerSingleton<GenerationRepository>(GenerationRepositoryImpl(
+    apiService: sl<NovelAiApiService>(),
+    gptApiService: sl<GptApiService>(),
+    nanoApiService: sl<NanoBananaApiService>(),
+    settingsRepo: sl<SettingsRepository>(),
+  ));
+  sl.registerSingleton<HistoryRepository>(HistoryRepositoryImpl(sl<Database>()));
+  sl.registerSingleton<PresetRepository>(PresetRepositoryImpl(sl<Database>()));
+  sl.registerSingleton<PromptTemplateRepository>(PromptTemplateRepositoryImpl(sl<Database>()));
+  sl.registerSingleton<LlmChatRepository>(LlmChatRepositoryImpl(
+    local: sl<LlmChatLocalDatasource>(),
+    api: sl<LlmApiService>(),
+  ));
+
+  sl.registerSingleton<GenerationQueue>(GenerationQueue(
+    sl<GenerationRepository>(),
+    sl<HistoryRepository>(),
+  ));
+
+  sl.registerSingleton<GenerateImageUseCase>(GenerateImageUseCase(
+    sl<HistoryRepository>(),
+  ));
+  sl.registerSingleton<GetHistoryUseCase>(GetHistoryUseCase(sl<HistoryRepository>()));
+  sl.registerSingleton<ManagePresetsUseCase>(ManagePresetsUseCase(sl<PresetRepository>()));
+  sl.registerSingleton<ManagePromptTemplatesUseCase>(ManagePromptTemplatesUseCase(sl<PromptTemplateRepository>()));
+  sl.registerSingleton<ManageSettingsUseCase>(ManageSettingsUseCase(sl<SettingsRepository>()));
+  sl.registerSingleton<ManageLlmChatUseCase>(ManageLlmChatUseCase(sl<LlmChatRepository>()));
+  sl.registerSingleton<SaveImageUseCase>(SaveImageUseCase(sl<HistoryRepository>()));
+
+  sl.registerFactory<GenerationViewModel>(() => GenerationViewModel(
+    generateImage: sl<GenerateImageUseCase>(),
+    manageSettings: sl<ManageSettingsUseCase>(),
+    saveImage: sl<SaveImageUseCase>(),
+    queue: sl<GenerationQueue>(),
+  ));
+  sl.registerFactory<HistoryViewModel>(() => HistoryViewModel(sl<GetHistoryUseCase>()));
+  sl.registerFactory<PresetViewModel>(() => PresetViewModel(sl<ManagePresetsUseCase>()));
+  sl.registerFactory<PromptTemplateViewModel>(() => PromptTemplateViewModel(sl<ManagePromptTemplatesUseCase>()));
+  sl.registerLazySingleton<SettingsViewModel>(() => SettingsViewModel(sl<ManageSettingsUseCase>()));
+  sl.registerFactory<LlmChatViewModel>(() => LlmChatViewModel(
+    manageChat: sl<ManageLlmChatUseCase>(),
+    manageSettings: sl<ManageSettingsUseCase>(),
+    bingSearch: sl<BingSearchService>(),
+  ));
+}

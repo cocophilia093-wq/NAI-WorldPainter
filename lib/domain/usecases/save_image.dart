@@ -1,0 +1,52 @@
+import 'dart:io';
+import 'package:nai_huishi/core/utils/image_utils.dart';
+import 'package:nai_huishi/domain/repositories/history_repository.dart';
+import 'package:nai_huishi/domain/entities/generation_task.dart';
+import 'package:dio/dio.dart';
+import 'package:image_gallery_saver_plus/image_gallery_saver_plus.dart';
+import 'package:path/path.dart' as p;
+
+class SaveImageUseCase {
+  final HistoryRepository _historyRepo;
+
+  SaveImageUseCase(this._historyRepo);
+
+  Future<String> execute(GenerationTask task) async {
+    if (task.imageUrl == null && task.imagePath == null) {
+      throw Exception('没有可保存的图片');
+    }
+
+    if (task.imagePath != null) {
+      final file = File(task.imagePath!);
+      if (await file.exists()) {
+        return task.imagePath!;
+      }
+    }
+
+    if (task.imageUrl != null) {
+      final filename = ImageUtils.generateFilename();
+      final dir = await ImageUtils.getImageDirectory();
+      final filePath = p.join(dir.path, filename);
+
+      final dio = Dio();
+      await dio.download(task.imageUrl!, filePath);
+
+      final updated = task.copyWith(imagePath: filePath);
+      await _historyRepo.updateTask(updated);
+
+      return filePath;
+    }
+
+    throw Exception('图片下载失败');
+  }
+
+  Future<bool> saveToGallery(String filePath) async {
+    final result = await ImageGallerySaverPlus.saveFile(filePath);
+    if (result is Map) {
+      final isSuccess = result['isSuccess'];
+      final success = result['success'];
+      return isSuccess == true || success == true;
+    }
+    return false;
+  }
+}

@@ -1,0 +1,47 @@
+name: nai_huishi
+description: nai 绘世 - NovelAI 图像生成客户端
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  dio: ^5.4.0
+  sqflite: ^2.3.0
+  path_provider: ^2.1.2
+  path: ^1.9.0
+  uuid: ^4.3.3
+  shared_preferences: ^2.2.2
+  get_it: ^7.6.7
+  equatable: ^2.0.5
+  json_annotation: ^4.8.1
+  image_gallery_saver_plus: ^4.0.1
+  cupertino_icons: ^1.0.6
+  google_fonts: ^6.2.1
+  image_picker: ^1.1.2
+  image: ^4.0.0
+  flutter_foreground_task: ^8.10.0
+  wakelock_plus: ^1.2.5
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.1
+  build_runner: ^2.4.8
+  json_serializable: ^6.7.1
+  flutter_launcher_icons: ^0.14.4
+
+flutter_launcher_icons:
+  android: true
+  ios: false
+  image_path: "assets/icons/app_icon.png"
+  adaptive_icon_background: "#0A0A0C"
+  adaptive_icon_foreground: "assets/icons/app_icon.png"
+
+flutter:
+  uses-material-design: true
+  assets:
+    - lib/assets/nsfw_knowledge.json
