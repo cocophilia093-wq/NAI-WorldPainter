@@ -155,6 +155,22 @@ class SettingsLocalDatasource {
   Future<void> setWebSearchEnabled(bool value) async =>
       _prefs.setBool(AppConstants.keyWebSearchEnabled, value);
 
+  // Danbooru 校准（默认启用）
+  bool getDanbooruCalibrationEnabled() =>
+      _prefs.getBool(AppConstants.keyDanbooruCalibrationEnabled) ?? true;
+  Future<void> setDanbooruCalibrationEnabled(bool value) async =>
+      _prefs.setBool(AppConstants.keyDanbooruCalibrationEnabled, value);
+
+  String getDanbooruBaseUrl() =>
+      _prefs.getString(AppConstants.keyDanbooruBaseUrl) ?? '';
+  Future<void> setDanbooruBaseUrl(String value) async {
+    if (value.trim().isEmpty) {
+      await _prefs.remove(AppConstants.keyDanbooruBaseUrl);
+    } else {
+      await _prefs.setString(AppConstants.keyDanbooruBaseUrl, value.trim());
+    }
+  }
+
   // 图像 API 供应商配置 — NovelAI
   String getImageProviderNovelAiBaseUrl() =>
       _prefs.getString(AppConstants.keyImageProviderNovelAiBaseUrl) ?? '';

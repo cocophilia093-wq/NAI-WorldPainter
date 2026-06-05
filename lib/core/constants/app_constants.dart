@@ -54,6 +54,10 @@ class AppConstants {
   // 联网搜索（手动开关，跨会话持久化）
   static const String keyWebSearchEnabled = 'llm_web_search_enabled';
 
+  // Danbooru 智能校准
+  static const String keyDanbooruCalibrationEnabled = 'danbooru_calibration_enabled';
+  static const String keyDanbooruBaseUrl = 'danbooru_base_url';
+
   static const int llmProfileCount = 4;
   static const int defaultLlmContextLimit = 20;
 

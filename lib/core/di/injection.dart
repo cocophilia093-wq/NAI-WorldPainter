@@ -11,6 +11,7 @@ import 'package:nai_huishi/data/datasources/remote/novelai_api_service.dart';
 import 'package:nai_huishi/data/datasources/remote/gpt_api_service.dart';
 import 'package:nai_huishi/data/datasources/remote/nano_banana_api_service.dart';
 import 'package:nai_huishi/data/datasources/remote/bing_search_service.dart';
+import 'package:nai_huishi/data/datasources/remote/danbooru_api_service.dart';
 import 'package:nai_huishi/data/repositories/generation_repository_impl.dart';
 import 'package:nai_huishi/data/repositories/history_repository_impl.dart';
 import 'package:nai_huishi/data/repositories/llm_chat_repository_impl.dart';
@@ -30,6 +31,7 @@ import 'package:nai_huishi/domain/usecases/manage_presets.dart';
 import 'package:nai_huishi/domain/usecases/manage_prompt_templates.dart';
 import 'package:nai_huishi/domain/usecases/manage_settings.dart';
 import 'package:nai_huishi/domain/usecases/save_image.dart';
+import 'package:nai_huishi/domain/usecases/calibrate_with_danbooru.dart';
 import 'package:nai_huishi/core/queue/generation_queue.dart';
 import 'package:nai_huishi/core/network/robust_http_adapter.dart';
 import 'package:nai_huishi/presentation/viewmodels/generation_viewmodel.dart';
@@ -56,6 +58,7 @@ Future<void> configureDependencies() async {
   sl.registerSingleton<NanoBananaApiService>(NanoBananaApiService(sl<Dio>()));
   sl.registerSingleton<LlmApiService>(LlmApiService(sl<Dio>()));
   sl.registerSingleton<BingSearchService>(BingSearchService());
+  sl.registerSingleton<DanbooruApiService>(DanbooruApiService());
   sl.registerSingleton<LlmChatLocalDatasource>(LlmChatLocalDatasource(sl<Database>()));
 
   final settingsRepo = SettingsRepositoryImpl(sl<SettingsLocalDatasource>());
@@ -90,6 +93,8 @@ Future<void> configureDependencies() async {
   sl.registerSingleton<ManageSettingsUseCase>(ManageSettingsUseCase(sl<SettingsRepository>()));
   sl.registerSingleton<ManageLlmChatUseCase>(ManageLlmChatUseCase(sl<LlmChatRepository>()));
   sl.registerSingleton<SaveImageUseCase>(SaveImageUseCase(sl<HistoryRepository>()));
+  sl.registerSingleton<CalibrateWithDanbooruUseCase>(
+      CalibrateWithDanbooruUseCase(sl<DanbooruApiService>()));
 
   sl.registerFactory<GenerationViewModel>(() => GenerationViewModel(
     generateImage: sl<GenerateImageUseCase>(),
@@ -105,5 +110,6 @@ Future<void> configureDependencies() async {
     manageChat: sl<ManageLlmChatUseCase>(),
     manageSettings: sl<ManageSettingsUseCase>(),
     bingSearch: sl<BingSearchService>(),
+    calibrate: sl<CalibrateWithDanbooruUseCase>(),
   ));
 }

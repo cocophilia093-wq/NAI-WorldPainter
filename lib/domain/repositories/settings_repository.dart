@@ -106,6 +106,12 @@ abstract class SettingsRepository {
   Future<bool> getWebSearchEnabled();
   Future<void> setWebSearchEnabled(bool value);
 
+  // Danbooru 智能校准
+  Future<bool> getDanbooruCalibrationEnabled();
+  Future<void> setDanbooruCalibrationEnabled(bool value);
+  Future<String> getDanbooruBaseUrl();
+  Future<void> setDanbooruBaseUrl(String value);
+
   // 图像 API 供应商配置 — NovelAI
   Future<String> getImageProviderNovelAiBaseUrl();
   Future<void> setImageProviderNovelAiBaseUrl(String value);

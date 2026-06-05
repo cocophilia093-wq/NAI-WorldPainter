@@ -202,7 +202,18 @@ class ChatMessageBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isUser = message.role == LlmMessageRole.user;
-    final segments = _splitContent(message.content);
+    var segments = _splitContent(message.content);
+    // Danbooru 校准：替换正向代码块内容为校准结果
+    final calibrated = message.calibratedPositive;
+    if (!isUser && calibrated != null && calibrated.isNotEmpty) {
+      segments = [
+        for (final seg in segments)
+          if (seg.isCode && _isPositiveLabel(seg.label))
+            _Segment.code(calibrated, seg.lang, seg.label)
+          else
+            seg,
+      ];
+    }
     final aggregated = isUser ? null : _aggregateSegments(segments);
     final showApplyAll = !isUser && onApplyAll != null && aggregated != null && !aggregated.isEmpty;
 
@@ -286,6 +297,14 @@ class ChatMessageBubble extends StatelessWidget {
                         child: _ApplyAllButton(
                           aggregated: aggregated,
                           onApplyAll: onApplyAll!,
+                        ),
+                      ),
+                    if (!isUser && message.calibrationStatus != null && message.calibrationStatus!.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 6),
+                        child: _CalibrationStatusLine(
+                          text: message.calibrationStatus!,
+                          success: message.calibrationSuccess,
                         ),
                       ),
                   ],
@@ -647,6 +666,38 @@ class _ApplyAllButton extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// Danbooru 校准状态条：成功用绿色 ✓，失败用灰色提示。
+class _CalibrationStatusLine extends StatelessWidget {
+  final String text;
+  final bool success;
+  const _CalibrationStatusLine({required this.text, required this.success});
+
+  @override
+  Widget build(BuildContext context) {
+    final color = success
+        ? Colors.greenAccent.shade400
+        : Colors.white.withValues(alpha: 0.45);
+    return Row(
+      children: [
+        Icon(
+          success
+              ? CupertinoIcons.checkmark_seal_fill
+              : CupertinoIcons.exclamationmark_circle,
+          size: 12,
+          color: color,
+        ),
+        const SizedBox(width: 6),
+        Expanded(
+          child: Text(
+            text,
+            style: TextStyle(fontSize: 11, color: color),
+          ),
+        ),
+      ],
     );
   }
 }

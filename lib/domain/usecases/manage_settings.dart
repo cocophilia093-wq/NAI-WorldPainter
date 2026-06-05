@@ -108,6 +108,13 @@ class ManageSettingsUseCase {
   Future<bool> getWebSearchEnabled() => _repo.getWebSearchEnabled();
   Future<void> setWebSearchEnabled(bool value) => _repo.setWebSearchEnabled(value);
 
+  // Danbooru 智能校准
+  Future<bool> getDanbooruCalibrationEnabled() => _repo.getDanbooruCalibrationEnabled();
+  Future<void> setDanbooruCalibrationEnabled(bool value) =>
+      _repo.setDanbooruCalibrationEnabled(value);
+  Future<String> getDanbooruBaseUrl() => _repo.getDanbooruBaseUrl();
+  Future<void> setDanbooruBaseUrl(String value) => _repo.setDanbooruBaseUrl(value);
+
   // 图像 API 供应商配置 — NovelAI
   Future<String> getImageProviderNovelAiBaseUrl() => _repo.getImageProviderNovelAiBaseUrl();
   Future<void> setImageProviderNovelAiBaseUrl(String value) => _repo.setImageProviderNovelAiBaseUrl(value);

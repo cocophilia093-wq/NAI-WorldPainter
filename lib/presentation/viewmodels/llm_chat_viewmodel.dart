@@ -6,6 +6,7 @@ import 'package:nai_huishi/domain/entities/llm_message.dart';
 import 'package:nai_huishi/domain/entities/llm_session.dart';
 import 'package:nai_huishi/domain/usecases/manage_llm_chat.dart';
 import 'package:nai_huishi/domain/usecases/manage_settings.dart';
+import 'package:nai_huishi/domain/usecases/calibrate_with_danbooru.dart';
 
 class LlmProfile {
   final String name;
@@ -37,14 +38,17 @@ class LlmChatViewModel extends ChangeNotifier {
   final ManageLlmChatUseCase _manageChat;
   final ManageSettingsUseCase _manageSettings;
   final BingSearchService _bingSearch;
+  final CalibrateWithDanbooruUseCase _calibrate;
 
   LlmChatViewModel({
     required ManageLlmChatUseCase manageChat,
     required ManageSettingsUseCase manageSettings,
     required BingSearchService bingSearch,
+    required CalibrateWithDanbooruUseCase calibrate,
   })  : _manageChat = manageChat,
         _manageSettings = manageSettings,
-        _bingSearch = bingSearch;
+        _bingSearch = bingSearch,
+        _calibrate = calibrate;
 
   // 配置（旧单配置，保留兼容）
   String _llmApiKey = '';
@@ -366,6 +370,14 @@ class LlmChatViewModel extends ChangeNotifier {
         _messages = [..._messages, assistantMessage];
       }
       _sessions = await _manageChat.listSessions();
+      // 异步触发 Danbooru 校准（不阻塞 UI）
+      if (assistantMessage.id != null) {
+        _triggerDanbooruCalibration(
+          messageId: assistantMessage.id!,
+          assistantContent: assistantMessage.content,
+          userQuery: trimmed,
+        );
+      }
     } catch (e) {
       _errorMessage = e.toString().replaceFirst('AppException(null): ', '');
       _messages = await _manageChat.listMessages(sessionId);
@@ -413,6 +425,88 @@ class LlmChatViewModel extends ChangeNotifier {
 
     // 用新文本重新发送
     await sendUserMessage(trimmed);
+  }
+
+  // ===== Danbooru 校准 =====
+
+  /// 匹配 LLM 回复中的"正向"代码块（含「正向」「正面」「通用底模词」「通用」等关键词的标注）
+  static final RegExp _positiveBlockRegex = RegExp(
+    r'((?:[^\n]*(?:正向|正面|底模|通用)[^\n]*[:：])\s*\n)```([a-zA-Z0-9_+\-]*)\s*\n([\s\S]*?)```',
+  );
+
+  /// 从 LLM 回复中抽取首个正向代码块。返回 null 表示没有找到。
+  String? _extractPositive(String content) {
+    final m = _positiveBlockRegex.firstMatch(content);
+    if (m == null) return null;
+    final text = (m.group(3) ?? '').trim();
+    if (text.isEmpty) return null;
+    // 排除「负向」误命中（标签同时含负向关键词时跳过）
+    final label = m.group(1) ?? '';
+    if (label.contains('负向') || label.contains('负面')) return null;
+    return text;
+  }
+
+  /// 异步执行校准并把结果回写到内存中的对应消息。
+  Future<void> _triggerDanbooruCalibration({
+    required int messageId,
+    required String assistantContent,
+    required String userQuery,
+  }) async {
+    // 检查开关
+    final enabled = await _manageSettings.getDanbooruCalibrationEnabled();
+    if (!enabled) return;
+    final positive = _extractPositive(assistantContent);
+    if (positive == null) return;
+
+    final customBase = (await _manageSettings.getDanbooruBaseUrl()).trim();
+    try {
+      final result = await _calibrate.call(
+        llmPositive: positive,
+        userQuery: userQuery,
+        showNsfw: true, // 与应用默认（允许）一致
+        customBaseUrl: customBase.isEmpty ? null : customBase,
+      );
+      _applyCalibrationResult(
+        messageId: messageId,
+        calibratedPositive: result.calibratedPositive,
+        status:
+            '✓ 校准 ${result.normalizedCount} 个 tag · ➕ 补 ${result.relatedCount} 个共现',
+        success: true,
+      );
+    } catch (_) {
+      _applyCalibrationResult(
+        messageId: messageId,
+        calibratedPositive: null,
+        status: 'Danbooru 校准失败，使用 LLM 原始结果',
+        success: false,
+      );
+    }
+  }
+
+  void _applyCalibrationResult({
+    required int messageId,
+    required String? calibratedPositive,
+    required String status,
+    required bool success,
+  }) {
+    var changed = false;
+    final updated = <LlmMessage>[];
+    for (final m in _messages) {
+      if (m.id == messageId) {
+        updated.add(m.copyWith(
+          calibratedPositive: calibratedPositive,
+          calibrationStatus: status,
+          calibrationSuccess: success,
+        ));
+        changed = true;
+      } else {
+        updated.add(m);
+      }
+    }
+    if (changed) {
+      _messages = updated;
+      notifyListeners();
+    }
   }
 }
 

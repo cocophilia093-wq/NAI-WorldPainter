@@ -39,6 +39,10 @@ class _ChatSettingsSheetState extends State<_ChatSettingsSheet>
   bool _nsfwBookLoaded = false;
   String _nsfwBookStatus = '';
 
+  // Danbooru 校准
+  bool _danbooruEnabled = true;
+  late final TextEditingController _danbooruBaseUrlController;
+
   // 每个 profile 的 controllers
   late final List<TextEditingController> _nameControllers;
   late final List<TextEditingController> _apiKeyControllers;
@@ -63,6 +67,7 @@ class _ChatSettingsSheetState extends State<_ChatSettingsSheet>
     _contextLimitController =
         TextEditingController(text: vm.contextLimit.toString());
     _nsfwBookPathController = TextEditingController(text: '');
+    _danbooruBaseUrlController = TextEditingController(text: '');
 
     _nameControllers = List.generate(
       AppConstants.llmProfileCount,
@@ -85,6 +90,18 @@ class _ChatSettingsSheetState extends State<_ChatSettingsSheet>
     _testError = List.filled(AppConstants.llmProfileCount, null);
 
     _loadNsfwBookPath();
+    _loadDanbooruSettings();
+  }
+
+  Future<void> _loadDanbooruSettings() async {
+    final settings = sl<ManageSettingsUseCase>();
+    final enabled = await settings.getDanbooruCalibrationEnabled();
+    final baseUrl = await settings.getDanbooruBaseUrl();
+    if (!mounted) return;
+    setState(() {
+      _danbooruEnabled = enabled;
+      _danbooruBaseUrlController.text = baseUrl;
+    });
   }
 
   Future<void> _loadNsfwBookPath() async {
@@ -108,6 +125,7 @@ class _ChatSettingsSheetState extends State<_ChatSettingsSheet>
     _tabController.dispose();
     _systemPromptController.dispose();
     _contextLimitController.dispose();
+    _danbooruBaseUrlController.dispose();
     for (final c in _nameControllers) {
       c.dispose();
     }
@@ -156,6 +174,9 @@ class _ChatSettingsSheetState extends State<_ChatSettingsSheet>
     );
     // 通知 vm 重新加载知识库
     await vm.reloadNsfwBook();
+    // 保存 Danbooru 校准设置
+    await settings.setDanbooruCalibrationEnabled(_danbooruEnabled);
+    await settings.setDanbooruBaseUrl(_danbooruBaseUrlController.text.trim());
     if (mounted) {
       showFloatingToast(context, '已保存配置', icon: CupertinoIcons.checkmark_circle_fill);
     }
@@ -470,6 +491,44 @@ class _ChatSettingsSheetState extends State<_ChatSettingsSheet>
                   AppConstants.defaultLlmSystemPrompt;
             },
             child: const Text('恢复默认系统提示词'),
+          ),
+          const SizedBox(height: 20),
+          const Divider(height: 1),
+          const SizedBox(height: 16),
+          const Text('Danbooru 智能校准',
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+          const SizedBox(height: 4),
+          const Text(
+            '开启后，每次 LLM 回复将自动用真实 Danbooru tag 校准正向提示词，'
+            '并补充共现推荐。失败时保留 LLM 原文。',
+            style: TextStyle(fontSize: 11, color: Colors.white38),
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              const Expanded(
+                child: Text('启用 Danbooru 校准',
+                    style: TextStyle(fontSize: 14, color: Colors.white70)),
+              ),
+              Switch.adaptive(
+                value: _danbooruEnabled,
+                onChanged: (v) => setState(() => _danbooruEnabled = v),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          TextField(
+            controller: _danbooruBaseUrlController,
+            keyboardType: TextInputType.url,
+            decoration: const InputDecoration(
+              labelText: '自定义 Base URL（可选）',
+              hintText: '留空使用公共 ModelScope/HuggingFace 服务',
+            ),
+          ),
+          const SizedBox(height: 4),
+          const Text(
+            '留空时会优先访问魔搭 ModelScope，不可用时自动回退到 HuggingFace。',
+            style: TextStyle(fontSize: 11, color: Colors.white38),
           ),
           const SizedBox(height: 20),
           const Divider(height: 1),

@@ -218,6 +218,18 @@ class SettingsRepositoryImpl implements SettingsRepository {
   @override
   Future<void> setWebSearchEnabled(bool value) => _local.setWebSearchEnabled(value);
 
+  // Danbooru 智能校准
+  @override
+  Future<bool> getDanbooruCalibrationEnabled() async =>
+      _local.getDanbooruCalibrationEnabled();
+  @override
+  Future<void> setDanbooruCalibrationEnabled(bool value) =>
+      _local.setDanbooruCalibrationEnabled(value);
+  @override
+  Future<String> getDanbooruBaseUrl() async => _local.getDanbooruBaseUrl();
+  @override
+  Future<void> setDanbooruBaseUrl(String value) => _local.setDanbooruBaseUrl(value);
+
   // 图像 API 供应商配置 — NovelAI
   @override
   Future<String> getImageProviderNovelAiBaseUrl() async => _local.getImageProviderNovelAiBaseUrl();
