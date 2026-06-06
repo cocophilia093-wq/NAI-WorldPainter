@@ -97,6 +97,7 @@ class DatabaseHelper {
 
     await _createLlmTables(db);
     await _createPromptAssistantTables(db);
+    await _createArtistPromptTables(db);
   }
 
   Future<void> _createLlmTables(Database db) async {
@@ -150,6 +151,39 @@ class DatabaseHelper {
     await db.execute('CREATE INDEX IF NOT EXISTS idx_style_presets_updated ON style_presets(updated_at)');
   }
 
+  Future<void> _createArtistPromptTables(Database db) async {
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS artist_prompts (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        tag TEXT NOT NULL,
+        image_path TEXT NOT NULL DEFAULT '',
+        categories TEXT NOT NULL,
+        danbooru_count INTEGER NOT NULL DEFAULT 0,
+        created_at INTEGER NOT NULL,
+        updated_at INTEGER NOT NULL
+      )
+    ''');
+    await db.execute('CREATE INDEX IF NOT EXISTS idx_artist_prompts_tag ON artist_prompts(tag)');
+    await db.execute('CREATE INDEX IF NOT EXISTS idx_artist_prompts_updated ON artist_prompts(updated_at)');
+
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS artist_prompt_categories (
+        name TEXT PRIMARY KEY,
+        created_at INTEGER NOT NULL
+      )
+    ''');
+
+    final now = DateTime.now().millisecondsSinceEpoch;
+    for (final category in const ['二次元', '厚涂', '写实', '水墨', '黑白', 'R18']) {
+      await db.insert(
+        'artist_prompt_categories',
+        {'name': category, 'created_at': now},
+        conflictAlgorithm: ConflictAlgorithm.ignore,
+      );
+    }
+  }
+
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
     if (oldVersion < 2) {
       await db.execute('ALTER TABLE generation_history ADD COLUMN seed INTEGER');
@@ -162,8 +196,8 @@ class DatabaseHelper {
     if (oldVersion < 4) {
       await _createLlmTables(db);
     }
-    if (oldVersion < 5) {
-      await _createPromptAssistantTables(db);
+    if (oldVersion < 6) {
+      await _createArtistPromptTables(db);
     }
   }
 }

@@ -99,6 +99,8 @@ class _ChatInputBarState extends State<ChatInputBar> {
   Widget build(BuildContext context) {
     final canSend =
         (_hasText || _pendingImageBase64 != null) && !widget.isSending;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     return Padding(
       padding: EdgeInsets.fromLTRB(
         12,
@@ -112,9 +114,9 @@ class _ChatInputBarState extends State<ChatInputBar> {
           if (_pendingImagePath != null) _buildImagePreview(),
           Container(
             decoration: BoxDecoration(
-              color: Colors.black.withValues(alpha: 0.35),
+              color: isDark ? Colors.black.withValues(alpha: 0.35) : Colors.white,
               borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
+              border: Border.all(color: theme.colorScheme.onSurface.withValues(alpha: 0.08)),
             ),
             padding: const EdgeInsets.fromLTRB(6, 4, 6, 4),
             child: Row(
@@ -127,7 +129,7 @@ class _ChatInputBarState extends State<ChatInputBar> {
                     size: 20,
                     color: _pendingImageBase64 != null
                         ? Theme.of(context).colorScheme.primary
-                        : Colors.white54,
+                        : Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
@@ -141,8 +143,8 @@ class _ChatInputBarState extends State<ChatInputBar> {
                     CupertinoIcons.tag,
                     size: 20,
                     color: widget.danbooruSearchEnabled
-                        ? const Color(0xFFF5D57A)
-                        : Colors.white54,
+                        ? theme.colorScheme.primary
+                        : Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
@@ -153,12 +155,12 @@ class _ChatInputBarState extends State<ChatInputBar> {
                     minLines: 1,
                     maxLines: 5,
                     textInputAction: TextInputAction.newline,
-                    style: const TextStyle(fontSize: 14, color: Colors.white),
-                    decoration: const InputDecoration(
+                    style: TextStyle(fontSize: 14, color: Theme.of(context).colorScheme.onSurface),
+                    decoration: InputDecoration(
                       isDense: true,
                       hintText: '描述你想画的画面...',
                       hintStyle:
-                          TextStyle(color: Colors.white38, fontSize: 14),
+                          TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.5), fontSize: 14),
                       border: InputBorder.none,
                       enabledBorder: InputBorder.none,
                       focusedBorder: InputBorder.none,
@@ -167,7 +169,7 @@ class _ChatInputBarState extends State<ChatInputBar> {
                     ),
                   ),
                 ),
-                const SizedBox(width: 4),
+                SizedBox(width: 4),
                 AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
                   width: 40,
@@ -180,8 +182,8 @@ class _ChatInputBarState extends State<ChatInputBar> {
                           )
                         : LinearGradient(
                             colors: [
-                              Colors.white.withValues(alpha: 0.16),
-                              Colors.white.withValues(alpha: 0.08),
+                              theme.colorScheme.onSurface.withValues(alpha: 0.14),
+                              theme.colorScheme.onSurface.withValues(alpha: 0.08),
                             ],
                           ),
                     boxShadow: canSend
@@ -203,7 +205,7 @@ class _ChatInputBarState extends State<ChatInputBar> {
                       onTap: canSend ? _submit : null,
                       child: Center(
                         child: widget.isSending
-                            ? const SizedBox(
+                            ? SizedBox(
                                 width: 18,
                                 height: 18,
                                 child: CircularProgressIndicator(
@@ -216,13 +218,13 @@ class _ChatInputBarState extends State<ChatInputBar> {
                                 CupertinoIcons.arrow_up,
                                 size: 20,
                                 color:
-                                    canSend ? Colors.black : Colors.white60,
+                                    canSend ? theme.colorScheme.onPrimary : theme.colorScheme.onSurfaceVariant,
                               ),
                       ),
                     ),
                   ),
                 ),
-                const SizedBox(width: 2),
+                SizedBox(width: 2),
               ],
             ),
           ),
@@ -257,8 +259,8 @@ class _ChatInputBarState extends State<ChatInputBar> {
                   color: Colors.black.withValues(alpha: 0.7),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(CupertinoIcons.xmark,
-                    size: 12, color: Colors.white),
+                child: Icon(CupertinoIcons.xmark,
+                    size: 12, color: Theme.of(context).colorScheme.onSurface),
               ),
             ),
           ),

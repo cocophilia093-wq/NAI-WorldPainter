@@ -195,14 +195,16 @@ class _ChatSettingsSheetState extends State<_ChatSettingsSheet>
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     return BackdropFilter(
       filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
       child: Container(
         margin: const EdgeInsets.fromLTRB(12, 12, 12, 0),
         decoration: BoxDecoration(
-          color: const Color(0xFF1C1C21),
+          color: isDark ? const Color(0xFF1C1C21) : Colors.white,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
+          border: Border.all(color: theme.colorScheme.onSurface.withValues(alpha: 0.08)),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -220,7 +222,7 @@ class _ChatSettingsSheetState extends State<_ChatSettingsSheet>
                   ),
                   IconButton(
                     onPressed: () => Navigator.of(context).pop(),
-                    icon: const Icon(CupertinoIcons.xmark_circle_fill),
+                    icon: Icon(CupertinoIcons.xmark_circle_fill),
                   ),
                 ],
               ),
@@ -258,14 +260,14 @@ class _ChatSettingsSheetState extends State<_ChatSettingsSheet>
                   Expanded(
                     child: OutlinedButton(
                       onPressed: () => Navigator.of(context).pop(),
-                      child: const Text('取消'),
+                      child: Text('取消'),
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  SizedBox(width: 12),
                   Expanded(
                     child: FilledButton(
                       onPressed: _save,
-                      child: const Text('保存'),
+                      child: Text('保存'),
                     ),
                   ),
                 ],
@@ -348,7 +350,7 @@ class _ChatSettingsSheetState extends State<_ChatSettingsSheet>
                   Icon(CupertinoIcons.checkmark_circle_fill,
                       size: 14,
                       color: Theme.of(context).colorScheme.primary),
-                  const SizedBox(width: 6),
+                  SizedBox(width: 6),
                   Text(
                     '当前使用中',
                     style: TextStyle(
@@ -365,7 +367,7 @@ class _ChatSettingsSheetState extends State<_ChatSettingsSheet>
               hintText: '例如：OpenAI / Gemini / 本地',
             ),
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: 12),
           TextField(
             controller: _apiKeyControllers[i],
             obscureText: true,
@@ -374,7 +376,7 @@ class _ChatSettingsSheetState extends State<_ChatSettingsSheet>
               hintText: '请输入 OpenAI 兼容接口 Key',
             ),
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: 12),
           TextField(
             controller: _baseUrlControllers[i],
             keyboardType: TextInputType.url,
@@ -383,7 +385,7 @@ class _ChatSettingsSheetState extends State<_ChatSettingsSheet>
               hintText: '例如 https://api.openai.com',
             ),
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: 12),
           TextField(
             controller: _modelControllers[i],
             decoration: const InputDecoration(
@@ -391,25 +393,25 @@ class _ChatSettingsSheetState extends State<_ChatSettingsSheet>
               hintText: '例如 gpt-4.1-mini / gemini-2.5-pro',
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
           OutlinedButton.icon(
             onPressed: _isTesting[i] ? null : () => _testProfileConnection(i),
             icon: _isTesting[i]
-                ? const SizedBox(
+                ? SizedBox(
                     width: 14,
                     height: 14,
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
-                : const Icon(CupertinoIcons.wifi, size: 14),
+                : Icon(CupertinoIcons.wifi, size: 14),
             label: Text(_isTesting[i] ? '测试中…' : '测试连接'),
           ),
           if (_latencyMs[i] != null) ...[
-            const SizedBox(height: 8),
+            SizedBox(height: 8),
             Row(
               children: [
                 Icon(CupertinoIcons.checkmark_circle_fill,
                     size: 14, color: Colors.greenAccent.shade400),
-                const SizedBox(width: 6),
+                SizedBox(width: 6),
                 Text(
                   '连接成功，延迟 ${_latencyMs[i]}ms',
                   style: TextStyle(fontSize: 12, color: Colors.greenAccent.shade400),
@@ -418,23 +420,23 @@ class _ChatSettingsSheetState extends State<_ChatSettingsSheet>
             ),
           ],
           if (_testError[i] != null) ...[
-            const SizedBox(height: 8),
+            SizedBox(height: 8),
             Row(
               children: [
-                const Icon(CupertinoIcons.exclamationmark_circle_fill,
+                Icon(CupertinoIcons.exclamationmark_circle_fill,
                     size: 14, color: Colors.orangeAccent),
-                const SizedBox(width: 6),
+                SizedBox(width: 6),
                 Expanded(
                   child: Text(
                     _testError[i]!,
-                    style: const TextStyle(fontSize: 12, color: Colors.orangeAccent),
+                    style: TextStyle(fontSize: 12, color: Colors.orangeAccent),
                   ),
                 ),
               ],
             ),
           ],
           if (!isActive) ...[
-            const SizedBox(height: 8),
+            SizedBox(height: 8),
             OutlinedButton.icon(
               onPressed: () async {
                 await widget.vm.switchProfile(i);
@@ -442,8 +444,8 @@ class _ChatSettingsSheetState extends State<_ChatSettingsSheet>
                   _composeProfileIndex = i;
                 });
               },
-              icon: const Icon(CupertinoIcons.arrow_right_circle, size: 16),
-              label: const Text('切换到此配置'),
+              icon: Icon(CupertinoIcons.arrow_right_circle, size: 16),
+              label: Text('切换到此配置'),
             ),
           ],
         ],
@@ -459,9 +461,9 @@ class _ChatSettingsSheetState extends State<_ChatSettingsSheet>
         children: [
           Row(
             children: [
-              const Expanded(
+              Expanded(
                 child: Text('上下文条数',
-                    style: TextStyle(fontSize: 14, color: Colors.white70)),
+                    style: TextStyle(fontSize: 14, color: Theme.of(context).colorScheme.onSurfaceVariant)),
               ),
               SizedBox(
                 width: 72,
@@ -477,16 +479,16 @@ class _ChatSettingsSheetState extends State<_ChatSettingsSheet>
                   ),
                 ),
               ),
-              const SizedBox(width: 8),
-              const Text('条', style: TextStyle(color: Colors.white54)),
+              SizedBox(width: 8),
+              Text('条', style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant)),
             ],
           ),
-          const SizedBox(height: 4),
-          const Text(
+          SizedBox(height: 4),
+          Text(
             '发送时携带的历史消息数量（不含系统提示词），越大消耗 token 越多',
-            style: TextStyle(fontSize: 11, color: Colors.white38),
+            style: TextStyle(fontSize: 11, color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.5)),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
           TextField(
             controller: _systemPromptController,
             minLines: 6,
@@ -497,31 +499,31 @@ class _ChatSettingsSheetState extends State<_ChatSettingsSheet>
               alignLabelWithHint: true,
             ),
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: 12),
           OutlinedButton(
             onPressed: () {
               _systemPromptController.text =
                   AppConstants.defaultLlmSystemPrompt;
             },
-            child: const Text('恢复默认系统提示词'),
+            child: Text('恢复默认系统提示词'),
           ),
-          const SizedBox(height: 20),
-          const Divider(height: 1),
-          const SizedBox(height: 16),
-          const Text('Danbooru 智能校准',
+          SizedBox(height: 20),
+          Divider(height: 1),
+          SizedBox(height: 16),
+          Text('Danbooru 智能校准',
               style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
-          const SizedBox(height: 4),
-          const Text(
+          SizedBox(height: 4),
+          Text(
             '开启后采用「先 Danbooru 检索、后 LLM 编排」的三段式流程：'
             '关键词抽取 → Danbooru 检索 → 提示词编排。失败时自动降级为单次 LLM。',
-            style: TextStyle(fontSize: 11, color: Colors.white38),
+            style: TextStyle(fontSize: 11, color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.5)),
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: 8),
           Row(
             children: [
-              const Expanded(
+              Expanded(
                 child: Text('启用 Danbooru 三段式流程',
-                    style: TextStyle(fontSize: 14, color: Colors.white70)),
+                    style: TextStyle(fontSize: 14, color: Theme.of(context).colorScheme.onSurfaceVariant)),
               ),
               Switch.adaptive(
                 value: _danbooruEnabled,
@@ -529,7 +531,7 @@ class _ChatSettingsSheetState extends State<_ChatSettingsSheet>
               ),
             ],
           ),
-          const SizedBox(height: 4),
+          SizedBox(height: 4),
           TextField(
             controller: _danbooruBaseUrlController,
             keyboardType: TextInputType.url,
@@ -538,28 +540,28 @@ class _ChatSettingsSheetState extends State<_ChatSettingsSheet>
               hintText: '留空使用公共 ModelScope/HuggingFace 服务',
             ),
           ),
-          const SizedBox(height: 4),
-          const Text(
+          SizedBox(height: 4),
+          Text(
             '留空时会优先访问魔搭 ModelScope，不可用时自动回退到 HuggingFace。',
-            style: TextStyle(fontSize: 11, color: Colors.white38),
+            style: TextStyle(fontSize: 11, color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.5)),
           ),
-          const SizedBox(height: 20),
-          const Divider(height: 1),
-          const SizedBox(height: 16),
-          const Text('双模型分配（仅 Danbooru 三段式流程使用）',
+          SizedBox(height: 20),
+          Divider(height: 1),
+          SizedBox(height: 16),
+          Text('双模型分配（仅 Danbooru 三段式流程使用）',
               style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
-          const SizedBox(height: 4),
-          const Text(
+          SizedBox(height: 4),
+          Text(
             '抽取模型用于把用户原文切成关键词（建议选最便宜的小模型，例如 gpt-4o-mini / Doubao Lite），'
             '编排模型用 Danbooru 真实 tag 池写成 NovelAI 提示词（建议选最强的）。',
-            style: TextStyle(fontSize: 11, color: Colors.white38),
+            style: TextStyle(fontSize: 11, color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.5)),
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: 12),
           Row(
             children: [
-              const Expanded(
+              Expanded(
                 child: Text('关键词抽取模型',
-                    style: TextStyle(fontSize: 14, color: Colors.white70)),
+                    style: TextStyle(fontSize: 14, color: Theme.of(context).colorScheme.onSurfaceVariant)),
               ),
               _buildProfileDropdown(
                 value: _extractProfileIndex,
@@ -569,12 +571,12 @@ class _ChatSettingsSheetState extends State<_ChatSettingsSheet>
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: 8),
           Row(
             children: [
-              const Expanded(
+              Expanded(
                 child: Text('提示词编排模型',
-                    style: TextStyle(fontSize: 14, color: Colors.white70)),
+                    style: TextStyle(fontSize: 14, color: Theme.of(context).colorScheme.onSurfaceVariant)),
               ),
               _buildProfileDropdown(
                 value: _composeProfileIndex,
@@ -584,18 +586,18 @@ class _ChatSettingsSheetState extends State<_ChatSettingsSheet>
               ),
             ],
           ),
-          const SizedBox(height: 20),
-          const Divider(height: 1),
-          const SizedBox(height: 16),
-          const Text('知识库（世界书）',
+          SizedBox(height: 20),
+          Divider(height: 1),
+          SizedBox(height: 16),
+          Text('知识库（世界书）',
               style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
-          const SizedBox(height: 4),
-          const Text(
+          SizedBox(height: 4),
+          Text(
             '知识库 JSON 文件路径，输入后保存自动加载。'
             '关键词匹配的知识会随每次提问注入给 LLM。',
-            style: TextStyle(fontSize: 11, color: Colors.white38),
+            style: TextStyle(fontSize: 11, color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.5)),
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: 12),
           TextField(
             controller: _nsfwBookPathController,
             decoration: const InputDecoration(
@@ -603,7 +605,7 @@ class _ChatSettingsSheetState extends State<_ChatSettingsSheet>
               hintText: '例如 /storage/emulated/0/nsfw_knowledge.json',
             ),
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: 8),
           if (_nsfwBookStatus.isNotEmpty)
             Row(
               children: [
@@ -614,7 +616,7 @@ class _ChatSettingsSheetState extends State<_ChatSettingsSheet>
                   size: 14,
                   color: _nsfwBookLoaded ? Colors.greenAccent.shade400 : Colors.orangeAccent,
                 ),
-                const SizedBox(width: 6),
+                SizedBox(width: 6),
                 Expanded(
                   child: Text(
                     _nsfwBookStatus,
@@ -637,9 +639,10 @@ class _ChatSettingsSheetState extends State<_ChatSettingsSheet>
   }) {
     return DropdownButton<int>(
       value: value,
-      dropdownColor: const Color(0xFF1C1C21),
+      dropdownColor: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1C1C21) : Colors.white,
+      borderRadius: BorderRadius.circular(18),
       underline: const SizedBox.shrink(),
-      style: const TextStyle(fontSize: 13, color: Colors.white),
+      style: TextStyle(fontSize: 13, color: Theme.of(context).colorScheme.onSurface),
       items: [
         for (int i = 0; i < AppConstants.llmProfileCount; i++)
           DropdownMenuItem<int>(

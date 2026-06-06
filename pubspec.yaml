@@ -46,3 +46,4 @@ flutter:
   assets:
     - lib/assets/nsfw_knowledge.json
     - assets/style_presets/
+    - assets/artist_prompts/

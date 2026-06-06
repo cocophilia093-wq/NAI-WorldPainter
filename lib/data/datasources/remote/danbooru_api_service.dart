@@ -8,7 +8,7 @@ import 'package:nai_huishi/domain/entities/danbooru_tag.dart';
 ///
 /// 双端点 failover 策略：
 ///   1. 用户自定义 Base URL（如填写）优先使用，单端点不做 failover；
-///   2. 否则按顺序尝试 ModelScope（国内直连） → HuggingFace（备份）；
+///   2. 否则按顺序尝试 HuggingFace（NSFW 查询更稳定） → ModelScope（备用）；
 ///   3. 任一端点 5 秒内未响应或返回非 2xx，立即切到下一个；
 ///   4. 全部失败抛出最后一次异常，由调用方降级。
 ///
@@ -43,8 +43,8 @@ class DanbooruApiService {
       return [_normalize(custom)];
     }
     return [
-      _normalize(defaultModelScopeBaseUrl),
       _normalize(defaultHuggingFaceBaseUrl),
+      _normalize(defaultModelScopeBaseUrl),
     ];
   }
 

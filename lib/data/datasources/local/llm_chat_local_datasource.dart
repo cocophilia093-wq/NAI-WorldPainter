@@ -61,6 +61,11 @@ class LlmChatLocalDatasource {
     await _db.delete('llm_sessions', where: 'id = ?', whereArgs: [id]);
   }
 
+  Future<void> deleteAllSessions() async {
+    await _db.delete('llm_messages');
+    await _db.delete('llm_sessions');
+  }
+
   Future<List<LlmMessage>> listMessages(String sessionId) async {
     final rows = await _db.query(
       'llm_messages',

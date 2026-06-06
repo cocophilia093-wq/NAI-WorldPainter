@@ -4,8 +4,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:nai_huishi/core/di/injection.dart';
+import 'package:nai_huishi/domain/entities/style_preset.dart';
 import 'package:nai_huishi/presentation/pages/style_preset_detail_page.dart';
 import 'package:nai_huishi/presentation/viewmodels/style_preset_viewmodel.dart';
+import 'package:nai_huishi/presentation/widgets/floating_toast.dart';
 
 class StylePresetPage extends StatefulWidget {
   final void Function(String prompt) onApplyPrompt;
@@ -113,8 +115,8 @@ class _StylePresetPageState extends State<StylePresetPage> {
       body: _vm.isLoading
           ? const Center(child: CupertinoActivityIndicator())
           : _vm.presets.isEmpty
-              ? const Center(
-                  child: Text('暂无画风收藏', style: TextStyle(color: Colors.white54)),
+              ? Center(
+                  child: Text('暂无画风收藏', style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant)),
                 )
               : GridView.builder(
                   padding: const EdgeInsets.all(16),
@@ -129,8 +131,11 @@ class _StylePresetPageState extends State<StylePresetPage> {
                     final preset = _vm.presets[index];
                     final file = File(preset.imagePath);
                     final exists = file.existsSync();
-                    return GestureDetector(
-                      onTap: () {
+                    return _StylePresetGridCard(
+                      preset: preset,
+                      file: file,
+                      exists: exists,
+                      onOpen: () {
                         Navigator.push(
                           context,
                           CupertinoPageRoute(
@@ -142,47 +147,106 @@ class _StylePresetPageState extends State<StylePresetPage> {
                           ),
                         );
                       },
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF1C1C21),
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
-                        ),
-                        clipBehavior: Clip.antiAlias,
-                        child: Stack(
-                          fit: StackFit.expand,
-                          children: [
-                            if (exists)
-                              Image.file(file, fit: BoxFit.cover)
-                            else
-                              const Center(child: Icon(CupertinoIcons.photo, color: Colors.white24, size: 32)),
-                            Positioned(
-                              left: 0,
-                              right: 0,
-                              bottom: 0,
-                              child: Container(
-                                padding: const EdgeInsets.all(12),
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    begin: Alignment.bottomCenter,
-                                    end: Alignment.topCenter,
-                                    colors: [Colors.black.withValues(alpha: 0.8), Colors.transparent],
-                                  ),
-                                ),
-                                child: Text(
-                                  preset.title,
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                      onApply: () {
+                        _applyAndClose(preset.prompt);
+                        showFloatingToast(context, '已复制到对话框', icon: CupertinoIcons.checkmark_circle_fill);
+                      },
                     );
                   },
                 ),
+    );
+  }
+}
+
+class _StylePresetGridCard extends StatefulWidget {
+  final StylePreset preset;
+  final File file;
+  final bool exists;
+  final VoidCallback onOpen;
+  final VoidCallback onApply;
+
+  const _StylePresetGridCard({
+    required this.preset,
+    required this.file,
+    required this.exists,
+    required this.onOpen,
+    required this.onApply,
+  });
+
+  @override
+  State<_StylePresetGridCard> createState() => _StylePresetGridCardState();
+}
+
+class _StylePresetGridCardState extends State<_StylePresetGridCard> {
+  bool _pressed = false;
+
+  void _setPressed(bool value) {
+    if (_pressed == value) return;
+    setState(() => _pressed = value);
+  }
+
+  void _applyWithFeedback() {
+    _setPressed(false);
+    widget.onApply();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: widget.onOpen,
+      onDoubleTap: _applyWithFeedback,
+      onTapDown: (_) => _setPressed(true),
+      onTapUp: (_) => _setPressed(false),
+      onTapCancel: () => _setPressed(false),
+      child: AnimatedScale(
+        scale: _pressed ? 0.96 : 1,
+        duration: const Duration(milliseconds: 180),
+        curve: _pressed ? Curves.easeOutCubic : Curves.elasticOut,
+        child: Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context).cardTheme.color,
+            borderRadius: BorderRadius.circular(_pressed ? 20 : 16),
+            border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.06)),
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              if (widget.exists)
+                Image.file(widget.file, fit: BoxFit.cover)
+              else
+                Center(
+                  child: Icon(
+                    CupertinoIcons.photo,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.25),
+                    size: 32,
+                  ),
+                ),
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.bottomCenter,
+                      end: Alignment.topCenter,
+                      colors: [Colors.black.withValues(alpha: 0.8), Colors.transparent],
+                    ),
+                  ),
+                  child: Text(
+                    widget.preset.title,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

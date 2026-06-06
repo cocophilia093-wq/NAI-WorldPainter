@@ -4,6 +4,7 @@ import 'package:nai_huishi/domain/entities/generation_task.dart';
 import 'package:nai_huishi/domain/usecases/save_image.dart';
 import 'package:nai_huishi/core/di/injection.dart';
 import 'package:nai_huishi/presentation/viewmodels/generation_viewmodel.dart';
+import 'package:nai_huishi/presentation/widgets/floating_toast.dart';
 import 'package:nai_huishi/presentation/widgets/fullscreen_image_preview.dart';
 
 class HistoryDetailPage extends StatelessWidget {
@@ -17,16 +18,16 @@ class HistoryDetailPage extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('生成详情')),
+      appBar: AppBar(title: Text('生成详情')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildImageSection(context, theme),
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
             _buildActionButtons(context),
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
             _buildParamsSection(theme),
           ],
         ),
@@ -60,11 +61,11 @@ class HistoryDetailPage extends StatelessWidget {
               ),
             );
           },
-          errorBuilder: (_, __, ___) => const Icon(Icons.broken_image, size: 64),
+          errorBuilder: (_, __, ___) => Icon(Icons.broken_image, size: 64),
         ),
       );
     } else {
-      imageWidget = const Center(child: Icon(Icons.image_not_supported_outlined, size: 64));
+      imageWidget = Center(child: Icon(Icons.image_not_supported_outlined, size: 64));
     }
 
     return Card(
@@ -84,14 +85,14 @@ class HistoryDetailPage extends StatelessWidget {
       children: [
         ElevatedButton.icon(
           onPressed: () => _applyToGeneratePage(context),
-          icon: const Icon(Icons.auto_fix_high),
-          label: const Text('覆盖到创作页'),
+          icon: Icon(Icons.auto_fix_high),
+          label: Text('覆盖到创作页'),
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: 8),
         ElevatedButton.icon(
           onPressed: () => _saveToGallery(context),
-          icon: const Icon(Icons.save_alt),
-          label: const Text('保存到相册'),
+          icon: Icon(Icons.save_alt),
+          label: Text('保存到相册'),
         ),
       ],
     );
@@ -121,7 +122,7 @@ class HistoryDetailPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('生成参数', style: theme.textTheme.titleMedium),
-            const SizedBox(height: 8),
+            SizedBox(height: 8),
             ...params.map(
               (p) => Padding(
                 padding: const EdgeInsets.symmetric(vertical: 4),
@@ -145,9 +146,9 @@ class HistoryDetailPage extends StatelessWidget {
               ),
             ),
             if (task.characters != null && task.characters!.isNotEmpty) ...[
-              const Divider(),
+              Divider(),
               Text('多角色', style: theme.textTheme.titleMedium),
-              const SizedBox(height: 8),
+              SizedBox(height: 8),
               ...task.characters!.asMap().entries.map((entry) {
                 final i = entry.key;
                 final c = entry.value;
@@ -166,31 +167,29 @@ class HistoryDetailPage extends StatelessWidget {
   }
 
   Future<void> _applyToGeneratePage(BuildContext context) async {
-    final messenger = ScaffoldMessenger.of(context);
     await sl<GenerationViewModel>().loadFromHistory(task);
     if (!context.mounted) return;
-    messenger.showSnackBar(const SnackBar(content: Text('已覆盖到创作页')));
+    showFloatingToast(context, '已覆盖到创作页', icon: Icons.auto_fix_high);
     Navigator.of(context).pop();
     onNavigate?.call(1);
   }
 
   Future<void> _saveToGallery(BuildContext context) async {
-    final messenger = ScaffoldMessenger.of(context);
     try {
       final saveUseCase = sl<SaveImageUseCase>();
       if (task.imagePath != null && File(task.imagePath!).existsSync()) {
         final saved = await saveUseCase.saveToGallery(task.imagePath!);
         if (!context.mounted) return;
-        messenger.showSnackBar(SnackBar(content: Text(saved ? '已保存到相册' : '保存失败')));
+        showFloatingToast(context, saved ? '已保存到相册' : '保存失败', icon: Icons.save_alt);
       } else if (task.imageUrl != null) {
         final filePath = await saveUseCase.execute(task);
         final saved = await saveUseCase.saveToGallery(filePath);
         if (!context.mounted) return;
-        messenger.showSnackBar(SnackBar(content: Text(saved ? '已保存到相册' : '保存失败')));
+        showFloatingToast(context, saved ? '已保存到相册' : '保存失败', icon: Icons.save_alt);
       }
     } catch (e) {
       if (!context.mounted) return;
-      messenger.showSnackBar(SnackBar(content: Text('保存失败: $e')));
+      showFloatingToast(context, '保存失败: $e', icon: Icons.error_outline);
     }
   }
 

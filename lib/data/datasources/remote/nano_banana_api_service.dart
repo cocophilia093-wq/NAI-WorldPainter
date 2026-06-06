@@ -62,15 +62,21 @@ class NanoBananaApiService {
       throw ApiException(message: '传图编辑缺少图片', code: 'MISSING_IMAGE');
     }
 
-    // 将图片编码为 base64 image_url parts
+    // 将图片编码为 Gemini inline_data parts
     final imageParts = <Map<String, dynamic>>[];
     for (final path in imagePaths) {
       final bytes = await File(path).readAsBytes();
       final b64 = base64Encode(bytes);
       final mime = _guessMime(path);
       imageParts.add({
-        'type': 'image_url',
-        'image_url': {'url': 'data:$mime;base64,$b64'},
+        'inline_data': {'mime_type': mime, 'data': b64},
+      });
+    }
+
+    if (task.mode == GenerationMode.inpainting && task.maskImagePath != null && task.maskImagePath!.isNotEmpty) {
+      final bytes = await File(task.maskImagePath!).readAsBytes();
+      imageParts.add({
+        'inline_data': {'mime_type': 'image/png', 'data': base64Encode(bytes)},
       });
     }
 
@@ -101,22 +107,24 @@ class NanoBananaApiService {
   }) {
     final aspectRatio = task.size ?? '1:1';
     final imageSize = task.nanoImageSize ?? '1K';
-    // 将比例和尺寸注入提示词开头
-    final enrichedPrompt = '[aspect_ratio:$aspectRatio,image_size:$imageSize] ${task.prompt}';
-
-    final contentParts = <Map<String, dynamic>>[
-      {'type': 'text', 'text': enrichedPrompt},
-      ...imageParts,
-    ];
+    final editHint = task.mode == GenerationMode.inpainting
+        ? 'Edit only the transparent masked area in the provided image. Keep unmasked regions unchanged. '
+        : '';
+    final enrichedPrompt = '$editHint[aspect_ratio:$aspectRatio,image_size:$imageSize] ${task.prompt}';
 
     return {
-      'model': task.model,
-      'messages': [
+      'contents': [
         {
           'role': 'user',
-          'content': contentParts,
+          'parts': [
+            {'text': enrichedPrompt},
+            ...imageParts,
+          ],
         }
       ],
+      'generationConfig': {
+        'responseModalities': ['TEXT', 'IMAGE'],
+      },
     };
   }
 
@@ -126,6 +134,34 @@ class NanoBananaApiService {
     String? imageUrl;
 
     if (data is Map<String, dynamic>) {
+      final candidates = data['candidates'] as List<dynamic>?;
+      if (candidates != null && candidates.isNotEmpty) {
+        final content = candidates[0]['content'];
+        final parts = content is Map<String, dynamic> ? content['parts'] as List<dynamic>? : null;
+        if (parts != null) {
+          for (final part in parts) {
+            if (part is! Map<String, dynamic>) continue;
+            final inline = part['inlineData'] ?? part['inline_data'];
+            if (inline is Map<String, dynamic>) {
+              final b64 = inline['data'] as String?;
+              if (b64 != null && b64.isNotEmpty) {
+                final filename = ImageUtils.generateFilename();
+                imagePath = await ImageUtils.saveBase64Image(b64, filename);
+                break;
+              }
+            }
+            final text = part['text'] as String?;
+            if (text != null) {
+              final extracted = ImageUtils.extractImageUrlFromMarkdown(text);
+              if (extracted != null) {
+                imageUrl = extracted;
+                break;
+              }
+            }
+          }
+        }
+      }
+
       final choices = data['choices'] as List<dynamic>?;
       if (choices != null && choices.isNotEmpty) {
         final message = choices[0]['message'];

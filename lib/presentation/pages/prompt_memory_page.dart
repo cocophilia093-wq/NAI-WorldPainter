@@ -49,7 +49,7 @@ class _PromptMemoryPageState extends State<PromptMemoryPage> {
             color: Colors.transparent,
             child: Column(
               children: [
-                const SizedBox(height: 12),
+                SizedBox(height: 12),
                 TextField(
                   controller: triggerController,
                   decoration: const InputDecoration(labelText: '触发词'),
@@ -60,7 +60,7 @@ class _PromptMemoryPageState extends State<PromptMemoryPage> {
                   maxLines: 4,
                   decoration: const InputDecoration(labelText: '正确内容'),
                 ),
-                const SizedBox(height: 8),
+                SizedBox(height: 8),
                 DropdownButton<PromptMemoryType>(
                   value: type,
                   isExpanded: true,
@@ -80,7 +80,7 @@ class _PromptMemoryPageState extends State<PromptMemoryPage> {
           actions: [
             CupertinoDialogAction(
               onPressed: () => Navigator.pop(ctx),
-              child: const Text('取消'),
+              child: Text('取消'),
             ),
             CupertinoDialogAction(
               onPressed: () async {
@@ -95,7 +95,7 @@ class _PromptMemoryPageState extends State<PromptMemoryPage> {
                 );
                 if (ctx.mounted) Navigator.pop(ctx);
               },
-              child: const Text('保存'),
+              child: Text('保存'),
             ),
           ],
         ),
@@ -123,11 +123,11 @@ class _PromptMemoryPageState extends State<PromptMemoryPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('学习记忆'),
+        title: Text('学习记忆'),
         actions: [
           IconButton(
             onPressed: () => _showEditor(),
-            icon: const Icon(CupertinoIcons.add),
+            icon: Icon(CupertinoIcons.add),
           ),
         ],
       ),
@@ -146,10 +146,10 @@ class _PromptMemoryPageState extends State<PromptMemoryPage> {
           ),
           Expanded(
             child: _vm.isLoading
-                ? const Center(child: CupertinoActivityIndicator())
+                ? Center(child: CupertinoActivityIndicator())
                 : _vm.memories.isEmpty
-                    ? const Center(
-                        child: Text('暂无记忆', style: TextStyle(color: Colors.white54)),
+                    ? Center(
+                        child: Text('暂无记忆', style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant)),
                       )
                     : ListView.builder(
                         padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
@@ -162,7 +162,7 @@ class _PromptMemoryPageState extends State<PromptMemoryPage> {
                               subtitle: Text('${_typeLabel(memory.type)} · ${memory.content}'),
                               onTap: () => _showEditor(memory),
                               trailing: IconButton(
-                                icon: const Icon(CupertinoIcons.delete, color: Colors.redAccent),
+                                icon: Icon(CupertinoIcons.delete, color: Colors.redAccent),
                                 onPressed: memory.id == null ? null : () => _vm.delete(memory.id!),
                               ),
                             ),

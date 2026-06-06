@@ -52,7 +52,7 @@ class _ApiConfigPageState extends State<ApiConfigPage> with SingleTickerProvider
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('API 配置'),
+        title: Text('API 配置'),
         bottom: TabBar(
           controller: _tabController,
           tabs: const [
@@ -63,7 +63,7 @@ class _ApiConfigPageState extends State<ApiConfigPage> with SingleTickerProvider
         ),
       ),
       body: _loading
-          ? const Center(child: CircularProgressIndicator())
+          ? Center(child: CircularProgressIndicator())
           : TabBarView(
               controller: _tabController,
               children: [
@@ -119,22 +119,22 @@ class _ProviderTabState extends State<_ProviderTab> {
             margin: const EdgeInsets.symmetric(vertical: 16),
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: const Color(0xFF1C1C21),
+              color: Theme.of(context).cardTheme.color,
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
+              border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.06)),
             ),
-            child: const Column(
+            child: Column(
               children: [
-                Icon(CupertinoIcons.cube_box, size: 36, color: Colors.white24),
+                Icon(CupertinoIcons.cube_box, size: 36, color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.25)),
                 SizedBox(height: 12),
                 Text(
                   '还没有配置任何中转站',
-                  style: TextStyle(color: Colors.white70),
+                  style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
                 ),
                 SizedBox(height: 4),
                 Text(
                   '点击下方按钮添加',
-                  style: TextStyle(color: Colors.white38, fontSize: 12),
+                  style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.5), fontSize: 12),
                 ),
               ],
             ),
@@ -147,11 +147,11 @@ class _ProviderTabState extends State<_ProviderTab> {
               isActive: ep.id == activeId,
               activeModel: activeModel,
             ),
-        const SizedBox(height: 12),
+        SizedBox(height: 12),
         OutlinedButton.icon(
           onPressed: () => _showEditDialog(context, provider, null),
-          icon: const Icon(CupertinoIcons.add_circled, size: 18),
-          label: const Text('添加中转站'),
+          icon: Icon(CupertinoIcons.add_circled, size: 18),
+          label: Text('添加中转站'),
         ),
       ],
     );
@@ -236,12 +236,12 @@ class _EndpointCardState extends State<_EndpointCard> {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: const Color(0xFF1C1C21),
+        color: Theme.of(context).cardTheme.color,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: widget.isActive
               ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.5)
-              : Colors.white.withValues(alpha: 0.06),
+              : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08),
           width: widget.isActive ? 1.2 : 0.5,
         ),
       ),
@@ -262,27 +262,27 @@ class _EndpointCardState extends State<_EndpointCard> {
                       shape: BoxShape.circle,
                       color: widget.isActive
                           ? Theme.of(context).colorScheme.primary
-                          : Colors.white24,
+                          : Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.25),
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  SizedBox(width: 12),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           ep.name.isEmpty ? '未命名' : ep.name,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
-                        const SizedBox(height: 2),
+                        SizedBox(height: 2),
                         Text(
                           ep.baseUrl.isEmpty ? '未填写 Base URL' : ep.baseUrl,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 11,
-                            color: Colors.white54,
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -292,29 +292,29 @@ class _EndpointCardState extends State<_EndpointCard> {
                   ),
                   Text(
                     '${ep.models.length} 模型',
-                    style: const TextStyle(fontSize: 11, color: Colors.white38),
+                    style: TextStyle(fontSize: 11, color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.5)),
                   ),
                   Icon(
                     _expanded ? CupertinoIcons.chevron_up : CupertinoIcons.chevron_down,
                     size: 16,
-                    color: Colors.white38,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
                   ),
-                  const SizedBox(width: 4),
+                  SizedBox(width: 4),
                 ],
               ),
             ),
           ),
           if (_expanded) ...[
-            const Divider(height: 1, color: Colors.white12),
+            Divider(height: 1, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12)),
             Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   if (ep.models.isEmpty)
-                    const Text(
+                    Text(
                       '尚未添加模型，点击「编辑」添加',
-                      style: TextStyle(fontSize: 12, color: Colors.white38),
+                      style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.5)),
                     )
                   else
                     Wrap(
@@ -330,28 +330,28 @@ class _EndpointCardState extends State<_EndpointCard> {
                             decoration: BoxDecoration(
                               color: isActiveModel
                                   ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.25)
-                                  : Colors.white.withValues(alpha: 0.05),
+                                  : Theme.of(context).colorScheme.surface,
                               borderRadius: BorderRadius.circular(20),
                               border: Border.all(
                                 color: isActiveModel
                                     ? Theme.of(context).colorScheme.primary
-                                    : Colors.white.withValues(alpha: 0.08),
+                                    : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08),
                               ),
                             ),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 if (isActiveModel) ...[
-                                  const Icon(
+                                  Icon(
                                     CupertinoIcons.checkmark_alt,
                                     size: 12,
-                                    color: Colors.white,
+                                    color: Theme.of(context).colorScheme.onSurface,
                                   ),
-                                  const SizedBox(width: 4),
+                                  SizedBox(width: 4),
                                 ],
                                 Text(
                                   m,
-                                  style: const TextStyle(fontSize: 12, color: Colors.white),
+                                  style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurface),
                                 ),
                               ],
                             ),
@@ -359,25 +359,25 @@ class _EndpointCardState extends State<_EndpointCard> {
                         );
                       }).toList(),
                     ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12),
                   Row(
                     children: [
                       OutlinedButton.icon(
                         onPressed: _isTesting ? null : _runTest,
                         icon: _isTesting
-                            ? const SizedBox(
+                            ? SizedBox(
                                 width: 14,
                                 height: 14,
                                 child: CircularProgressIndicator(strokeWidth: 2),
                               )
-                            : const Icon(CupertinoIcons.wifi, size: 14),
+                            : Icon(CupertinoIcons.wifi, size: 14),
                         label: Text(_isTesting ? '测试中…' : '测试连接'),
                       ),
-                      const SizedBox(width: 8),
+                      SizedBox(width: 8),
                       OutlinedButton.icon(
                         onPressed: () => _showEditDialog(context, widget.provider, ep),
-                        icon: const Icon(CupertinoIcons.pencil, size: 14),
-                        label: const Text('编辑'),
+                        icon: Icon(CupertinoIcons.pencil, size: 14),
+                        label: Text('编辑'),
                       ),
                       const Spacer(),
                       IconButton(
@@ -385,17 +385,17 @@ class _EndpointCardState extends State<_EndpointCard> {
                           final ok = await showDialog<bool>(
                             context: context,
                             builder: (ctx) => AlertDialog(
-                              title: const Text('删除中转站'),
+                              title: Text('删除中转站'),
                               content: Text('确定要删除「${ep.name}」吗？该操作不可撤销。'),
                               actions: [
                                 TextButton(
                                   onPressed: () => Navigator.pop(ctx, false),
-                                  child: const Text('取消'),
+                                  child: Text('取消'),
                                 ),
                                 FilledButton(
                                   style: FilledButton.styleFrom(backgroundColor: Colors.redAccent),
                                   onPressed: () => Navigator.pop(ctx, true),
-                                  child: const Text('删除'),
+                                  child: Text('删除'),
                                 ),
                               ],
                             ),
@@ -407,27 +407,27 @@ class _EndpointCardState extends State<_EndpointCard> {
                             }
                           }
                         },
-                        icon: const Icon(CupertinoIcons.trash, size: 18, color: Colors.white54),
+                        icon: Icon(CupertinoIcons.trash, size: 18, color: Theme.of(context).colorScheme.onSurfaceVariant),
                       ),
                     ],
                   ),
                   if (_latencyMs != null) ...[
-                    const SizedBox(height: 8),
+                    SizedBox(height: 8),
                     Row(
                       children: [
                         Icon(CupertinoIcons.checkmark_circle_fill,
                             size: 14, color: Colors.greenAccent.shade400),
-                        const SizedBox(width: 6),
+                        SizedBox(width: 6),
                         Text('延迟 ${_latencyMs}ms',
                             style: TextStyle(fontSize: 12, color: Colors.greenAccent.shade400)),
                       ],
                     ),
                   ],
                   if (_testError != null) ...[
-                    const SizedBox(height: 8),
+                    SizedBox(height: 8),
                     Text(
                       _testError!,
-                      style: const TextStyle(fontSize: 12, color: Colors.orangeAccent),
+                      style: TextStyle(fontSize: 12, color: Colors.orangeAccent),
                     ),
                   ],
                 ],
@@ -472,7 +472,7 @@ Future<void> _showEditDialog(
                         hintText: '例如 主中转站',
                       ),
                     ),
-                    const SizedBox(height: 12),
+                    SizedBox(height: 12),
                     TextField(
                       controller: urlCtrl,
                       keyboardType: TextInputType.url,
@@ -481,7 +481,7 @@ Future<void> _showEditDialog(
                         hintText: '例如 https://api.openai.com',
                       ),
                     ),
-                    const SizedBox(height: 12),
+                    SizedBox(height: 12),
                     TextField(
                       controller: keyCtrl,
                       obscureText: true,
@@ -489,15 +489,15 @@ Future<void> _showEditDialog(
                         labelText: 'API Key',
                       ),
                     ),
-                    const SizedBox(height: 16),
-                    const Align(
+                    SizedBox(height: 16),
+                    Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
                         '模型列表',
-                        style: TextStyle(fontSize: 12, color: Colors.white70),
+                        style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurfaceVariant),
                       ),
                     ),
-                    const SizedBox(height: 6),
+                    SizedBox(height: 6),
                     Row(
                       children: [
                         Expanded(
@@ -518,7 +518,7 @@ Future<void> _showEditDialog(
                           ),
                         ),
                         IconButton(
-                          icon: const Icon(CupertinoIcons.add_circled_solid),
+                          icon: Icon(CupertinoIcons.add_circled_solid),
                           onPressed: () {
                             final t = modelInputCtrl.text.trim();
                             if (t.isEmpty) return;
@@ -530,13 +530,13 @@ Future<void> _showEditDialog(
                         ),
                       ],
                     ),
-                    const SizedBox(height: 8),
+                    SizedBox(height: 8),
                     if (models.isEmpty)
-                      const Padding(
+                      Padding(
                         padding: EdgeInsets.only(top: 4),
                         child: Text(
                           '尚未添加任何模型',
-                          style: TextStyle(fontSize: 11, color: Colors.white38),
+                          style: TextStyle(fontSize: 11, color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.5)),
                         ),
                       )
                     else
@@ -546,9 +546,9 @@ Future<void> _showEditDialog(
                         children: [
                           for (final m in models)
                             Chip(
-                              label: Text(m, style: const TextStyle(fontSize: 12)),
+                              label: Text(m, style: TextStyle(fontSize: 12)),
                               onDeleted: () => setState(() => models.remove(m)),
-                              deleteIconColor: Colors.white54,
+                              deleteIconColor: Theme.of(context).colorScheme.onSurfaceVariant,
                             ),
                         ],
                       ),
@@ -558,7 +558,7 @@ Future<void> _showEditDialog(
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(ctx),
-                  child: const Text('取消'),
+                  child: Text('取消'),
                 ),
                 FilledButton(
                   onPressed: () async {
@@ -603,7 +603,7 @@ Future<void> _showEditDialog(
                       );
                     }
                   },
-                  child: const Text('保存'),
+                  child: Text('保存'),
                 ),
               ],
             ),

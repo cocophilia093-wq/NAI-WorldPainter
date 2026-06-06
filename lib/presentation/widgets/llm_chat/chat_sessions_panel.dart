@@ -55,17 +55,17 @@ class _SessionsPanelState extends State<_SessionsPanel> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('删除会话'),
+        title: Text('删除会话'),
         content: Text('确定删除「${session.title}」？此操作不可撤销。'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('取消'),
+            child: Text('取消'),
           ),
           FilledButton(
             onPressed: () => Navigator.of(ctx).pop(true),
             style: FilledButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text('删除'),
+            child: Text('删除'),
           ),
         ],
       ),
@@ -76,10 +76,37 @@ class _SessionsPanelState extends State<_SessionsPanel> {
     }
   }
 
+  Future<void> _deleteAll() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('清空所有历史会话'),
+        content: const Text('会删除所有提示词辅助助手的历史会话，并新建一个空白会话。是否继续？'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('取消'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            style: FilledButton.styleFrom(backgroundColor: Colors.redAccent),
+            child: const Text('清空'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true) {
+      await widget.vm.deleteAllSessions();
+      if (mounted) Navigator.of(context).pop();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final sessions = widget.vm.sessions;
     final activeSessionId = widget.vm.activeSessionId;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return BackdropFilter(
       filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
@@ -92,9 +119,9 @@ class _SessionsPanelState extends State<_SessionsPanel> {
           bottom: MediaQuery.viewInsetsOf(context).bottom + 20,
         ),
         decoration: BoxDecoration(
-          color: const Color(0xFF1C1C21),
+          color: isDark ? const Color(0xFF1C1C21) : Colors.white,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
+          border: Border.all(color: theme.colorScheme.onSurface.withValues(alpha: 0.08)),
         ),
         child: SafeArea(
           top: false,
@@ -114,22 +141,36 @@ class _SessionsPanelState extends State<_SessionsPanel> {
                       await widget.vm.createNewSession();
                       if (context.mounted) Navigator.of(context).pop();
                     },
-                    icon: const Icon(CupertinoIcons.add, size: 16),
-                    label: const Text('新对话'),
+                    icon: Icon(CupertinoIcons.add, size: 16),
+                    label: Text('新对话'),
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 10),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: sessions.isEmpty ? null : _deleteAll,
+                  icon: const Icon(CupertinoIcons.trash, size: 15),
+                  label: const Text('一键删除所有历史会话'),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: Colors.redAccent,
+                    side: BorderSide(color: Colors.redAccent.withValues(alpha: 0.35)),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  ),
+                ),
+              ),
+              SizedBox(height: 12),
               Flexible(
                 child: sessions.isEmpty
-                    ? const Padding(
+                    ? Padding(
                         padding: EdgeInsets.symmetric(vertical: 32),
-                        child: Text('还没有会话', style: TextStyle(color: Colors.white54)),
+                        child: Text('还没有会话', style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant)),
                       )
                     : ListView.separated(
                         shrinkWrap: true,
                         itemCount: sessions.length,
-                        separatorBuilder: (_, __) => const SizedBox(height: 8),
+                        separatorBuilder: (_, __) => SizedBox(height: 8),
                         itemBuilder: (context, index) {
                           final session = sessions[index];
                           final active = session.id == activeSessionId;
@@ -152,7 +193,7 @@ class _SessionsPanelState extends State<_SessionsPanel> {
                                           .colorScheme
                                           .primary
                                           .withValues(alpha: 0.12)
-                                      : Colors.white.withValues(alpha: 0.03),
+                                      : theme.colorScheme.surface,
                                   borderRadius: BorderRadius.circular(18),
                                   border: Border.all(
                                     color: active
@@ -160,7 +201,7 @@ class _SessionsPanelState extends State<_SessionsPanel> {
                                             .colorScheme
                                             .primary
                                             .withValues(alpha: 0.5)
-                                        : Colors.white.withValues(alpha: 0.05),
+                                        : theme.colorScheme.onSurface.withValues(alpha: 0.06),
                                   ),
                                 ),
                                 child: Row(
@@ -174,16 +215,16 @@ class _SessionsPanelState extends State<_SessionsPanel> {
                                             session.title,
                                             maxLines: 1,
                                             overflow: TextOverflow.ellipsis,
-                                            style: const TextStyle(
+                                            style: TextStyle(
                                                 fontSize: 14,
                                                 fontWeight: FontWeight.w600),
                                           ),
-                                          const SizedBox(height: 4),
+                                          SizedBox(height: 4),
                                           Text(
                                             _formatDate(session.updatedAt),
-                                            style: const TextStyle(
+                                            style: TextStyle(
                                                 fontSize: 12,
-                                                color: Colors.white54),
+                                                color: Theme.of(context).colorScheme.onSurfaceVariant),
                                           ),
                                         ],
                                       ),
@@ -192,9 +233,9 @@ class _SessionsPanelState extends State<_SessionsPanel> {
                                     // 避免 PopupMenuButton 的 context 层级问题
                                     Builder(
                                       builder: (btnCtx) => IconButton(
-                                        icon: const Icon(
+                                        icon: Icon(
                                             CupertinoIcons.ellipsis,
-                                            color: Colors.white70),
+                                            color: Theme.of(context).colorScheme.onSurfaceVariant),
                                         onPressed: () async {
                                           final RenderBox button =
                                               btnCtx.findRenderObject()
@@ -258,7 +299,7 @@ Future<String?> _showRenameDialog(
     context: context,
     builder: (ctx) {
       return AlertDialog(
-        title: const Text('重命名会话'),
+        title: Text('重命名会话'),
         content: TextField(
           controller: controller,
           autofocus: true,
@@ -267,11 +308,11 @@ Future<String?> _showRenameDialog(
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('取消'),
+            child: Text('取消'),
           ),
           FilledButton(
             onPressed: () => Navigator.of(ctx).pop(controller.text.trim()),
-            child: const Text('确定'),
+            child: Text('确定'),
           ),
         ],
       );

@@ -4,180 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:nai_huishi/domain/entities/llm_message.dart';
-
-/// AI 回复中匹配 fenced code block：```lang\n...\n```
-final _codeBlockRegex = RegExp(r'```([a-zA-Z0-9_+\-]*)\s*\n([\s\S]*?)```');
-
-class _Segment {
-  final bool isCode;
-  final String text;
-  final String lang;
-  /// 代码块前的标注文字（如"正向"、"负向"、"通用底模词"、"角色1"等）
-  final String label;
-  const _Segment.text(this.text)
-      : isCode = false,
-        lang = '',
-        label = '';
-  const _Segment.code(this.text, this.lang, this.label) : isCode = true;
-}
-
-/// 判断标注是否为角色标签
-bool _isCharacterLabel(String label) {
-  if (label.isEmpty) return false;
-  // "角色1"、"角色2" 等
-  if (label.contains('角色')) return true;
-  return false;
-}
-
-/// 判断标注是否为负向标签
-bool _isNegativeLabel(String label) {
-  if (label.isEmpty) return false;
-  return label.contains('负向') || label.contains('负面');
-}
-
-/// 判断标注是否为正向（"通用底模词" / "正向" / "通用正向" 等都视为全局正向）
-bool _isPositiveLabel(String label) {
-  if (label.isEmpty) return false;
-  if (_isNegativeLabel(label)) return false;
-  if (_isCharacterLabel(label)) return false;
-  return label.contains('正向') ||
-      label.contains('正面') ||
-      label.contains('底模') ||
-      label.contains('通用');
-}
-
-/// 提取该角色标注里的索引：「角色1」→ 0，「角色 2」→ 1
-int? _characterIndex(String label) {
-  final m = RegExp(r'角色\s*(\d+)').firstMatch(label);
-  if (m == null) return null;
-  final n = int.tryParse(m.group(1) ?? '');
-  if (n == null || n <= 0) return null;
-  return n - 1;
-}
-
-/// 把整条助手回复中所有带标签的代码块按类型聚合
-class AppliedSegments {
-  final String? positive;
-  final String? negative;
-  final List<String> characterPrompts; // 索引 0,1,2... 对应 角色1,角色2,角色3...
-  final List<String> characterNegatives;
-
-  const AppliedSegments({
-    this.positive,
-    this.negative,
-    required this.characterPrompts,
-    required this.characterNegatives,
-  });
-
-  bool get isEmpty =>
-      (positive == null || positive!.isEmpty) &&
-      (negative == null || negative!.isEmpty) &&
-      characterPrompts.isEmpty;
-}
-
-AppliedSegments _aggregateSegments(List<_Segment> segments) {
-  String? positive;
-  String? negative;
-  final charPrompts = <int, String>{};
-  final charNegatives = <int, String>{};
-
-  for (final seg in segments) {
-    if (!seg.isCode || seg.text.trim().isEmpty) continue;
-    final label = seg.label;
-    final text = seg.text.trim();
-
-    final charIdx = _characterIndex(label);
-    if (charIdx != null) {
-      // 角色块。再判断这个块是该角色的正向还是负向：
-      // 默认按正向；如果 label 同时包含负向关键词则按负向
-      if (_isNegativeLabel(label)) {
-        charNegatives[charIdx] = text;
-      } else {
-        charPrompts[charIdx] = text;
-      }
-      continue;
-    }
-    if (_isNegativeLabel(label)) {
-      negative = (negative == null) ? text : '$negative, $text';
-      continue;
-    }
-    if (_isPositiveLabel(label)) {
-      positive = (positive == null) ? text : '$positive, $text';
-      continue;
-    }
-  }
-
-  // 按索引顺序铺平
-  final maxIdx = [...charPrompts.keys, ...charNegatives.keys]
-      .fold<int>(-1, (a, b) => b > a ? b : a);
-  final promptsList = <String>[];
-  final negativesList = <String>[];
-  for (int i = 0; i <= maxIdx; i++) {
-    promptsList.add(charPrompts[i] ?? '');
-    negativesList.add(charNegatives[i] ?? '');
-  }
-
-  return AppliedSegments(
-    positive: positive,
-    negative: negative,
-    characterPrompts: promptsList,
-    characterNegatives: negativesList,
-  );
-}
-
-List<_Segment> _splitContent(String content) {
-  final segments = <_Segment>[];
-  int cursor = 0;
-  String pendingLabel = '';
-
-  for (final m in _codeBlockRegex.allMatches(content)) {
-    if (m.start > cursor) {
-      final text = content.substring(cursor, m.start);
-      if (text.trim().isNotEmpty) {
-        // 提取代码块前的标注（取最后一行非空文本的冒号前部分）
-        pendingLabel = _extractLabel(text);
-        segments.add(_Segment.text(text));
-      }
-    }
-    segments.add(_Segment.code((m.group(2) ?? '').trim(), m.group(1) ?? '', pendingLabel));
-    pendingLabel = '';
-    cursor = m.end;
-  }
-  if (cursor < content.length) {
-    final tail = content.substring(cursor);
-    if (tail.trim().isNotEmpty) segments.add(_Segment.text(tail));
-  }
-  if (segments.isEmpty && content.trim().isNotEmpty) {
-    segments.add(_Segment.text(content));
-  }
-  return segments;
-}
-
-/// 从代码块前的文本中提取标注，如 "正向：" → "正向"，"角色1：" → "角色1"
-String _extractLabel(String textBefore) {
-  final lines = textBefore.trimRight().split('\n');
-  for (int i = lines.length - 1; i >= 0; i--) {
-    var line = lines[i].trim();
-    if (line.isEmpty) continue;
-    // 去掉常见 markdown 装饰：**bold**、__bold__、*italic*、行首 #/-/>/  ` 等
-    line = line
-        .replaceAll(RegExp(r'\*+'), '')
-        .replaceAll(RegExp(r'_+'), '')
-        .replaceAll(RegExp(r'`+'), '')
-        .replaceAll(RegExp(r'^[#\-\>\s]+'), '')
-        .trim();
-    if (line.isEmpty) continue;
-    // 匹配 "正向：" "负向：" "通用底模词：" "角色1：" "角色1正向：" 等格式
-    final match = RegExp(r'^[\s]*([\u4e00-\u9fff\d\s]+?)[\s]*[：:]').firstMatch(line);
-    if (match != null) return match.group(1)!.trim();
-    // 也匹配纯中文标注无冒号（如独立一行的"正向"或"角色1正向"）
-    if (RegExp(r'^[\s]*[\u4e00-\u9fff\d\s]+[\s]*$').hasMatch(line)) {
-      return line.trim();
-    }
-    break;
-  }
-  return '';
-}
+import 'package:nai_huishi/presentation/widgets/llm_chat/prompt_apply_parser.dart';
 
 class ChatMessageBubble extends StatelessWidget {
   final LlmMessage message;
@@ -202,8 +29,10 @@ class ChatMessageBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isUser = message.role == LlmMessageRole.user;
-    final segments = _splitContent(message.content);
-    final aggregated = isUser ? null : _aggregateSegments(segments);
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final segments = splitPromptContent(message.content);
+    final aggregated = isUser ? null : parseAppliedSegments(message.content);
     final showApplyAll = !isUser && onApplyAll != null && aggregated != null && !aggregated.isEmpty;
     // 占位消息：纯 pipeline 状态，无正文
     final isPlaceholder = !isUser && message.content.trim().isEmpty &&
@@ -224,8 +53,10 @@ class ChatMessageBubble extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                 decoration: BoxDecoration(
                   color: isUser
-                      ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.18)
-                      : const Color(0xFF1C1C21).withValues(alpha: 0.6),
+                      ? theme.colorScheme.primary.withValues(alpha: isDark ? 0.18 : 0.14)
+                      : isDark
+                          ? const Color(0xFF1C1C21).withValues(alpha: 0.6)
+                          : Colors.white.withValues(alpha: 0.92),
                   borderRadius: BorderRadius.only(
                     topLeft: const Radius.circular(18),
                     topRight: const Radius.circular(18),
@@ -233,7 +64,7 @@ class ChatMessageBubble extends StatelessWidget {
                     bottomRight: Radius.circular(isUser ? 4 : 18),
                   ),
                   border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.06),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.08),
                   ),
                 ),
                 child: Column(
@@ -269,18 +100,18 @@ class ChatMessageBubble extends StatelessWidget {
                             child: isUser
                                 ? Text(
                                     seg.text.trim(),
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 14,
                                       height: 1.5,
-                                      color: Colors.white,
+                                      color: Theme.of(context).colorScheme.onSurface,
                                     ),
                                   )
                                 : SelectableText(
                                     seg.text.trim(),
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 14,
                                       height: 1.5,
-                                      color: Colors.white,
+                                      color: Theme.of(context).colorScheme.onSurface,
                                     ),
                                   ),
                           ),
@@ -335,6 +166,7 @@ class ChatMessageBubble extends StatelessWidget {
       position: RelativeRect.fill,
       items: menuItems,
     ).then((value) {
+      if (!context.mounted) return;
       if (value == 'retry' && onRetry != null) {
         onRetry!();
       } else if (value == 'edit' && onEditAndResend != null) {
@@ -352,13 +184,13 @@ class ChatMessageBubble extends StatelessWidget {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('编辑消息'),
+        title: Text('编辑消息'),
         content: TextField(
           controller: controller,
           maxLines: 5,
           minLines: 1,
           autofocus: true,
-          style: const TextStyle(fontSize: 14),
+          style: TextStyle(fontSize: 14),
           decoration: const InputDecoration(
             border: OutlineInputBorder(),
             hintText: '修改消息内容…',
@@ -367,14 +199,14 @@ class ChatMessageBubble extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('取消'),
+            child: Text('取消'),
           ),
           FilledButton(
             onPressed: () {
               Navigator.pop(ctx);
               onEditAndResend?.call(controller.text.trim());
             },
-            child: const Text('发送'),
+            child: Text('发送'),
           ),
         ],
 ),
@@ -401,12 +233,13 @@ class _CodeBlock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 6),
       decoration: BoxDecoration(
-        color: Colors.black.withValues(alpha: 0.45),
+        color: isDark ? Colors.black.withValues(alpha: 0.45) : const Color(0xFFF8FAFC),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+        border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -415,24 +248,24 @@ class _CodeBlock extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.04),
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.04),
                 borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
               ),
               child: Text(
                 label.isNotEmpty
                     ? (lang.isNotEmpty ? '$label · ${lang.toLowerCase()}' : label)
                     : lang.toLowerCase(),
-                style: const TextStyle(fontSize: 11, color: Colors.white54, fontFamily: 'monospace'),
+                style: TextStyle(fontSize: 11, color: Theme.of(context).colorScheme.onSurfaceVariant, fontFamily: 'monospace'),
               ),
             ),
           Padding(
             padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
             child: SelectableText(
               text,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 13,
                 height: 1.5,
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.onSurface,
                 fontFamily: 'monospace',
               ),
             ),
@@ -441,7 +274,7 @@ class _CodeBlock extends StatelessWidget {
             Container(
               padding: const EdgeInsets.fromLTRB(8, 6, 8, 8),
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.03),
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.03),
                 borderRadius: const BorderRadius.vertical(bottom: Radius.circular(12)),
               ),
               child: Wrap(
@@ -528,7 +361,7 @@ class _MiniBtnState extends State<_MiniBtn> {
             ),
             child: Text(
               widget.feedback,
-              style: const TextStyle(fontSize: 11, color: Colors.white),
+              style: TextStyle(fontSize: 11, color: Theme.of(context).colorScheme.onSurface),
             ),
           ),
         ),
@@ -559,16 +392,16 @@ class _MiniBtnState extends State<_MiniBtn> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.06),
+          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.06),
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+          border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08)),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(widget.icon, size: 13, color: Colors.white70),
-            const SizedBox(width: 4),
-            Text(widget.label, style: const TextStyle(fontSize: 12, color: Colors.white)),
+            Icon(widget.icon, size: 13, color: Theme.of(context).colorScheme.onSurfaceVariant),
+            SizedBox(width: 4),
+            Text(widget.label, style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurface)),
           ],
         ),
       ),
@@ -607,20 +440,20 @@ class _ApplyAllButton extends StatelessWidget {
         final confirmed = await showDialog<bool>(
           context: context,
           builder: (ctx) => AlertDialog(
-            title: const Text('一键替换全部'),
+            title: Text('一键替换全部'),
             content: Text(
               '此操作会先清空当前所有提示词（正向、负向、所有角色），'
               '然后写入本条消息中的内容$summary。无法撤销，是否继续？',
-              style: const TextStyle(fontSize: 14, height: 1.5),
+              style: TextStyle(fontSize: 14, height: 1.5),
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(ctx, false),
-                child: const Text('取消'),
+                child: Text('取消'),
               ),
               FilledButton(
                 onPressed: () => Navigator.pop(ctx, true),
-                child: const Text('确认替换'),
+                child: Text('确认替换'),
               ),
             ],
           ),
@@ -645,14 +478,14 @@ class _ApplyAllButton extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(CupertinoIcons.wand_stars, size: 16, color: Colors.white),
-            const SizedBox(width: 8),
+            Icon(CupertinoIcons.wand_stars, size: 16, color: Theme.of(context).colorScheme.onSurface),
+            SizedBox(width: 8),
             Flexible(
               child: Text(
                 '一键替换全部$summary',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 13,
-                  color: Colors.white,
+                  color: Theme.of(context).colorScheme.onSurface,
                   fontWeight: FontWeight.w600,
                 ),
                 overflow: TextOverflow.ellipsis,
@@ -697,13 +530,13 @@ class _PipelineStatusLine extends StatelessWidget {
       leading = Icon(CupertinoIcons.checkmark_seal_fill, size: 12, color: color);
     } else {
       // fallback / unknown
-      color = Colors.white.withValues(alpha: 0.45);
+      color = Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.55);
       leading = Icon(CupertinoIcons.exclamationmark_circle, size: 12, color: color);
     }
     return Row(
       children: [
         leading,
-        const SizedBox(width: 6),
+        SizedBox(width: 6),
         Expanded(
           child: Text(
             text,

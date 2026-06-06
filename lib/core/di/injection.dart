@@ -12,6 +12,7 @@ import 'package:nai_huishi/data/datasources/remote/gpt_api_service.dart';
 import 'package:nai_huishi/data/datasources/remote/nano_banana_api_service.dart';
 import 'package:nai_huishi/data/datasources/remote/bing_search_service.dart';
 import 'package:nai_huishi/data/datasources/remote/danbooru_api_service.dart';
+import 'package:nai_huishi/data/repositories/artist_prompt_repository_impl.dart';
 import 'package:nai_huishi/data/repositories/generation_repository_impl.dart';
 import 'package:nai_huishi/data/repositories/history_repository_impl.dart';
 import 'package:nai_huishi/data/repositories/llm_chat_repository_impl.dart';
@@ -20,6 +21,7 @@ import 'package:nai_huishi/data/repositories/prompt_memory_repository_impl.dart'
 import 'package:nai_huishi/data/repositories/prompt_template_repository_impl.dart';
 import 'package:nai_huishi/data/repositories/settings_repository_impl.dart';
 import 'package:nai_huishi/data/repositories/style_preset_repository_impl.dart';
+import 'package:nai_huishi/domain/repositories/artist_prompt_repository.dart';
 import 'package:nai_huishi/domain/repositories/generation_repository.dart';
 import 'package:nai_huishi/domain/repositories/history_repository.dart';
 import 'package:nai_huishi/domain/repositories/llm_chat_repository.dart';
@@ -28,6 +30,7 @@ import 'package:nai_huishi/domain/repositories/prompt_memory_repository.dart';
 import 'package:nai_huishi/domain/repositories/prompt_template_repository.dart';
 import 'package:nai_huishi/domain/repositories/settings_repository.dart';
 import 'package:nai_huishi/domain/repositories/style_preset_repository.dart';
+import 'package:nai_huishi/domain/usecases/manage_artist_prompts.dart';
 import 'package:nai_huishi/domain/usecases/generate_image.dart';
 import 'package:nai_huishi/domain/usecases/get_history.dart';
 import 'package:nai_huishi/domain/usecases/manage_llm_chat.dart';
@@ -42,6 +45,7 @@ import 'package:nai_huishi/domain/usecases/extract_keywords.dart';
 import 'package:nai_huishi/domain/usecases/search_danbooru_tags.dart';
 import 'package:nai_huishi/core/queue/generation_queue.dart';
 import 'package:nai_huishi/core/network/robust_http_adapter.dart';
+import 'package:nai_huishi/presentation/viewmodels/artist_prompt_viewmodel.dart';
 import 'package:nai_huishi/presentation/viewmodels/generation_viewmodel.dart';
 import 'package:nai_huishi/presentation/viewmodels/history_viewmodel.dart';
 import 'package:nai_huishi/presentation/viewmodels/llm_chat_viewmodel.dart';
@@ -86,6 +90,7 @@ Future<void> configureDependencies() async {
   sl.registerSingleton<PromptMemoryRepository>(PromptMemoryRepositoryImpl(sl<Database>()));
   sl.registerSingleton<PromptTemplateRepository>(PromptTemplateRepositoryImpl(sl<Database>()));
   sl.registerSingleton<StylePresetRepository>(StylePresetRepositoryImpl(sl<Database>()));
+  sl.registerSingleton<ArtistPromptRepository>(ArtistPromptRepositoryImpl(sl<Database>()));
   sl.registerSingleton<LlmChatRepository>(LlmChatRepositoryImpl(
     local: sl<LlmChatLocalDatasource>(),
     api: sl<LlmApiService>(),
@@ -105,6 +110,7 @@ Future<void> configureDependencies() async {
   sl.registerSingleton<ManagePromptTemplatesUseCase>(ManagePromptTemplatesUseCase(sl<PromptTemplateRepository>()));
   sl.registerSingleton<ManageSettingsUseCase>(ManageSettingsUseCase(sl<SettingsRepository>()));
   sl.registerSingleton<ManageStylePresetsUseCase>(ManageStylePresetsUseCase(sl<StylePresetRepository>()));
+  sl.registerSingleton<ManageArtistPromptsUseCase>(ManageArtistPromptsUseCase(sl<ArtistPromptRepository>()));
   sl.registerSingleton<ManageLlmChatUseCase>(ManageLlmChatUseCase(sl<LlmChatRepository>()));
   sl.registerSingleton<SaveImageUseCase>(SaveImageUseCase(sl<HistoryRepository>()));
   sl.registerSingleton<CalibrateWithDanbooruUseCase>(
@@ -126,6 +132,7 @@ Future<void> configureDependencies() async {
   sl.registerFactory<PromptTemplateViewModel>(() => PromptTemplateViewModel(sl<ManagePromptTemplatesUseCase>()));
   sl.registerLazySingleton<SettingsViewModel>(() => SettingsViewModel(sl<ManageSettingsUseCase>()));
   sl.registerFactory<StylePresetViewModel>(() => StylePresetViewModel(sl<ManageStylePresetsUseCase>()));
+  sl.registerFactory<ArtistPromptViewModel>(() => ArtistPromptViewModel(sl<ManageArtistPromptsUseCase>()));
   sl.registerFactory<LlmChatViewModel>(() => LlmChatViewModel(
     manageChat: sl<ManageLlmChatUseCase>(),
     manageSettings: sl<ManageSettingsUseCase>(),

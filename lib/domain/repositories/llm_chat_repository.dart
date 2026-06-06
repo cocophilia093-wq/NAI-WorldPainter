@@ -6,6 +6,7 @@ abstract class LlmChatRepository {
   Future<LlmSession> createSession({String? initialTitle});
   Future<void> renameSession(String id, String title);
   Future<void> deleteSession(String id);
+  Future<void> deleteAllSessions();
   Future<List<LlmMessage>> listMessages(String sessionId);
 
   /// 发送一条用户消息，自动落库 + 调 LLM + 落库 assistant 回复，返回 assistant 消息

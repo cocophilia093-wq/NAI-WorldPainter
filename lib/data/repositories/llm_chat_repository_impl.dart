@@ -47,6 +47,9 @@ class LlmChatRepositoryImpl implements LlmChatRepository {
   Future<void> deleteSession(String id) => _local.deleteSession(id);
 
   @override
+  Future<void> deleteAllSessions() => _local.deleteAllSessions();
+
+  @override
   Future<List<LlmMessage>> listMessages(String sessionId) => _local.listMessages(sessionId);
 
   @override

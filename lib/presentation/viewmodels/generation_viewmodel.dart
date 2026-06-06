@@ -454,10 +454,6 @@ class GenerationViewModel extends ChangeNotifier {
       await _manageSettings.setActiveEndpointId(opt.first.provider, opt.first.endpointId);
     }
     await _ensureResolutionForCurrentProvider();
-    // Nano Banana 不支持局部重绘，自动回退到文生图
-    if (isNanoProvider && generationMode == GenerationMode.inpainting) {
-      generationMode = GenerationMode.textToImage;
-    }
     notifyListeners();
   }
 

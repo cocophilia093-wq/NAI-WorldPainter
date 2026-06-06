@@ -1,0 +1,1470 @@
+{
+  "version": 12,
+  "artists": [
+    {
+      "name": "sorrowny",
+      "tag": "sorrowny",
+      "categories": [
+        "未分类",
+        "伪厚涂"
+      ],
+      "danbooruCount": 122,
+      "assetImage": "assets/artist_prompts/artist_001.jpg",
+      "createdAt": 1769965631124
+    },
+    {
+      "name": "min_(120716)",
+      "tag": "min_(120716)",
+      "categories": [
+        "未分类",
+        "伪厚涂"
+      ],
+      "danbooruCount": 200,
+      "assetImage": "assets/artist_prompts/artist_002.jpg",
+      "createdAt": 1769965450486
+    },
+    {
+      "name": "lobelia_(saclia)",
+      "tag": "lobelia_(saclia)",
+      "categories": [
+        "未分类"
+      ],
+      "danbooruCount": 349,
+      "assetImage": "assets/artist_prompts/artist_003.jpg",
+      "createdAt": 1769929557958
+    },
+    {
+      "name": "v-von",
+      "tag": "v-von",
+      "categories": [
+        "未分类"
+      ],
+      "danbooruCount": 73,
+      "assetImage": "assets/artist_prompts/artist_004.jpg",
+      "createdAt": 1769929402058
+    },
+    {
+      "name": "smusmuye",
+      "tag": "smusmuye",
+      "categories": [
+        "未分类",
+        "伪厚涂"
+      ],
+      "danbooruCount": 67,
+      "assetImage": "assets/artist_prompts/artist_005.jpg",
+      "createdAt": 1769928566159
+    },
+    {
+      "name": "rafaelaaa",
+      "tag": "rafaelaaa",
+      "categories": [
+        "未分类",
+        "伪厚涂"
+      ],
+      "danbooruCount": 393,
+      "assetImage": "assets/artist_prompts/artist_006.jpg",
+      "createdAt": 1769863200031
+    },
+    {
+      "name": "chongzhen_085",
+      "tag": "chongzhen_085",
+      "categories": [
+        "未分类",
+        "伪厚涂"
+      ],
+      "danbooruCount": 0,
+      "assetImage": "assets/artist_prompts/artist_007.jpg",
+      "createdAt": 1769862876278
+    },
+    {
+      "name": "noland",
+      "tag": "noland",
+      "categories": [
+        "未分类",
+        "伪厚涂"
+      ],
+      "danbooruCount": 70,
+      "assetImage": "assets/artist_prompts/artist_008.jpg",
+      "createdAt": 1769862829175
+    },
+    {
+      "name": "void_0 ",
+      "tag": "void_0",
+      "categories": [
+        "未分类",
+        "伪厚涂"
+      ],
+      "danbooruCount": 208,
+      "assetImage": "assets/artist_prompts/artist_009.jpg",
+      "createdAt": 1768491427890
+    },
+    {
+      "name": "lam_(ramdayo)",
+      "tag": "lam_(ramdayo)",
+      "categories": [
+        "未分类",
+        "薄涂(赛璐璐)"
+      ],
+      "danbooruCount": 434,
+      "assetImage": "assets/artist_prompts/artist_010.jpg",
+      "createdAt": 1768491318380
+    },
+    {
+      "name": "nixeu",
+      "tag": "nixeu",
+      "categories": [
+        "未分类",
+        "厚涂"
+      ],
+      "danbooruCount": 357,
+      "assetImage": "assets/artist_prompts/artist_011.jpg",
+      "createdAt": 1768158534368
+    },
+    {
+      "name": "iumu",
+      "tag": "iumu",
+      "categories": [
+        "未分类",
+        "伪厚涂"
+      ],
+      "danbooruCount": 173,
+      "assetImage": "assets/artist_prompts/artist_012.jpg",
+      "createdAt": 1767261712531
+    },
+    {
+      "name": "ness_(pjw0168)",
+      "tag": "ness_(pjw0168)",
+      "categories": [
+        "未分类",
+        "Nikke画风"
+      ],
+      "danbooruCount": 147,
+      "assetImage": "assets/artist_prompts/artist_013.jpg",
+      "createdAt": 1767260129621
+    },
+    {
+      "name": "NIKKE:dduck_kong",
+      "tag": "dduck_kong",
+      "categories": [
+        "未分类",
+        "Nikke画风"
+      ],
+      "danbooruCount": 375,
+      "assetImage": "assets/artist_prompts/artist_014.jpg",
+      "createdAt": 1767260081874
+    },
+    {
+      "name": "NIKKE:dramz",
+      "tag": "dramz",
+      "categories": [
+        "未分类",
+        "Nikke画风"
+      ],
+      "danbooruCount": 109,
+      "assetImage": "assets/artist_prompts/artist_015.jpg",
+      "createdAt": 1767259990088
+    },
+    {
+      "name": "NIKKE:dore_(gilles_dore)",
+      "tag": "dore_(gilles_dore)",
+      "categories": [
+        "未分类",
+        "Nikke画风"
+      ],
+      "danbooruCount": 160,
+      "assetImage": "assets/artist_prompts/artist_016.jpg",
+      "createdAt": 1767259885050
+    },
+    {
+      "name": "NIKKE:dfm_(darknessdfm)",
+      "tag": "dfm_(darknessdfm)",
+      "categories": [
+        "未分类",
+        "Nikke画风"
+      ],
+      "danbooruCount": 67,
+      "assetImage": "assets/artist_prompts/artist_017.jpg",
+      "createdAt": 1767259825620
+    },
+    {
+      "name": "NIKKE:jam_(nandade)",
+      "tag": "jam_(nandade)",
+      "categories": [
+        "未分类",
+        "Nikke画风"
+      ],
+      "danbooruCount": 304,
+      "assetImage": "assets/artist_prompts/artist_018.jpg",
+      "createdAt": 1767259735029
+    },
+    {
+      "name": "NIKKE:tigermtang",
+      "tag": "tigermtang",
+      "categories": [
+        "未分类",
+        "Nikke画风"
+      ],
+      "danbooruCount": 19,
+      "assetImage": "assets/artist_prompts/artist_019.jpg",
+      "createdAt": 1767259638782
+    },
+    {
+      "name": "NIKKE:2v_(joyeong)",
+      "tag": "2v_(joyeong)",
+      "categories": [
+        "未分类",
+        "Nikke画风"
+      ],
+      "danbooruCount": 82,
+      "assetImage": "assets/artist_prompts/artist_020.jpg",
+      "createdAt": 1767259597037
+    },
+    {
+      "name": "NIKKE:aronman",
+      "tag": "aronman",
+      "categories": [
+        "未分类",
+        "Nikke画风"
+      ],
+      "danbooruCount": 66,
+      "assetImage": "assets/artist_prompts/artist_021.jpg",
+      "createdAt": 1767259553174
+    },
+    {
+      "name": "NIKKE:dora_(garyeong)",
+      "tag": "dora_(garyeong)",
+      "categories": [
+        "未分类",
+        "Nikke画风"
+      ],
+      "danbooruCount": 62,
+      "assetImage": "assets/artist_prompts/artist_022.jpg",
+      "createdAt": 1767259503480
+    },
+    {
+      "name": "NIKKE:domi_(hongsung0819)",
+      "tag": "domi_(hongsung0819)",
+      "categories": [
+        "未分类",
+        "Nikke画风"
+      ],
+      "danbooruCount": 294,
+      "assetImage": "assets/artist_prompts/artist_023.jpg",
+      "createdAt": 1767259411827
+    },
+    {
+      "name": "NIKKE:sami_(ami12702752)",
+      "tag": "sami_(ami12702752)",
+      "categories": [
+        "未分类",
+        "Nikke画风"
+      ],
+      "danbooruCount": 38,
+      "assetImage": "assets/artist_prompts/artist_024.jpg",
+      "createdAt": 1767259262382
+    },
+    {
+      "name": "ddinut",
+      "tag": "ddinut",
+      "categories": [
+        "未分类",
+        "伪厚涂"
+      ],
+      "danbooruCount": 42,
+      "assetImage": "assets/artist_prompts/artist_025.jpg",
+      "createdAt": 1767078847660
+    },
+    {
+      "name": "mgong520",
+      "tag": "mgong520",
+      "categories": [
+        "未分类",
+        "伪厚涂"
+      ],
+      "danbooruCount": 243,
+      "assetImage": "assets/artist_prompts/artist_026.jpg",
+      "createdAt": 1764211429199
+    },
+    {
+      "name": "sudong_tangyuan",
+      "tag": "sudong_tangyuan",
+      "categories": [
+        "未分类",
+        "伪厚涂"
+      ],
+      "danbooruCount": 38,
+      "assetImage": "assets/artist_prompts/artist_027.jpg",
+      "createdAt": 1764211289421
+    },
+    {
+      "name": "redum4",
+      "tag": "redum4",
+      "categories": [
+        "未分类",
+        "伪厚涂"
+      ],
+      "danbooruCount": 148,
+      "assetImage": "assets/artist_prompts/artist_028.jpg",
+      "createdAt": 1764211191502
+    },
+    {
+      "name": "hvvvzzz",
+      "tag": "hvvvzzz",
+      "categories": [
+        "未分类",
+        "伪厚涂"
+      ],
+      "danbooruCount": 21,
+      "assetImage": "assets/artist_prompts/artist_029.jpg",
+      "createdAt": 1764210990676
+    },
+    {
+      "name": "tnpp_coc",
+      "tag": "tnpp_coc",
+      "categories": [
+        "未分类",
+        "伪厚涂"
+      ],
+      "danbooruCount": 9,
+      "assetImage": "assets/artist_prompts/artist_030.jpg",
+      "createdAt": 1764210874739
+    },
+    {
+      "name": "umehara_sei",
+      "tag": "umehara_sei",
+      "categories": [
+        "未分类",
+        "伪厚涂"
+      ],
+      "danbooruCount": 192,
+      "assetImage": "assets/artist_prompts/artist_031.jpg",
+      "createdAt": 1764068735327
+    },
+    {
+      "name": "maccha_(mochancc)",
+      "tag": "maccha_(mochancc)",
+      "categories": [
+        "未分类",
+        "伪厚涂"
+      ],
+      "danbooruCount": 528,
+      "assetImage": "assets/artist_prompts/artist_032.jpg",
+      "createdAt": 1764065313967
+    },
+    {
+      "name": "ttosom",
+      "tag": "ttosom",
+      "categories": [
+        "未分类",
+        "伪厚涂"
+      ],
+      "danbooruCount": 193,
+      "assetImage": "assets/artist_prompts/artist_033.jpg",
+      "createdAt": 1764065241884
+    },
+    {
+      "name": "aos",
+      "tag": "aos",
+      "categories": [
+        "未分类",
+        "伪厚涂"
+      ],
+      "danbooruCount": 275,
+      "assetImage": "assets/artist_prompts/artist_034.jpg",
+      "createdAt": 1764063385051
+    },
+    {
+      "name": "ohisashiburi",
+      "tag": "ohisashiburi",
+      "categories": [
+        "未分类",
+        "薄涂(赛璐璐)"
+      ],
+      "danbooruCount": 1600,
+      "assetImage": "assets/artist_prompts/artist_035.jpg",
+      "createdAt": 1764063203601
+    },
+    {
+      "name": "tianliang_duohe_fangdongye",
+      "tag": "tianliang_duohe_fangdongye",
+      "categories": [
+        "未分类",
+        "薄涂(赛璐璐)"
+      ],
+      "danbooruCount": 148,
+      "assetImage": "assets/artist_prompts/artist_036.jpg",
+      "createdAt": 1764062144156
+    },
+    {
+      "name": "kotarou_(kot_mochi)",
+      "tag": "kotarou_(kot_mochi)",
+      "categories": [
+        "未分类"
+      ],
+      "danbooruCount": 157,
+      "assetImage": "assets/artist_prompts/artist_037.jpg",
+      "createdAt": 1764062095956
+    },
+    {
+      "name": "fuzuki_fuuro",
+      "tag": "fuzuki_fuuro",
+      "categories": [
+        "未分类"
+      ],
+      "danbooruCount": 187,
+      "assetImage": "assets/artist_prompts/artist_038.jpg",
+      "createdAt": 1764062055897
+    },
+    {
+      "name": "miwano_rag",
+      "tag": "miwano_rag",
+      "categories": [
+        "未分类"
+      ],
+      "danbooruCount": 516,
+      "assetImage": "assets/artist_prompts/artist_039.jpg",
+      "createdAt": 1764062019396
+    },
+    {
+      "name": "mignon",
+      "tag": "mignon",
+      "categories": [
+        "未分类"
+      ],
+      "danbooruCount": 909,
+      "assetImage": "assets/artist_prompts/artist_040.jpg",
+      "createdAt": 1764061981940
+    },
+    {
+      "name": "lightria",
+      "tag": "lightria",
+      "categories": [
+        "未分类",
+        "薄涂(赛璐璐)"
+      ],
+      "danbooruCount": 237,
+      "assetImage": "assets/artist_prompts/artist_041.jpg",
+      "createdAt": 1764061957313
+    },
+    {
+      "name": "suyamori",
+      "tag": "suyamori",
+      "categories": [
+        "未分类",
+        "薄涂(赛璐璐)"
+      ],
+      "danbooruCount": 96,
+      "assetImage": "assets/artist_prompts/artist_042.jpg",
+      "createdAt": 1764061900918
+    },
+    {
+      "name": "bigxixi",
+      "tag": "bigxixi",
+      "categories": [
+        "未分类",
+        "薄涂(赛璐璐)"
+      ],
+      "danbooruCount": 118,
+      "assetImage": "assets/artist_prompts/artist_043.jpg",
+      "createdAt": 1764061830931
+    },
+    {
+      "name": "ao_(ao0_0nemu)",
+      "tag": "ao_(ao0_0nemu)",
+      "categories": [
+        "未分类",
+        "薄涂(赛璐璐)"
+      ],
+      "danbooruCount": 270,
+      "assetImage": "assets/artist_prompts/artist_044.jpg",
+      "createdAt": 1763781712031
+    },
+    {
+      "name": "hito komoru",
+      "tag": "hito_komoru",
+      "categories": [
+        "未分类",
+        "薄涂(赛璐璐)"
+      ],
+      "danbooruCount": 303,
+      "assetImage": "assets/artist_prompts/artist_045.jpg",
+      "createdAt": 1763781468120
+    },
+    {
+      "name": "wool_bl",
+      "tag": "wool_bl",
+      "categories": [
+        "未分类",
+        "薄涂(赛璐璐)"
+      ],
+      "danbooruCount": 92,
+      "assetImage": "assets/artist_prompts/artist_046.jpg",
+      "createdAt": 1763670168496
+    },
+    {
+      "name": "takayanagi_katsuya",
+      "tag": "takayanagi_katsuya",
+      "categories": [
+        "未分类",
+        "薄涂(赛璐璐)"
+      ],
+      "danbooruCount": 47,
+      "assetImage": "assets/artist_prompts/artist_047.jpg",
+      "createdAt": 1763670117896
+    },
+    {
+      "name": "ryuuforkaf",
+      "tag": "ryuuforkaf",
+      "categories": [
+        "未分类",
+        "伪厚涂"
+      ],
+      "danbooruCount": 178,
+      "assetImage": "assets/artist_prompts/artist_048.jpg",
+      "createdAt": 1763670027557
+    },
+    {
+      "name": "ame_(uten_cancel) ",
+      "tag": "ame_(uten_cancel)",
+      "categories": [
+        "未分类",
+        "薄涂(赛璐璐)"
+      ],
+      "danbooruCount": 346,
+      "assetImage": "assets/artist_prompts/artist_049.jpg",
+      "createdAt": 1763669991499
+    },
+    {
+      "name": "aoi_tiduru ",
+      "tag": "aoi_tiduru",
+      "categories": [
+        "未分类",
+        "薄涂(赛璐璐)"
+      ],
+      "danbooruCount": 244,
+      "assetImage": "assets/artist_prompts/artist_050.jpg",
+      "createdAt": 1763669915659
+    },
+    {
+      "name": "letdie1414",
+      "tag": "letdie1414",
+      "categories": [
+        "未分类",
+        "薄涂(赛璐璐)"
+      ],
+      "danbooruCount": 340,
+      "assetImage": "assets/artist_prompts/artist_051.jpg",
+      "createdAt": 1763669804570
+    },
+    {
+      "name": "shiomi_(lowrise)",
+      "tag": "shiomi_(lowrise)",
+      "categories": [
+        "未分类",
+        "薄涂(赛璐璐)"
+      ],
+      "danbooruCount": 159,
+      "assetImage": "assets/artist_prompts/artist_052.jpg",
+      "createdAt": 1763667976777
+    },
+    {
+      "name": "kase_daiki",
+      "tag": "kase_daiki",
+      "categories": [
+        "未分类",
+        "薄涂(赛璐璐)"
+      ],
+      "danbooruCount": 1300,
+      "assetImage": "assets/artist_prompts/artist_053.jpg",
+      "createdAt": 1763576714806
+    },
+    {
+      "name": "yoneyama_mai",
+      "tag": "yoneyama_mai",
+      "categories": [
+        "未分类",
+        "薄涂(赛璐璐)"
+      ],
+      "danbooruCount": 302,
+      "assetImage": "assets/artist_prompts/artist_054.jpg",
+      "createdAt": 1762177462059
+    },
+    {
+      "name": "myowa",
+      "tag": "myowa",
+      "categories": [
+        "未分类",
+        "薄涂(赛璐璐)"
+      ],
+      "danbooruCount": 241,
+      "assetImage": "assets/artist_prompts/artist_055.jpg",
+      "createdAt": 1762177508356
+    },
+    {
+      "name": "scottie_(phantom2)",
+      "tag": "scottie_(phantom2)",
+      "categories": [
+        "未分类"
+      ],
+      "danbooruCount": 1200,
+      "assetImage": "assets/artist_prompts/artist_056.jpg",
+      "createdAt": 1762177556240
+    },
+    {
+      "name": "hitokoto",
+      "tag": "hitokoto",
+      "categories": [
+        "未分类",
+        "薄涂(赛璐璐)"
+      ],
+      "danbooruCount": 207,
+      "assetImage": "assets/artist_prompts/artist_057.jpg",
+      "createdAt": 1762177581145
+    },
+    {
+      "name": "akakura",
+      "tag": "akakura",
+      "categories": [
+        "未分类",
+        "薄涂(赛璐璐)"
+      ],
+      "danbooruCount": 361,
+      "assetImage": "assets/artist_prompts/artist_058.jpg",
+      "createdAt": 1762177603804
+    },
+    {
+      "name": "betabeet",
+      "tag": "betabeet",
+      "categories": [
+        "未分类",
+        "薄涂(赛璐璐)"
+      ],
+      "danbooruCount": 610,
+      "assetImage": "assets/artist_prompts/artist_059.jpg",
+      "createdAt": 1762177633909
+    },
+    {
+      "name": "akizero1510",
+      "tag": "akizero1510",
+      "categories": [
+        "未分类"
+      ],
+      "danbooruCount": 211,
+      "assetImage": "assets/artist_prompts/artist_060.jpg",
+      "createdAt": 1762177830864
+    },
+    {
+      "name": "qys3",
+      "tag": "qys3",
+      "categories": [
+        "未分类",
+        "薄涂(赛璐璐)"
+      ],
+      "danbooruCount": 591,
+      "assetImage": "assets/artist_prompts/artist_061.jpg",
+      "createdAt": 1762177857216
+    },
+    {
+      "name": "toosaka_asagi",
+      "tag": "toosaka_asagi",
+      "categories": [
+        "未分类",
+        "薄涂(赛璐璐)"
+      ],
+      "danbooruCount": 2000,
+      "assetImage": "assets/artist_prompts/artist_062.jpg",
+      "createdAt": 1762177916053
+    },
+    {
+      "name": "yonchan",
+      "tag": "yonchan",
+      "categories": [
+        "未分类"
+      ],
+      "danbooruCount": 126,
+      "assetImage": "assets/artist_prompts/artist_063.jpg",
+      "createdAt": 1762177947396
+    },
+    {
+      "name": "hiten_(hitenkei)",
+      "tag": "hiten_(hitenkei)",
+      "categories": [
+        "未分类"
+      ],
+      "danbooruCount": 844,
+      "assetImage": "assets/artist_prompts/artist_064.jpg",
+      "createdAt": 1762178082833
+    },
+    {
+      "name": "mogumo",
+      "tag": "mogumo",
+      "categories": [
+        "未分类"
+      ],
+      "danbooruCount": 371,
+      "assetImage": "assets/artist_prompts/artist_065.jpg",
+      "createdAt": 1762178115344
+    },
+    {
+      "name": "ye_jji",
+      "tag": "ye_jji",
+      "categories": [
+        "未分类"
+      ],
+      "danbooruCount": 175,
+      "assetImage": "assets/artist_prompts/artist_066.jpg",
+      "createdAt": 1762178151090
+    },
+    {
+      "name": "momoko_(momopoco)",
+      "tag": "momoko_(momopoco)",
+      "categories": [
+        "未分类"
+      ],
+      "danbooruCount": 1300,
+      "assetImage": "assets/artist_prompts/artist_067.jpg",
+      "createdAt": 1762178177276
+    },
+    {
+      "name": "ito_lab",
+      "tag": "ito_lab",
+      "categories": [
+        "未分类"
+      ],
+      "danbooruCount": 86,
+      "assetImage": "assets/artist_prompts/artist_068.jpg",
+      "createdAt": 1762178198846
+    },
+    {
+      "name": "swd3e2",
+      "tag": "swd3e2",
+      "categories": [
+        "未分类",
+        "伪厚涂"
+      ],
+      "danbooruCount": 1400,
+      "assetImage": "assets/artist_prompts/artist_069.jpg",
+      "createdAt": 1762178237100
+    },
+    {
+      "name": "dino_(dinoartforame)",
+      "tag": "dino_(dinoartforame)",
+      "categories": [
+        "未分类",
+        "伪厚涂"
+      ],
+      "danbooruCount": 565,
+      "assetImage": "assets/artist_prompts/artist_070.jpg",
+      "createdAt": 1762178269580
+    },
+    {
+      "name": "rella",
+      "tag": "rella",
+      "categories": [
+        "未分类"
+      ],
+      "danbooruCount": 432,
+      "assetImage": "assets/artist_prompts/artist_071.jpg",
+      "createdAt": 1762178323302
+    },
+    {
+      "name": "reoen",
+      "tag": "reoen",
+      "categories": [
+        "未分类",
+        "伪厚涂"
+      ],
+      "danbooruCount": 350,
+      "assetImage": "assets/artist_prompts/artist_072.jpg",
+      "createdAt": 1762178354490
+    },
+    {
+      "name": "xilmo",
+      "tag": "xilmo",
+      "categories": [
+        "未分类",
+        "伪厚涂"
+      ],
+      "danbooruCount": 252,
+      "assetImage": "assets/artist_prompts/artist_073.jpg",
+      "createdAt": 1762178404178
+    },
+    {
+      "name": "alchemaniac",
+      "tag": "alchemaniac",
+      "categories": [
+        "未分类",
+        "伪厚涂"
+      ],
+      "danbooruCount": 280,
+      "assetImage": "assets/artist_prompts/artist_074.jpg",
+      "createdAt": 1762178430206
+    },
+    {
+      "name": "noyu_(noyu23386566)",
+      "tag": "noyu_(noyu23386566)",
+      "categories": [
+        "未分类"
+      ],
+      "danbooruCount": 280,
+      "assetImage": "assets/artist_prompts/artist_075.jpg",
+      "createdAt": 1762178457317
+    },
+    {
+      "name": "tomari (veryberry00)",
+      "tag": "tomari (veryberry00)",
+      "categories": [
+        "未分类"
+      ],
+      "danbooruCount": 580,
+      "assetImage": "assets/artist_prompts/artist_076.jpg",
+      "createdAt": 1762178846335
+    },
+    {
+      "name": "bai_qi-qsr",
+      "tag": "bai_qi-qsr",
+      "categories": [
+        "未分类",
+        "薄涂(赛璐璐)"
+      ],
+      "danbooruCount": 206,
+      "assetImage": "assets/artist_prompts/artist_077.jpg",
+      "createdAt": 1762178907226
+    },
+    {
+      "name": "ciloranko",
+      "tag": "ciloranko",
+      "categories": [
+        "未分类",
+        "薄涂(赛璐璐)"
+      ],
+      "danbooruCount": 222,
+      "assetImage": "assets/artist_prompts/artist_078.jpg",
+      "createdAt": 1762178925876
+    },
+    {
+      "name": "misyune",
+      "tag": "misyune",
+      "categories": [
+        "未分类"
+      ],
+      "danbooruCount": 274,
+      "assetImage": "assets/artist_prompts/artist_079.jpg",
+      "createdAt": 1762178947302
+    },
+    {
+      "name": "sushispin",
+      "tag": "sushispin",
+      "categories": [
+        "未分类",
+        "薄涂(赛璐璐)"
+      ],
+      "danbooruCount": 134,
+      "assetImage": "assets/artist_prompts/artist_080.jpg",
+      "createdAt": 1762178968294
+    },
+    {
+      "name": "jima",
+      "tag": "jima",
+      "categories": [
+        "未分类",
+        "伪厚涂"
+      ],
+      "danbooruCount": 204,
+      "assetImage": "assets/artist_prompts/artist_081.jpg",
+      "createdAt": 1762178996737
+    },
+    {
+      "name": "subong",
+      "tag": "subong",
+      "categories": [
+        "未分类",
+        "薄涂(赛璐璐)",
+        "Nikke画风"
+      ],
+      "danbooruCount": 68,
+      "assetImage": "assets/artist_prompts/artist_082.jpg",
+      "createdAt": 1762179026164
+    },
+    {
+      "name": "arl",
+      "tag": "arl",
+      "categories": [
+        "未分类"
+      ],
+      "danbooruCount": 111,
+      "assetImage": "assets/artist_prompts/artist_083.jpg",
+      "createdAt": 1762179079223
+    },
+    {
+      "name": "kurikabacha",
+      "tag": "kurikabacha",
+      "categories": [
+        "未分类"
+      ],
+      "danbooruCount": 136,
+      "assetImage": "assets/artist_prompts/artist_084.jpg",
+      "createdAt": 1762179109666
+    },
+    {
+      "name": "kitada mo",
+      "tag": "kitada mo",
+      "categories": [
+        "未分类"
+      ],
+      "danbooruCount": 339,
+      "assetImage": "assets/artist_prompts/artist_085.jpg",
+      "createdAt": 1762179145210
+    },
+    {
+      "name": "nisi_ki_no",
+      "tag": "nisi_ki_no",
+      "categories": [
+        "未分类"
+      ],
+      "danbooruCount": 146,
+      "assetImage": "assets/artist_prompts/artist_086.jpg",
+      "createdAt": 1762179170093
+    },
+    {
+      "name": "poki_(j0ch3fvj6nd)",
+      "tag": "poki_(j0ch3fvj6nd)",
+      "categories": [
+        "未分类"
+      ],
+      "danbooruCount": 106,
+      "assetImage": "assets/artist_prompts/artist_087.jpg",
+      "createdAt": 1762179204037
+    },
+    {
+      "name": "cryturtle",
+      "tag": "cryturtle",
+      "categories": [
+        "未分类"
+      ],
+      "danbooruCount": 100,
+      "assetImage": "assets/artist_prompts/artist_088.jpg",
+      "createdAt": 1762179237369
+    },
+    {
+      "name": "lium",
+      "tag": "lium",
+      "categories": [
+        "未分类"
+      ],
+      "danbooruCount": 148,
+      "assetImage": "assets/artist_prompts/artist_089.jpg",
+      "createdAt": 1762179262024
+    },
+    {
+      "name": "bangsom",
+      "tag": "bangsom",
+      "categories": [
+        "未分类"
+      ],
+      "danbooruCount": 114,
+      "assetImage": "assets/artist_prompts/artist_090.jpg",
+      "createdAt": 1762179281173
+    },
+    {
+      "name": "fuzichoco",
+      "tag": "fuzichoco",
+      "categories": [
+        "未分类",
+        "薄涂(赛璐璐)"
+      ],
+      "danbooruCount": 977,
+      "assetImage": "assets/artist_prompts/artist_091.jpg",
+      "createdAt": 1762179320562
+    },
+    {
+      "name": "mika pikazo",
+      "tag": "mika pikazo",
+      "categories": [
+        "未分类",
+        "薄涂(赛璐璐)"
+      ],
+      "danbooruCount": 1100,
+      "assetImage": "assets/artist_prompts/artist_092.jpg",
+      "createdAt": 1762179346094
+    },
+    {
+      "name": "ame929",
+      "tag": "ame929",
+      "categories": [
+        "未分类"
+      ],
+      "danbooruCount": 89,
+      "assetImage": "assets/artist_prompts/artist_093.jpg",
+      "createdAt": 1762179372761
+    },
+    {
+      "name": "torino_aqua",
+      "tag": "torino_aqua",
+      "categories": [
+        "未分类",
+        "薄涂(赛璐璐)"
+      ],
+      "danbooruCount": 563,
+      "assetImage": "assets/artist_prompts/artist_094.jpg",
+      "createdAt": 1762179396707
+    },
+    {
+      "name": "ena_(enaa97)",
+      "tag": "ena_(enaa97)",
+      "categories": [
+        "未分类",
+        "薄涂(赛璐璐)"
+      ],
+      "danbooruCount": 89,
+      "assetImage": "assets/artist_prompts/artist_095.jpg",
+      "createdAt": 1762179420059
+    },
+    {
+      "name": "kieed",
+      "tag": "kieed",
+      "categories": [
+        "未分类",
+        "薄涂(赛璐璐)"
+      ],
+      "danbooruCount": 397,
+      "assetImage": "assets/artist_prompts/artist_096.jpg",
+      "createdAt": 1762179545355
+    },
+    {
+      "name": "fajyobore",
+      "tag": "fajyobore",
+      "categories": [
+        "未分类",
+        "薄涂(赛璐璐)"
+      ],
+      "danbooruCount": 305,
+      "assetImage": "assets/artist_prompts/artist_097.jpg",
+      "createdAt": 1762179562958
+    },
+    {
+      "name": "ningen_mame",
+      "tag": "ningen_mame",
+      "categories": [
+        "未分类"
+      ],
+      "danbooruCount": 428,
+      "assetImage": "assets/artist_prompts/artist_098.jpg",
+      "createdAt": 1762179581683
+    },
+    {
+      "name": "z3zz4",
+      "tag": "z3zz4",
+      "categories": [
+        "未分类",
+        "薄涂(赛璐璐)"
+      ],
+      "danbooruCount": 224,
+      "assetImage": "assets/artist_prompts/artist_099.jpg",
+      "createdAt": 1762179597708
+    },
+    {
+      "name": "wanke",
+      "tag": "wanke",
+      "categories": [
+        "未分类",
+        "薄涂(赛璐璐)"
+      ],
+      "danbooruCount": 178,
+      "assetImage": "assets/artist_prompts/artist_100.jpg",
+      "createdAt": 1762179630430
+    },
+    {
+      "name": "konya karasue",
+      "tag": "konya karasue",
+      "categories": [
+        "未分类",
+        "薄涂(赛璐璐)"
+      ],
+      "danbooruCount": 213,
+      "assetImage": "assets/artist_prompts/artist_101.jpg",
+      "createdAt": 1762179645549
+    },
+    {
+      "name": "ask \\(askzy\\)",
+      "tag": "ask \\(askzy\\)",
+      "categories": [
+        "未分类",
+        "伪厚涂"
+      ],
+      "danbooruCount": 582,
+      "assetImage": "assets/artist_prompts/artist_102.jpg",
+      "createdAt": 1762179673251
+    },
+    {
+      "name": "quasarcake",
+      "tag": "quasarcake",
+      "categories": [
+        "未分类"
+      ],
+      "danbooruCount": 328,
+      "assetImage": "assets/artist_prompts/artist_103.jpg",
+      "createdAt": 1762179692081
+    },
+    {
+      "name": "Mochizuki Kei",
+      "tag": "Mochizuki Kei",
+      "categories": [
+        "未分类"
+      ],
+      "danbooruCount": 652,
+      "assetImage": "assets/artist_prompts/artist_104.jpg",
+      "createdAt": 1762179721662
+    },
+    {
+      "name": "rei(sanbonzakura)",
+      "tag": "rei(sanbonzakura)",
+      "categories": [
+        "未分类",
+        "伪厚涂"
+      ],
+      "danbooruCount": 653,
+      "assetImage": "assets/artist_prompts/artist_105.jpg",
+      "createdAt": 1762179752163
+    },
+    {
+      "name": "cogecha",
+      "tag": "cogecha",
+      "categories": [
+        "未分类",
+        "薄涂(赛璐璐)"
+      ],
+      "danbooruCount": 217,
+      "assetImage": "assets/artist_prompts/artist_106.jpg",
+      "createdAt": 1762179782388
+    },
+    {
+      "name": "wlop",
+      "tag": "wlop",
+      "categories": [
+        "未分类",
+        "伪厚涂",
+        "厚涂"
+      ],
+      "danbooruCount": 368,
+      "assetImage": "assets/artist_prompts/artist_107.jpg",
+      "createdAt": 1762179801931
+    },
+    {
+      "name": "suzumi_(ccroquette)",
+      "tag": "suzumi_(ccroquette)",
+      "categories": [
+        "未分类"
+      ],
+      "danbooruCount": 70,
+      "assetImage": "assets/artist_prompts/artist_108.jpg",
+      "createdAt": 1762179824921
+    },
+    {
+      "name": "modare",
+      "tag": "modare",
+      "categories": [
+        "未分类",
+        "伪厚涂"
+      ],
+      "danbooruCount": 908,
+      "assetImage": "assets/artist_prompts/artist_109.jpg",
+      "createdAt": 1762179844247
+    },
+    {
+      "name": "misaka_12003-gou",
+      "tag": "misaka_12003-gou",
+      "categories": [
+        "未分类"
+      ],
+      "danbooruCount": 621,
+      "assetImage": "assets/artist_prompts/artist_110.jpg",
+      "createdAt": 1762179876457
+    },
+    {
+      "name": "liduke",
+      "tag": "liduke",
+      "categories": [
+        "未分类",
+        "伪厚涂"
+      ],
+      "danbooruCount": 389,
+      "assetImage": "assets/artist_prompts/artist_111.jpg",
+      "createdAt": 1762179895019
+    },
+    {
+      "name": "freng",
+      "tag": "freng",
+      "categories": [
+        "未分类",
+        "薄涂(赛璐璐)"
+      ],
+      "danbooruCount": 594,
+      "assetImage": "assets/artist_prompts/artist_112.jpg",
+      "createdAt": 1762179921766
+    },
+    {
+      "name": "haze_(7h4ze)",
+      "tag": "haze_(7h4ze)",
+      "categories": [
+        "未分类",
+        "薄涂(赛璐璐)"
+      ],
+      "danbooruCount": 324,
+      "assetImage": "assets/artist_prompts/artist_113.jpg",
+      "createdAt": 1762179949352
+    },
+    {
+      "name": "rolua",
+      "tag": "rolua",
+      "categories": [
+        "未分类",
+        "薄涂(赛璐璐)"
+      ],
+      "danbooruCount": 228,
+      "assetImage": "assets/artist_prompts/artist_114.jpg",
+      "createdAt": 1762179966031
+    },
+    {
+      "name": "hisiya_(wldn1112)",
+      "tag": "hisiya_(wldn1112)",
+      "categories": [
+        "未分类"
+      ],
+      "danbooruCount": 84,
+      "assetImage": "assets/artist_prompts/artist_115.jpg",
+      "createdAt": 1762179999898
+    },
+    {
+      "name": "gwan-e",
+      "tag": "gwan-e",
+      "categories": [
+        "未分类",
+        "薄涂(赛璐璐)"
+      ],
+      "danbooruCount": 153,
+      "assetImage": "assets/artist_prompts/artist_116.jpg",
+      "createdAt": 1762180027759
+    },
+    {
+      "name": "meion",
+      "tag": "meion",
+      "categories": [
+        "未分类"
+      ],
+      "danbooruCount": 395,
+      "assetImage": "assets/artist_prompts/artist_117.jpg",
+      "createdAt": 1762180044147
+    },
+    {
+      "name": "nekoya_(nekodayo_22)",
+      "tag": "nekoya_(nekodayo_22)",
+      "categories": [
+        "未分类",
+        "薄涂(赛璐璐)"
+      ],
+      "danbooruCount": 143,
+      "assetImage": "assets/artist_prompts/artist_118.jpg",
+      "createdAt": 1762180062682
+    },
+    {
+      "name": "love_cacao",
+      "tag": "love_cacao",
+      "categories": [
+        "未分类",
+        "薄涂(赛璐璐)",
+        "Nikke画风"
+      ],
+      "danbooruCount": 447,
+      "assetImage": "assets/artist_prompts/artist_119.jpg",
+      "createdAt": 1762180084902
+    },
+    {
+      "name": "turbulence",
+      "tag": "turbulence",
+      "categories": [
+        "未分类",
+        "薄涂(赛璐璐)"
+      ],
+      "danbooruCount": 228,
+      "assetImage": "assets/artist_prompts/artist_120.jpg",
+      "createdAt": 1762180101469
+    },
+    {
+      "name": "quuni",
+      "tag": "quuni",
+      "categories": [
+        "未分类"
+      ],
+      "danbooruCount": 212,
+      "assetImage": "assets/artist_prompts/artist_121.jpg",
+      "createdAt": 1762180125402
+    },
+    {
+      "name": "nanaken_nana",
+      "tag": "nanaken_nana",
+      "categories": [
+        "未分类",
+        "薄涂(赛璐璐)"
+      ],
+      "danbooruCount": 422,
+      "assetImage": "assets/artist_prompts/artist_122.jpg",
+      "createdAt": 1762180143375
+    },
+    {
+      "name": "fymrie",
+      "tag": "fymrie",
+      "categories": [
+        "未分类",
+        "薄涂(赛璐璐)"
+      ],
+      "danbooruCount": 255,
+      "assetImage": "assets/artist_prompts/artist_123.jpg",
+      "createdAt": 1762180187669
+    },
+    {
+      "name": "junpaku karen",
+      "tag": "junpaku karen",
+      "categories": [
+        "未分类",
+        "薄涂(赛璐璐)"
+      ],
+      "danbooruCount": 404,
+      "assetImage": "assets/artist_prompts/artist_124.jpg",
+      "createdAt": 1762232796537
+    },
+    {
+      "name": "atha (leejuiping)",
+      "tag": "atha (leejuiping)",
+      "categories": [
+        "未分类"
+      ],
+      "danbooruCount": 162,
+      "assetImage": "assets/artist_prompts/artist_125.jpg",
+      "createdAt": 1762232846456
+    },
+    {
+      "name": "bypos",
+      "tag": "bypos",
+      "categories": [
+        "未分类"
+      ],
+      "danbooruCount": 96,
+      "assetImage": "assets/artist_prompts/artist_126.jpg",
+      "createdAt": 1762232881196
+    },
+    {
+      "name": "tansuan_(ensj3875)",
+      "tag": "tansuan_(ensj3875)",
+      "categories": [
+        "未分类"
+      ],
+      "danbooruCount": 319,
+      "assetImage": "assets/artist_prompts/artist_127.jpg",
+      "createdAt": 1762232929944
+    },
+    {
+      "name": "ribao",
+      "tag": "ribao",
+      "categories": [
+        "未分类",
+        "伪厚涂"
+      ],
+      "danbooruCount": 153,
+      "assetImage": "assets/artist_prompts/artist_128.jpg",
+      "createdAt": 1762532778539
+    },
+    {
+      "name": "songjikyo",
+      "tag": "songjikyo",
+      "categories": [
+        "未分类"
+      ],
+      "danbooruCount": 236,
+      "assetImage": "assets/artist_prompts/artist_129.jpg",
+      "createdAt": 1762532816550
+    },
+    {
+      "name": "dishwasher1910",
+      "tag": "dishwasher1910",
+      "categories": [
+        "未分类"
+      ],
+      "danbooruCount": 1600,
+      "assetImage": "assets/artist_prompts/artist_130.jpg",
+      "createdAt": 1762707254752
+    },
+    {
+      "name": "qiandaiyiyu",
+      "tag": "qiandaiyiyu",
+      "categories": [
+        "未分类"
+      ],
+      "danbooruCount": 645,
+      "assetImage": "assets/artist_prompts/artist_131.jpg",
+      "createdAt": 1762707331402
+    },
+    {
+      "name": "kuma_daigorou",
+      "tag": "kuma_daigorou",
+      "categories": [
+        "未分类"
+      ],
+      "danbooruCount": 132,
+      "assetImage": "assets/artist_prompts/artist_132.jpg",
+      "createdAt": 1762774717227
+    },
+    {
+      "name": "tidsean",
+      "tag": "tidsean",
+      "categories": [
+        "未分类"
+      ],
+      "danbooruCount": 420,
+      "assetImage": "assets/artist_prompts/artist_133.jpg",
+      "createdAt": 1762774830212
+    },
+    {
+      "name": "yurika-r",
+      "tag": "yurika-r",
+      "categories": [
+        "未分类"
+      ],
+      "danbooruCount": 277,
+      "assetImage": "assets/artist_prompts/artist_134.jpg",
+      "createdAt": 1762866463702
+    },
+    {
+      "name": "riko_(rik0ring)",
+      "tag": "riko_(rik0ring)",
+      "categories": [
+        "未分类",
+        "薄涂(赛璐璐)"
+      ],
+      "danbooruCount": 127,
+      "assetImage": "assets/artist_prompts/artist_135.jpg",
+      "createdAt": 1762875465158
+    },
+    {
+      "name": "tokkyu",
+      "tag": "tokkyu",
+      "categories": [
+        "未分类"
+      ],
+      "danbooruCount": 533,
+      "assetImage": "assets/artist_prompts/artist_136.jpg",
+      "createdAt": 1762875539091
+    },
+    {
+      "name": "suzukasuraimu",
+      "tag": "suzukasuraimu",
+      "categories": [
+        "未分类"
+      ],
+      "danbooruCount": 132,
+      "assetImage": "assets/artist_prompts/artist_137.jpg",
+      "createdAt": 1762885000812
+    }
+  ],
+  "presets": []
+}

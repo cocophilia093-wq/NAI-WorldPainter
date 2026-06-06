@@ -9,6 +9,7 @@ import 'package:nai_huishi/presentation/pages/style_preset_page.dart';
 import 'package:nai_huishi/presentation/viewmodels/llm_chat_viewmodel.dart';
 import 'package:nai_huishi/presentation/widgets/llm_chat/chat_input_bar.dart';
 import 'package:nai_huishi/presentation/widgets/llm_chat/chat_message_bubble.dart';
+import 'package:nai_huishi/presentation/widgets/llm_chat/prompt_apply_parser.dart';
 import 'package:nai_huishi/presentation/widgets/llm_chat/chat_sessions_panel.dart';
 import 'package:nai_huishi/presentation/widgets/llm_chat/chat_settings_sheet.dart';
 
@@ -103,13 +104,15 @@ class _ChatDrawerState extends State<ChatDrawer> {
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width * 0.85;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     return Stack(
       children: [
         Positioned.fill(
           child: GestureDetector(
             behavior: HitTestBehavior.opaque,
             onTap: widget.onClose,
-            child: Container(color: Colors.black.withValues(alpha: 0.4)),
+            child: Container(color: Colors.black.withValues(alpha: isDark ? 0.48 : 0.38)),
           ),
         ),
         Positioned(
@@ -130,8 +133,10 @@ class _ChatDrawerState extends State<ChatDrawer> {
                 filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
                 child: Container(
                   decoration: BoxDecoration(
-                    color: const Color(0xFF14141A).withValues(alpha: 0.92),
-                    border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
+                    color: isDark
+                        ? const Color(0xFF14141A).withValues(alpha: 0.92)
+                        : Colors.white.withValues(alpha: 0.94),
+                    border: Border.all(color: theme.colorScheme.onSurface.withValues(alpha: 0.08)),
                     borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(28),
                       bottomLeft: Radius.circular(28),
@@ -144,7 +149,7 @@ class _ChatDrawerState extends State<ChatDrawer> {
                         _buildTopBar(),
                         Expanded(
                           child: !_ready || _vm.isLoading
-                              ? const Center(child: CircularProgressIndicator())
+                              ? Center(child: CircularProgressIndicator())
                               : _buildMessageList(),
                         ),
                         if (_vm.errorMessage != null)
@@ -160,17 +165,17 @@ class _ChatDrawerState extends State<ChatDrawer> {
                               ),
                               child: Row(
                                 children: [
-                                  const Icon(CupertinoIcons.exclamationmark_triangle, size: 16, color: Colors.redAccent),
-                                  const SizedBox(width: 8),
+                                  Icon(CupertinoIcons.exclamationmark_triangle, size: 16, color: Colors.redAccent),
+                                  SizedBox(width: 8),
                                   Expanded(
                                     child: Text(
                                       _vm.errorMessage!,
-                                      style: const TextStyle(fontSize: 12, color: Colors.white),
+                                      style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurface),
                                     ),
                                   ),
                                   GestureDetector(
                                     onTap: _vm.clearError,
-                                    child: const Icon(CupertinoIcons.xmark, size: 14, color: Colors.white60),
+                                    child: Icon(CupertinoIcons.xmark, size: 14, color: Theme.of(context).colorScheme.onSurfaceVariant),
                                   ),
                                 ],
                               ),
@@ -204,33 +209,33 @@ class _ChatDrawerState extends State<ChatDrawer> {
           IconButton(
             onPressed: _openSessions,
             tooltip: '会话列表',
-            icon: const Icon(CupertinoIcons.list_bullet, color: Colors.white),
+            icon: Icon(CupertinoIcons.list_bullet, color: Theme.of(context).colorScheme.onSurface),
           ),
           IconButton(
             onPressed: _openStylePresets,
             tooltip: '画风收藏',
-            icon: const Icon(CupertinoIcons.square_grid_2x2, color: Colors.white),
+            icon: Icon(CupertinoIcons.square_grid_2x2, color: Theme.of(context).colorScheme.onSurface),
           ),
           IconButton(
             onPressed: _openMemories,
             tooltip: '学习记忆',
-            icon: const Icon(CupertinoIcons.book, color: Colors.white),
+            icon: Icon(CupertinoIcons.book, color: Theme.of(context).colorScheme.onSurface),
           ),
           const Spacer(),
           IconButton(
             onPressed: _vm.createNewSession,
             tooltip: '新建会话',
-            icon: const Icon(CupertinoIcons.square_pencil, color: Colors.white),
+            icon: Icon(CupertinoIcons.square_pencil, color: Theme.of(context).colorScheme.onSurface),
           ),
           IconButton(
             onPressed: () => showChatSettingsSheet(context, _vm),
             tooltip: '配置',
-            icon: const Icon(CupertinoIcons.gear_alt, color: Colors.white),
+            icon: Icon(CupertinoIcons.gear_alt, color: Theme.of(context).colorScheme.onSurface),
           ),
           IconButton(
             onPressed: widget.onClose,
             tooltip: '关闭',
-            icon: const Icon(CupertinoIcons.xmark_circle_fill, color: Colors.white),
+            icon: Icon(CupertinoIcons.xmark_circle_fill, color: Theme.of(context).colorScheme.onSurface),
           ),
         ],
       ),
@@ -239,18 +244,18 @@ class _ChatDrawerState extends State<ChatDrawer> {
 
   Widget _buildMessageList() {
     if (_vm.messages.isEmpty) {
-      return const Center(
+      return Center(
         child: Padding(
-          padding: EdgeInsets.all(24),
+          padding: const EdgeInsets.all(24),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(CupertinoIcons.wand_stars, size: 34, color: Colors.white38),
+              Icon(CupertinoIcons.wand_stars, size: 34, color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.5)),
               SizedBox(height: 12),
               Text(
                 '描述你想生成的画面，我来帮你整理成提示词。\n建议让模型按正向/负向两个代码块输出。',
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 14, height: 1.6, color: Colors.white54),
+                style: TextStyle(fontSize: 14, height: 1.6, color: Theme.of(context).colorScheme.onSurfaceVariant),
               ),
             ],
           ),

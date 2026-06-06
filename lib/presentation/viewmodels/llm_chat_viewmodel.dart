@@ -317,6 +317,17 @@ class LlmChatViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> deleteAllSessions() async {
+    await _manageChat.deleteAllSessions();
+    final created = await _manageChat.createSession();
+    _sessions = [created];
+    _activeSessionId = created.id;
+    _messages = [];
+    await _manageSettings.setLlmActiveSessionId(_activeSessionId);
+    _errorMessage = null;
+    notifyListeners();
+  }
+
   Future<void> _captureExplicitMemoryInstruction(String text) async {
     final trimmed = text.trim();
     final patterns = [

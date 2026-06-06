@@ -12,6 +12,7 @@ class ManageLlmChatUseCase {
       _repo.createSession(initialTitle: initialTitle);
   Future<void> renameSession(String id, String title) => _repo.renameSession(id, title);
   Future<void> deleteSession(String id) => _repo.deleteSession(id);
+  Future<void> deleteAllSessions() => _repo.deleteAllSessions();
   Future<List<LlmMessage>> listMessages(String sessionId) => _repo.listMessages(sessionId);
 
   Future<LlmMessage> sendUserMessage({

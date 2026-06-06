@@ -6,7 +6,7 @@ class AppConstants {
 
   // 数据库
   static const String dbName = 'nai_huishi.db';
-  static const int dbVersion = 5;
+  static const int dbVersion = 6;
 
   // 本地存储
   static const String imagesDirName = 'generated_images';
@@ -176,36 +176,36 @@ class AppConstants {
       '\n'
       '**八、输出格式规范（必须严格遵守）**\n'
       '\n'
-      '单角色时，输出两个代码块：\n'
-      '正向：\n'
-      '```\n'
-      '（正向tag）\n'
-      '```\n'
-      '负向：\n'
-      '```\n'
-      '（负向tag）\n'
+      '你必须优先输出一个 json 代码块，所有可一键应用到生图页的内容都必须放进这个 JSON。JSON 外可以有简短中文对照，但不要把可应用 tag 只写在 JSON 外。\n'
+      '\n'
+      '单角色格式：\n'
+      '```json\n'
+      '{\n'
+      '  "positive": "正向英文 tags，用半角逗号分隔",\n'
+      '  "negative": "负向英文 tags，用半角逗号分隔",\n'
+      '  "characters": []\n'
+      '}\n'
       '```\n'
       '\n'
-      '多角色时（2人及以上），输出格式如下，每个角色和通用底模词各一个代码块，最后一个负向代码块：\n'
-      '通用底模词：\n'
-      '```\n'
-      '（画质词、画师串、环境、光影、构图等通用tag）\n'
-      '```\n'
-      '角色1：\n'
-      '```\n'
-      '（角色1的外貌、服装、动作tag，含互动标签）\n'
-      '```\n'
-      '角色2：\n'
-      '```\n'
-      '（角色2的外貌、服装、动作tag，含互动标签）\n'
-      '```\n'
-      '（如有更多角色依此类推）\n'
-      '负向：\n'
-      '```\n'
-      '（负向tag）\n'
+      '多角色格式：\n'
+      '```json\n'
+      '{\n'
+      '  "positive": "通用底模词、画质词、环境、光影、构图等全局正向 tags",\n'
+      '  "negative": "全局负向 tags",\n'
+      '  "characters": [\n'
+      '    {\n'
+      '      "positive": "角色1的外貌、服装、动作 tags，含互动标签",\n'
+      '      "negative": "角色1专属负向 tags，没有则留空字符串"\n'
+      '    },\n'
+      '    {\n'
+      '      "positive": "角色2的外貌、服装、动作 tags，含互动标签",\n'
+      '      "negative": "角色2专属负向 tags，没有则留空字符串"\n'
+      '    }\n'
+      '  ]\n'
+      '}\n'
       '```\n'
       '\n'
-      '注意：所有提示词内容必须放在 ``` 代码块内，代码块上方用中文标注用途（正向/负向/通用底模词/角色N）。禁止把tag写在代码块外面。';
+      '字段规则：positive、negative、characters、characters[].positive、characters[].negative 必须使用英文 tag 字符串；没有内容时使用空字符串或空数组。禁止使用中文字段名。';
 
   /// 关键词抽取小模型用的内置系统提示词。用户不可改。
   /// 目标：从用户原文中切出"用于 Danbooru 检索的种子词"。

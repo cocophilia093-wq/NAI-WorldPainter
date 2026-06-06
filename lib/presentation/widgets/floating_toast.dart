@@ -34,14 +34,14 @@ void showFloatingToast(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     if (icon != null) ...[
-                      Icon(icon, size: 16, color: Colors.white),
-                      const SizedBox(width: 8),
+                      Icon(icon, size: 16, color: Theme.of(context).colorScheme.onSurface),
+                      SizedBox(width: 8),
                     ],
                     Text(
                       text,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 14,
-                        color: Colors.white,
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontWeight: FontWeight.w500,
                       ),
                     ),

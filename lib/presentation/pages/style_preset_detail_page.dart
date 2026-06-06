@@ -37,12 +37,12 @@ class _StylePresetDetailPageState extends State<StylePresetDetailPage> {
     await showCupertinoDialog<void>(
       context: context,
       builder: (ctx) => CupertinoAlertDialog(
-        title: const Text('编辑画风收藏'),
+        title: Text('编辑画风收藏'),
         content: Material(
           color: Colors.transparent,
           child: Column(
             children: [
-              const SizedBox(height: 12),
+              SizedBox(height: 12),
               TextField(
                 controller: titleController,
                 decoration: const InputDecoration(labelText: '标题'),
@@ -59,7 +59,7 @@ class _StylePresetDetailPageState extends State<StylePresetDetailPage> {
         actions: [
           CupertinoDialogAction(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('取消'),
+            child: Text('取消'),
           ),
           CupertinoDialogAction(
             onPressed: () async {
@@ -74,7 +74,7 @@ class _StylePresetDetailPageState extends State<StylePresetDetailPage> {
               setState(() => _preset = updated);
               if (ctx.mounted) Navigator.pop(ctx);
             },
-            child: const Text('保存'),
+            child: Text('保存'),
           ),
         ],
       ),
@@ -90,17 +90,17 @@ class _StylePresetDetailPageState extends State<StylePresetDetailPage> {
     final confirmed = await showCupertinoDialog<bool>(
       context: context,
       builder: (ctx) => CupertinoAlertDialog(
-        title: const Text('删除收藏'),
-        content: const Text('确定删除这个画风画师串收藏吗？'),
+        title: Text('删除收藏'),
+        content: Text('确定删除这个画风画师串收藏吗？'),
         actions: [
           CupertinoDialogAction(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('取消'),
+            child: Text('取消'),
           ),
           CupertinoDialogAction(
             isDestructiveAction: true,
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('删除'),
+            child: Text('删除'),
           ),
         ],
       ),
@@ -119,8 +119,8 @@ class _StylePresetDetailPageState extends State<StylePresetDetailPage> {
       appBar: AppBar(
         title: Text(_preset.title),
         actions: [
-          IconButton(onPressed: _edit, icon: const Icon(CupertinoIcons.pencil)),
-          IconButton(onPressed: _delete, icon: const Icon(CupertinoIcons.delete)),
+          IconButton(onPressed: _edit, icon: Icon(CupertinoIcons.pencil)),
+          IconButton(onPressed: _delete, icon: Icon(CupertinoIcons.delete)),
         ],
       ),
       body: ListView(
@@ -133,22 +133,22 @@ class _StylePresetDetailPageState extends State<StylePresetDetailPage> {
               color: const Color(0xFF1C1C21),
               child: exists
                   ? InteractiveViewer(child: Image.file(file, fit: BoxFit.contain))
-                  : const Center(child: Icon(CupertinoIcons.photo, color: Colors.white24, size: 44)),
+                  : Center(child: Icon(CupertinoIcons.photo, color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.25), size: 44)),
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
           SelectableText(
             _preset.prompt,
-            style: const TextStyle(fontSize: 14, height: 1.6, color: Colors.white),
+            style: TextStyle(fontSize: 14, height: 1.6, color: Theme.of(context).colorScheme.onSurface),
           ),
-          const SizedBox(height: 18),
+          SizedBox(height: 18),
           FilledButton.icon(
             onPressed: () {
               widget.onApplyPrompt(_preset.prompt);
               Navigator.pop(context);
             },
-            icon: const Icon(CupertinoIcons.plus_circle),
-            label: const Text('添加到对话栏'),
+            icon: Icon(CupertinoIcons.plus_circle),
+            label: Text('添加到对话栏'),
           ),
         ],
       ),

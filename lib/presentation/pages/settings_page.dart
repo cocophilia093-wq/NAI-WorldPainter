@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:nai_huishi/core/di/injection.dart';
 import 'package:nai_huishi/presentation/pages/api_config_page.dart';
+import 'package:nai_huishi/presentation/pages/artist_prompt_manager_page.dart';
+import 'package:nai_huishi/presentation/pages/danbooru_tag_search_page.dart';
 import 'package:nai_huishi/presentation/viewmodels/settings_viewmodel.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -40,15 +42,21 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: ListView(
-          padding: const EdgeInsets.fromLTRB(12, 16, 12, 120),
+          padding: const EdgeInsets.fromLTRB(16, 18, 16, 120),
           children: [
-            const Padding(
-              padding: EdgeInsets.only(left: 2, bottom: 18),
+            Padding(
+              padding: const EdgeInsets.only(left: 4, bottom: 14),
               child: Text(
-                '设置',
-                style: TextStyle(fontSize: 26, fontWeight: FontWeight.w800, letterSpacing: -0.6),
+                '更多',
+                style: TextStyle(
+                  fontSize: 26,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: -0.8,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
               ),
             ),
             _SettingsGroup(
@@ -64,14 +72,25 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
               ],
             ),
-            const SizedBox(height: 24),
-            const _SettingsGroup(
+            SizedBox(height: 18),
+            _SettingsGroup(
               title: '更多功能',
               children: [
                 _SettingsTile(
-                  icon: CupertinoIcons.square_grid_2x2,
-                  title: '预留功能位',
-                  subtitle: '后续可以放模型默认参数、主题等',
+                  icon: CupertinoIcons.search,
+                  title: 'Danbooru 查词',
+                  subtitle: '直接搜索真实 Danbooru 标签',
+                  onTap: () => Navigator.of(context).push(
+                    CupertinoPageRoute(builder: (_) => const DanbooruTagSearchPage()),
+                  ),
+                ),
+                _SettingsTile(
+                  icon: CupertinoIcons.person_2_square_stack,
+                  title: '画师串管理',
+                  subtitle: '分类管理画师、调权重并生成 NAI 画师串',
+                  onTap: () => Navigator.of(context).push(
+                    CupertinoPageRoute(builder: (_) => const ArtistPromptManagerPage()),
+                  ),
                 ),
               ],
             ),
@@ -90,35 +109,33 @@ class _SettingsGroup extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final dividerColor = isDark
+        ? Colors.white.withValues(alpha: 0.07)
+        : Colors.black.withValues(alpha: 0.08);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 10, bottom: 10),
-          child: Text(
-            title,
-            style: const TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w700,
-              color: Colors.white70,
-              letterSpacing: 0.2,
+        ClipRRect(
+          borderRadius: BorderRadius.circular(20),
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF1C1C21) : Colors.white,
+            ),
+            child: Column(
+              children: [
+                for (var i = 0; i < children.length; i++) ...[
+                  children[i],
+                  if (i != children.length - 1)
+                    Padding(
+                      padding: const EdgeInsets.only(left: 86),
+                      child: Divider(height: 1, thickness: 0.7, color: dividerColor),
+                    ),
+                ],
+              ],
             ),
           ),
-        ),
-        Container(
-          decoration: BoxDecoration(
-            color: const Color(0xFF1C1C21),
-            borderRadius: BorderRadius.circular(30),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.055), width: 1),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.22),
-                blurRadius: 18,
-                offset: const Offset(0, 8),
-              ),
-            ],
-          ),
-          child: Column(children: children),
         ),
       ],
     );
@@ -141,44 +158,38 @@ class _SettingsTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      borderRadius: BorderRadius.circular(30),
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 13),
         child: Row(
           children: [
-            Container(
-              width: 36,
-              height: 36,
-              decoration: BoxDecoration(
-                color: const Color(0xFF3A3522),
-                borderRadius: BorderRadius.circular(10),
+            SizedBox(
+              width: 30,
+              height: 30,
+              child: Center(
+                child: Icon(icon, size: 20, color: Theme.of(context).colorScheme.primary),
               ),
-              child: Icon(icon, size: 18, color: Theme.of(context).colorScheme.primary),
             ),
-            const SizedBox(width: 14),
+            SizedBox(width: 12),
             Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    subtitle,
-                    style: const TextStyle(fontSize: 12, color: Colors.white54, height: 1.2),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
+              child: Text(
+                title,
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: -0.2,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
               ),
             ),
             if (onTap != null)
-              const Padding(
-                padding: EdgeInsets.only(left: 6),
-                child: Icon(CupertinoIcons.chevron_right, size: 16, color: Colors.white38),
+              Padding(
+                padding: const EdgeInsets.only(left: 8),
+                child: Icon(
+                  CupertinoIcons.chevron_right,
+                  size: 18,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.58),
+                ),
               ),
           ],
         ),
