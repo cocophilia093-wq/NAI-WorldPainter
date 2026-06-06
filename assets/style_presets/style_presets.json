@@ -1,0 +1,122 @@
+[
+  {
+    "title": "唯美",
+    "prompt": "[artist:kedama milk][artist:ask_(askzy)],artist:wanke,[artist:wlop],",
+    "assetImage": "assets/style_presets/style_001.jpg"
+  },
+  {
+    "title": "萌系",
+    "prompt": "[artist:ciloranko],artist:kazutake_hazano,[artist:kedama milk],[artist:ask_(askzy)],artist:wanke,artist:wlop,artist:fujiyama,",
+    "assetImage": "assets/style_presets/style_002.jpg"
+  },
+  {
+    "title": "卡通",
+    "prompt": "[[artist:wlop]],[artist:ningen mame],[artist:bilibili xiaolu],artist:ciloranko,[[artist:tianliang duohe fangdongye]],[artist:hiten {hitenkei}],[[[artist:bm_tol]]],",
+    "assetImage": "assets/style_presets/style_003.jpg"
+  },
+  {
+    "title": "清纯质感科技现代感",
+    "prompt": "artist:tekito_midori,artist:ask_(askzy),artist:ke-ta,artist:wanke,",
+    "assetImage": "assets/style_presets/style_004.jpg"
+  },
+  {
+    "title": "清纯质感 清新",
+    "prompt": "artist:tekito_midori,artist:ask_(askzy),artist:ke-ta,artist:wanke,[[artist:hiten_(hitenkei)]],",
+    "assetImage": "assets/style_presets/style_005.jpg"
+  },
+  {
+    "title": "人体",
+    "prompt": "artist:kazutake_hazano, artist:danimaru,[artist:ask_(askzy)], artist:wanke, artist:wlop, artist:fujiyama, artisit:yuyu_(yuyuworks)，artist:hiten_(hitenkei),atrisit:dishwasher1910,",
+    "assetImage": "assets/style_presets/style_006.jpg"
+  },
+  {
+    "title": "清新日系插画",
+    "prompt": "[[artist:kantoku]], [[artist:parsley-f]], [artist:yd_(orange_maru)], {artist:u_u_zan}, artist:komeshiro_kasu, [[artist:maett]], {artist:dsmile}, artist:fuya_(tempupupu),",
+    "assetImage": "assets/style_presets/style_007.jpg"
+  },
+  {
+    "title": "肉感",
+    "prompt": "artist:kazutake_hazano, artist:danimaru,[artist:ask_(askzy)], artist:wanke, artist:wlop, artist:fujiyama, artisit:yuyu_(yuyuworks)，artist:hiten_(hitenkei),atrisit:dishwasher1910,",
+    "assetImage": "assets/style_presets/style_008.jpg"
+  },
+  {
+    "title": "清透空气感日系赛璐璐",
+    "prompt": "ningen_mame,ciloranko,sho_(sho_lwlw),tianliang duohe,",
+    "assetImage": "assets/style_presets/style_009.jpg"
+  },
+  {
+    "title": "干净线条",
+    "prompt": "zhibuji,artist:ciloranko,artist:yushe_quetzalli,",
+    "assetImage": "assets/style_presets/style_010.jpg"
+  },
+  {
+    "title": "厚涂质感",
+    "prompt": "[artist:wlop],artist:ciloranko,",
+    "assetImage": "assets/style_presets/style_011.jpg"
+  },
+  {
+    "title": "精美 阴影质感",
+    "prompt": "{{mochizuki_kei,asakuraf}},wlop,marushin_(denwa0214),shion(mirudakemann),[ningen_mame,sho_(sho_lwlw)],ciloranko,",
+    "assetImage": "assets/style_presets/style_012.jpg"
+  },
+  {
+    "title": "精致线条",
+    "prompt": "[artist:ningen_mame],artist:ciloranko,[artist:sho_(sho_lwlw)],",
+    "assetImage": "assets/style_presets/style_013.jpg"
+  },
+  {
+    "title": "细节",
+    "prompt": "artist:[as109],[artist:ciloranko],[artist:oyariashito],[[artist:cutesexyrobutts]],",
+    "assetImage": "assets/style_presets/style_014.jpg"
+  },
+  {
+    "title": "细致唯美",
+    "prompt": "artist:[as109],[artist:ciloranko],[artist:oyariashito],[[artist:cutesexyrobutts]],",
+    "assetImage": "assets/style_presets/style_015.jpg"
+  },
+  {
+    "title": "高饱和 通透细腻",
+    "prompt": "houkisei,misaka_12003-gou,meion,[kaede_(sayappa),dishwasher1910],reoen, sencha_(senchat),you_shimizu,",
+    "assetImage": "assets/style_presets/style_016.jpg"
+  },
+  {
+    "title": "清透明快",
+    "prompt": "[artist:ningen_mame],artist:ciloranko,[artist:sho_(sho_lwlw)],[[tianliang duohe fangdongye]],[[artist:rhasta]],",
+    "assetImage": "assets/style_presets/style_017.jpg"
+  },
+  {
+    "title": "线条利落清爽",
+    "prompt": "{{artist:tekito_midori}},{{artist:ciloranko}},",
+    "assetImage": "assets/style_presets/style_018.jpg"
+  },
+  {
+    "title": "二次元细节赛璐璐",
+    "prompt": "[artist:kedama milk],[artist:ask_(askzy)],artist:wanke, [artist:ATDAN],artist:ciloranko,[[artist:rhasta]],[artist:tidsean],[artist:ke-ta],{{chiaroscuro}},[artist:as109]],[artist:sho_(sho_lwlw)]],,artist:wlop,",
+    "assetImage": "assets/style_presets/style_019.jpg"
+  },
+  {
+    "title": "风格化",
+    "prompt": "{{artist:mountain_han}},[[artist:kahlua]],artist:mochizuki_kei,[artist:gin00],",
+    "assetImage": "assets/style_presets/style_020.jpg"
+  },
+  {
+    "title": "厚涂",
+    "prompt": "[artist:kedama milk],agm,houkisei,wlop,[artist:ask_(askzy)],artist:wanke,{wlop, reoen},[artist:ATDAN],artist:ciloranko,[[artist:rhasta]],[artist:tidsean],[artist:ke-ta],{{chiaroscuro}},[artist:as109]],",
+    "assetImage": "assets/style_presets/style_021.jpg"
+  },
+  {
+    "title": "二次元明亮肉感",
+    "prompt": "artist:kazutake_hazano, artist:danimaru,[artist:ask_(askzy)], artist:wanke, artist:wlop, artist:fujiyama, artisit:yuyu_(yuyuworks)，artist:hiten_(hitenkei),atrisit:dishwasher1910,",
+    "assetImage": "assets/style_presets/style_022.jpg"
+  },
+  {
+    "title": "厚涂2",
+    "prompt": "{{[artist:ATDAN],artist:ciloranko,[[artist:rhasta]],[artist:tidsean],[artist:ke-ta],{{chiaroscuro}},[artist:as109]],[artist:sho_(sho_lwlw)]],",
+    "assetImage": "assets/style_presets/style_023.jpg"
+  },
+  {
+    "title": "coco神秘蜜汁画风（稳定版）",
+    "prompt": "masterpiece, best quality, very aesthetic, absurdres, luminous skin, luminous hair, crisp and clean, fine hair, 0.2::shiny skin::, 0.4::mignon, 1.2::sunlit bedroom, sheer curtains, soft daylight, floating dust particles, cozy interior, warm light, cinematic lighting, artist:quasarcake, artist:houkisei, artist:kedama milk, artist:40hara, artist:piromizu, [ke-ta], [modare], year 2024, year 2025",
+    "assetImage": "assets/style_presets/style_024.jpg"
+  }
+]

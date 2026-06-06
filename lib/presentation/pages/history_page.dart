@@ -105,7 +105,30 @@ class _HistoryPageState extends State<HistoryPage> {
       ),
       body: _vm.isLoading && _vm.history.isEmpty
           ? const Center(child: CupertinoActivityIndicator())
-          : RefreshIndicator(
+          : !_vm.isLoading && _vm.history.isEmpty
+              ? Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(32),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(CupertinoIcons.sparkles, size: 42, color: Colors.white38),
+                        const SizedBox(height: 14),
+                        const Text(
+                          '请去创造更多美好回忆吧！',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 15, color: Colors.white70, fontWeight: FontWeight.w600),
+                        ),
+                        const SizedBox(height: 18),
+                        FilledButton(
+                          onPressed: widget.onNavigate == null ? null : () => widget.onNavigate!(1),
+                          child: const Text('去创作'),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              : RefreshIndicator(
               onRefresh: () => _vm.loadHistory(refresh: true),
               child: GridView.builder(
                 controller: _scrollController,

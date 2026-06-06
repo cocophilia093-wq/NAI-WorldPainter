@@ -119,6 +119,12 @@ class SettingsLocalDatasource {
   int getLlmActiveProfile() => _prefs.getInt(AppConstants.keyLlmActiveProfile) ?? 0;
   Future<void> setLlmActiveProfile(int index) async => _prefs.setInt(AppConstants.keyLlmActiveProfile, index);
 
+  int getLlmExtractProfile() => _prefs.getInt(AppConstants.keyLlmExtractProfile) ?? 0;
+  Future<void> setLlmExtractProfile(int index) async => _prefs.setInt(AppConstants.keyLlmExtractProfile, index);
+
+  int getLlmComposeProfile() => _prefs.getInt(AppConstants.keyLlmComposeProfile) ?? 0;
+  Future<void> setLlmComposeProfile(int index) async => _prefs.setInt(AppConstants.keyLlmComposeProfile, index);
+
   int getLlmContextLimit() => _prefs.getInt(AppConstants.keyLlmContextLimit) ?? AppConstants.defaultLlmContextLimit;
   Future<void> setLlmContextLimit(int value) async => _prefs.setInt(AppConstants.keyLlmContextLimit, value);
 

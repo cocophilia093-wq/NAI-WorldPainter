@@ -202,20 +202,12 @@ class ChatMessageBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isUser = message.role == LlmMessageRole.user;
-    var segments = _splitContent(message.content);
-    // Danbooru 校准：替换正向代码块内容为校准结果
-    final calibrated = message.calibratedPositive;
-    if (!isUser && calibrated != null && calibrated.isNotEmpty) {
-      segments = [
-        for (final seg in segments)
-          if (seg.isCode && _isPositiveLabel(seg.label))
-            _Segment.code(calibrated, seg.lang, seg.label)
-          else
-            seg,
-      ];
-    }
+    final segments = _splitContent(message.content);
     final aggregated = isUser ? null : _aggregateSegments(segments);
     final showApplyAll = !isUser && onApplyAll != null && aggregated != null && !aggregated.isEmpty;
+    // 占位消息：纯 pipeline 状态，无正文
+    final isPlaceholder = !isUser && message.content.trim().isEmpty &&
+        message.pipelineStage != null;
 
     Widget bubble = Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
@@ -260,38 +252,39 @@ class ChatMessageBubble extends StatelessWidget {
                           ),
                         ),
                       ),
-                    for (final seg in segments)
-                      if (seg.isCode)
-                        _CodeBlock(
-                          text: seg.text,
-                          lang: seg.lang,
-                          label: seg.label,
-                          showApplyButtons: !isUser,
-                          onApplyPrompt: onApplyPrompt,
-                          onApplyNegative: onApplyNegative,
-                        )
-                      else
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 2),
-                          child: isUser
-                              ? Text(
-                                  seg.text.trim(),
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    height: 1.5,
-                                    color: Colors.white,
+                    if (!isPlaceholder)
+                      for (final seg in segments)
+                        if (seg.isCode)
+                          _CodeBlock(
+                            text: seg.text,
+                            lang: seg.lang,
+                            label: seg.label,
+                            showApplyButtons: !isUser,
+                            onApplyPrompt: onApplyPrompt,
+                            onApplyNegative: onApplyNegative,
+                          )
+                        else
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 2),
+                            child: isUser
+                                ? Text(
+                                    seg.text.trim(),
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      height: 1.5,
+                                      color: Colors.white,
+                                    ),
+                                  )
+                                : SelectableText(
+                                    seg.text.trim(),
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      height: 1.5,
+                                      color: Colors.white,
+                                    ),
                                   ),
-                                )
-                              : SelectableText(
-                                  seg.text.trim(),
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    height: 1.5,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                        ),
-                    if (showApplyAll)
+                          ),
+                    if (showApplyAll && !isPlaceholder)
                       Padding(
                         padding: const EdgeInsets.only(top: 8),
                         child: _ApplyAllButton(
@@ -299,12 +292,14 @@ class ChatMessageBubble extends StatelessWidget {
                           onApplyAll: onApplyAll!,
                         ),
                       ),
-                    if (!isUser && message.calibrationStatus != null && message.calibrationStatus!.isNotEmpty)
+                    if (!isUser &&
+                        message.pipelineStatus != null &&
+                        message.pipelineStatus!.isNotEmpty)
                       Padding(
-                        padding: const EdgeInsets.only(top: 6),
-                        child: _CalibrationStatusLine(
-                          text: message.calibrationStatus!,
-                          success: message.calibrationSuccess,
+                        padding: EdgeInsets.only(top: isPlaceholder ? 0 : 6),
+                        child: _PipelineStatusLine(
+                          text: message.pipelineStatus!,
+                          stage: message.pipelineStage,
                         ),
                       ),
                   ],
@@ -670,26 +665,44 @@ class _ApplyAllButton extends StatelessWidget {
   }
 }
 
-/// Danbooru 校准状态条：成功用绿色 ✓，失败用灰色提示。
-class _CalibrationStatusLine extends StatelessWidget {
+/// Danbooru 三段式流程状态条：根据 pipelineStage 显示不同图标 + 颜色。
+///   extracting / searching / composing → 蓝色 spinner
+///   done → 绿色 ✓
+///   fallback → 灰色感叹号
+class _PipelineStatusLine extends StatelessWidget {
   final String text;
-  final bool success;
-  const _CalibrationStatusLine({required this.text, required this.success});
+  final String? stage;
+  const _PipelineStatusLine({required this.text, required this.stage});
+
+  bool get _isPending =>
+      stage == 'extracting' || stage == 'searching' || stage == 'composing';
+  bool get _isDone => stage == 'done';
 
   @override
   Widget build(BuildContext context) {
-    final color = success
-        ? Colors.greenAccent.shade400
-        : Colors.white.withValues(alpha: 0.45);
+    final Color color;
+    final Widget leading;
+    if (_isPending) {
+      color = const Color(0xFF7AB8F5);
+      leading = SizedBox(
+        width: 12,
+        height: 12,
+        child: CircularProgressIndicator(
+          strokeWidth: 1.6,
+          valueColor: AlwaysStoppedAnimation<Color>(color),
+        ),
+      );
+    } else if (_isDone) {
+      color = Colors.greenAccent.shade400;
+      leading = Icon(CupertinoIcons.checkmark_seal_fill, size: 12, color: color);
+    } else {
+      // fallback / unknown
+      color = Colors.white.withValues(alpha: 0.45);
+      leading = Icon(CupertinoIcons.exclamationmark_circle, size: 12, color: color);
+    }
     return Row(
       children: [
-        Icon(
-          success
-              ? CupertinoIcons.checkmark_seal_fill
-              : CupertinoIcons.exclamationmark_circle,
-          size: 12,
-          color: color,
-        ),
+        leading,
         const SizedBox(width: 6),
         Expanded(
           child: Text(

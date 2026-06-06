@@ -4,6 +4,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:nai_huishi/core/di/injection.dart';
 import 'package:nai_huishi/domain/entities/llm_message.dart';
+import 'package:nai_huishi/presentation/pages/prompt_memory_page.dart';
+import 'package:nai_huishi/presentation/pages/style_preset_page.dart';
 import 'package:nai_huishi/presentation/viewmodels/llm_chat_viewmodel.dart';
 import 'package:nai_huishi/presentation/widgets/llm_chat/chat_input_bar.dart';
 import 'package:nai_huishi/presentation/widgets/llm_chat/chat_message_bubble.dart';
@@ -31,6 +33,7 @@ class ChatDrawer extends StatefulWidget {
 class _ChatDrawerState extends State<ChatDrawer> {
   late final LlmChatViewModel _vm;
   final ScrollController _scrollController = ScrollController();
+  final TextEditingController _inputController = TextEditingController();
   bool _ready = false;
 
   @override
@@ -67,11 +70,34 @@ class _ChatDrawerState extends State<ChatDrawer> {
   void dispose() {
     _vm.removeListener(_onVmChanged);
     _scrollController.dispose();
+    _inputController.dispose();
     super.dispose();
   }
 
   Future<void> _openSessions() async {
     await showChatSessionsPanel(context, vm: _vm);
+  }
+
+  void _insertIntoInput(String text) {
+    final current = _inputController.text.trim();
+    _inputController.text = current.isEmpty ? text : '$current, $text';
+    _inputController.selection = TextSelection.collapsed(offset: _inputController.text.length);
+  }
+
+  Future<void> _openStylePresets() async {
+    await Navigator.push(
+      context,
+      CupertinoPageRoute(
+        builder: (_) => StylePresetPage(onApplyPrompt: _insertIntoInput),
+      ),
+    );
+  }
+
+  Future<void> _openMemories() async {
+    await Navigator.push(
+      context,
+      CupertinoPageRoute(builder: (_) => const PromptMemoryPage()),
+    );
   }
 
   @override
@@ -151,9 +177,10 @@ class _ChatDrawerState extends State<ChatDrawer> {
                             ),
                           ),
                         ChatInputBar(
+                          controller: _inputController,
                           isSending: _vm.isSending,
-                          webSearchEnabled: _vm.webSearchEnabled,
-                          onToggleWebSearch: _vm.toggleWebSearch,
+                          danbooruSearchEnabled: _vm.danbooruSearchEnabled,
+                          onToggleDanbooruSearch: _vm.toggleDanbooruSearch,
                           onSend: (text, {String? imageBase64}) =>
                               _vm.sendUserMessage(text, imageBase64: imageBase64),
                         ),
@@ -171,32 +198,25 @@ class _ChatDrawerState extends State<ChatDrawer> {
 
   Widget _buildTopBar() {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(12, 10, 8, 8),
+      padding: const EdgeInsets.fromLTRB(8, 8, 8, 6),
       child: Row(
         children: [
           IconButton(
             onPressed: _openSessions,
+            tooltip: '会话列表',
             icon: const Icon(CupertinoIcons.list_bullet, color: Colors.white),
           ),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  '提示词辅助写手',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
-                ),
-                Text(
-                  _vm.activeSession?.title ?? '新对话',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(fontSize: 12, color: Colors.white54),
-                ),
-              ],
-            ),
+          IconButton(
+            onPressed: _openStylePresets,
+            tooltip: '画风收藏',
+            icon: const Icon(CupertinoIcons.square_grid_2x2, color: Colors.white),
           ),
+          IconButton(
+            onPressed: _openMemories,
+            tooltip: '学习记忆',
+            icon: const Icon(CupertinoIcons.book, color: Colors.white),
+          ),
+          const Spacer(),
           IconButton(
             onPressed: _vm.createNewSession,
             tooltip: '新建会话',
@@ -204,10 +224,12 @@ class _ChatDrawerState extends State<ChatDrawer> {
           ),
           IconButton(
             onPressed: () => showChatSettingsSheet(context, _vm),
+            tooltip: '配置',
             icon: const Icon(CupertinoIcons.gear_alt, color: Colors.white),
           ),
           IconButton(
             onPressed: widget.onClose,
+            tooltip: '关闭',
             icon: const Icon(CupertinoIcons.xmark_circle_fill, color: Colors.white),
           ),
         ],

@@ -39,9 +39,13 @@ class _ChatSettingsSheetState extends State<_ChatSettingsSheet>
   bool _nsfwBookLoaded = false;
   String _nsfwBookStatus = '';
 
-  // Danbooru 校准
+  // Danbooru 校准（含三段式流程开关）
   bool _danbooruEnabled = true;
   late final TextEditingController _danbooruBaseUrlController;
+
+  // 双模型分配（抽取 / 编排）
+  int _extractProfileIndex = 0;
+  int _composeProfileIndex = 0;
 
   // 每个 profile 的 controllers
   late final List<TextEditingController> _nameControllers;
@@ -97,10 +101,14 @@ class _ChatSettingsSheetState extends State<_ChatSettingsSheet>
     final settings = sl<ManageSettingsUseCase>();
     final enabled = await settings.getDanbooruCalibrationEnabled();
     final baseUrl = await settings.getDanbooruBaseUrl();
+    final extractIdx = await settings.getLlmExtractProfile();
+    final composeIdx = await settings.getLlmComposeProfile();
     if (!mounted) return;
     setState(() {
       _danbooruEnabled = enabled;
       _danbooruBaseUrlController.text = baseUrl;
+      _extractProfileIndex = extractIdx;
+      _composeProfileIndex = composeIdx;
     });
   }
 
@@ -177,6 +185,9 @@ class _ChatSettingsSheetState extends State<_ChatSettingsSheet>
     // 保存 Danbooru 校准设置
     await settings.setDanbooruCalibrationEnabled(_danbooruEnabled);
     await settings.setDanbooruBaseUrl(_danbooruBaseUrlController.text.trim());
+    // 保存双模型分配
+    await vm.setExtractProfile(_extractProfileIndex);
+    await vm.setComposeProfile(_composeProfileIndex);
     if (mounted) {
       showFloatingToast(context, '已保存配置', icon: CupertinoIcons.checkmark_circle_fill);
     }
@@ -427,7 +438,9 @@ class _ChatSettingsSheetState extends State<_ChatSettingsSheet>
             OutlinedButton.icon(
               onPressed: () async {
                 await widget.vm.switchProfile(i);
-                setState(() {});
+                setState(() {
+                  _composeProfileIndex = i;
+                });
               },
               icon: const Icon(CupertinoIcons.arrow_right_circle, size: 16),
               label: const Text('切换到此配置'),
@@ -499,15 +512,15 @@ class _ChatSettingsSheetState extends State<_ChatSettingsSheet>
               style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
           const SizedBox(height: 4),
           const Text(
-            '开启后，每次 LLM 回复将自动用真实 Danbooru tag 校准正向提示词，'
-            '并补充共现推荐。失败时保留 LLM 原文。',
+            '开启后采用「先 Danbooru 检索、后 LLM 编排」的三段式流程：'
+            '关键词抽取 → Danbooru 检索 → 提示词编排。失败时自动降级为单次 LLM。',
             style: TextStyle(fontSize: 11, color: Colors.white38),
           ),
           const SizedBox(height: 8),
           Row(
             children: [
               const Expanded(
-                child: Text('启用 Danbooru 校准',
+                child: Text('启用 Danbooru 三段式流程',
                     style: TextStyle(fontSize: 14, color: Colors.white70)),
               ),
               Switch.adaptive(
@@ -529,6 +542,47 @@ class _ChatSettingsSheetState extends State<_ChatSettingsSheet>
           const Text(
             '留空时会优先访问魔搭 ModelScope，不可用时自动回退到 HuggingFace。',
             style: TextStyle(fontSize: 11, color: Colors.white38),
+          ),
+          const SizedBox(height: 20),
+          const Divider(height: 1),
+          const SizedBox(height: 16),
+          const Text('双模型分配（仅 Danbooru 三段式流程使用）',
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+          const SizedBox(height: 4),
+          const Text(
+            '抽取模型用于把用户原文切成关键词（建议选最便宜的小模型，例如 gpt-4o-mini / Doubao Lite），'
+            '编排模型用 Danbooru 真实 tag 池写成 NovelAI 提示词（建议选最强的）。',
+            style: TextStyle(fontSize: 11, color: Colors.white38),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              const Expanded(
+                child: Text('关键词抽取模型',
+                    style: TextStyle(fontSize: 14, color: Colors.white70)),
+              ),
+              _buildProfileDropdown(
+                value: _extractProfileIndex,
+                onChanged: (v) {
+                  if (v != null) setState(() => _extractProfileIndex = v);
+                },
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              const Expanded(
+                child: Text('提示词编排模型',
+                    style: TextStyle(fontSize: 14, color: Colors.white70)),
+              ),
+              _buildProfileDropdown(
+                value: _composeProfileIndex,
+                onChanged: (v) {
+                  if (v != null) setState(() => _composeProfileIndex = v);
+                },
+              ),
+            ],
           ),
           const SizedBox(height: 20),
           const Divider(height: 1),
@@ -574,6 +628,30 @@ class _ChatSettingsSheetState extends State<_ChatSettingsSheet>
             ),
         ],
       ),
+    );
+  }
+
+  Widget _buildProfileDropdown({
+    required int value,
+    required ValueChanged<int?> onChanged,
+  }) {
+    return DropdownButton<int>(
+      value: value,
+      dropdownColor: const Color(0xFF1C1C21),
+      underline: const SizedBox.shrink(),
+      style: const TextStyle(fontSize: 13, color: Colors.white),
+      items: [
+        for (int i = 0; i < AppConstants.llmProfileCount; i++)
+          DropdownMenuItem<int>(
+            value: i,
+            child: Text(
+              _nameControllers[i].text.trim().isEmpty
+                  ? '配置 ${i + 1}'
+                  : _nameControllers[i].text.trim(),
+            ),
+          ),
+      ],
+      onChanged: onChanged,
     );
   }
 }

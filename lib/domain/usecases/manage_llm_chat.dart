@@ -38,4 +38,20 @@ class ManageLlmChatUseCase {
   /// 删除指定消息及其之后的所有消息
   Future<void> deleteMessagesFrom(int messageId, String sessionId) =>
       _repo.deleteMessagesFrom(messageId, sessionId);
+
+  /// 不落库的轻量调用（关键词抽取等中间步骤用）
+  Future<String> chatCompletionsRaw({
+    required String apiKey,
+    required String baseUrl,
+    required String model,
+    required String systemPrompt,
+    required String userText,
+  }) =>
+      _repo.chatCompletionsRaw(
+        apiKey: apiKey,
+        baseUrl: baseUrl,
+        model: model,
+        systemPrompt: systemPrompt,
+        userText: userText,
+      );
 }

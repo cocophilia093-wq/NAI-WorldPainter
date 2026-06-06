@@ -148,4 +148,23 @@ class LlmChatRepositoryImpl implements LlmChatRepository {
   @override
   Future<void> deleteMessagesFrom(int messageId, String sessionId) =>
       _local.deleteMessagesFrom(messageId, sessionId);
+
+  @override
+  Future<String> chatCompletionsRaw({
+    required String apiKey,
+    required String baseUrl,
+    required String model,
+    required String systemPrompt,
+    required String userText,
+  }) {
+    return _api.chatCompletions(
+      apiKey: apiKey,
+      baseUrl: baseUrl,
+      model: model,
+      messages: [
+        {'role': 'system', 'content': systemPrompt},
+        {'role': 'user', 'content': userText},
+      ],
+    );
+  }
 }

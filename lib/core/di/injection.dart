@@ -16,30 +16,40 @@ import 'package:nai_huishi/data/repositories/generation_repository_impl.dart';
 import 'package:nai_huishi/data/repositories/history_repository_impl.dart';
 import 'package:nai_huishi/data/repositories/llm_chat_repository_impl.dart';
 import 'package:nai_huishi/data/repositories/preset_repository_impl.dart';
+import 'package:nai_huishi/data/repositories/prompt_memory_repository_impl.dart';
 import 'package:nai_huishi/data/repositories/prompt_template_repository_impl.dart';
 import 'package:nai_huishi/data/repositories/settings_repository_impl.dart';
+import 'package:nai_huishi/data/repositories/style_preset_repository_impl.dart';
 import 'package:nai_huishi/domain/repositories/generation_repository.dart';
 import 'package:nai_huishi/domain/repositories/history_repository.dart';
 import 'package:nai_huishi/domain/repositories/llm_chat_repository.dart';
 import 'package:nai_huishi/domain/repositories/preset_repository.dart';
+import 'package:nai_huishi/domain/repositories/prompt_memory_repository.dart';
 import 'package:nai_huishi/domain/repositories/prompt_template_repository.dart';
 import 'package:nai_huishi/domain/repositories/settings_repository.dart';
+import 'package:nai_huishi/domain/repositories/style_preset_repository.dart';
 import 'package:nai_huishi/domain/usecases/generate_image.dart';
 import 'package:nai_huishi/domain/usecases/get_history.dart';
 import 'package:nai_huishi/domain/usecases/manage_llm_chat.dart';
 import 'package:nai_huishi/domain/usecases/manage_presets.dart';
+import 'package:nai_huishi/domain/usecases/manage_prompt_memories.dart';
 import 'package:nai_huishi/domain/usecases/manage_prompt_templates.dart';
 import 'package:nai_huishi/domain/usecases/manage_settings.dart';
+import 'package:nai_huishi/domain/usecases/manage_style_presets.dart';
 import 'package:nai_huishi/domain/usecases/save_image.dart';
 import 'package:nai_huishi/domain/usecases/calibrate_with_danbooru.dart';
+import 'package:nai_huishi/domain/usecases/extract_keywords.dart';
+import 'package:nai_huishi/domain/usecases/search_danbooru_tags.dart';
 import 'package:nai_huishi/core/queue/generation_queue.dart';
 import 'package:nai_huishi/core/network/robust_http_adapter.dart';
 import 'package:nai_huishi/presentation/viewmodels/generation_viewmodel.dart';
 import 'package:nai_huishi/presentation/viewmodels/history_viewmodel.dart';
 import 'package:nai_huishi/presentation/viewmodels/llm_chat_viewmodel.dart';
 import 'package:nai_huishi/presentation/viewmodels/preset_viewmodel.dart';
+import 'package:nai_huishi/presentation/viewmodels/prompt_memory_viewmodel.dart';
 import 'package:nai_huishi/presentation/viewmodels/prompt_template_viewmodel.dart';
 import 'package:nai_huishi/presentation/viewmodels/settings_viewmodel.dart';
+import 'package:nai_huishi/presentation/viewmodels/style_preset_viewmodel.dart';
 
 final sl = GetIt.instance;
 
@@ -73,7 +83,9 @@ Future<void> configureDependencies() async {
   ));
   sl.registerSingleton<HistoryRepository>(HistoryRepositoryImpl(sl<Database>()));
   sl.registerSingleton<PresetRepository>(PresetRepositoryImpl(sl<Database>()));
+  sl.registerSingleton<PromptMemoryRepository>(PromptMemoryRepositoryImpl(sl<Database>()));
   sl.registerSingleton<PromptTemplateRepository>(PromptTemplateRepositoryImpl(sl<Database>()));
+  sl.registerSingleton<StylePresetRepository>(StylePresetRepositoryImpl(sl<Database>()));
   sl.registerSingleton<LlmChatRepository>(LlmChatRepositoryImpl(
     local: sl<LlmChatLocalDatasource>(),
     api: sl<LlmApiService>(),
@@ -89,12 +101,18 @@ Future<void> configureDependencies() async {
   ));
   sl.registerSingleton<GetHistoryUseCase>(GetHistoryUseCase(sl<HistoryRepository>()));
   sl.registerSingleton<ManagePresetsUseCase>(ManagePresetsUseCase(sl<PresetRepository>()));
+  sl.registerSingleton<ManagePromptMemoriesUseCase>(ManagePromptMemoriesUseCase(sl<PromptMemoryRepository>()));
   sl.registerSingleton<ManagePromptTemplatesUseCase>(ManagePromptTemplatesUseCase(sl<PromptTemplateRepository>()));
   sl.registerSingleton<ManageSettingsUseCase>(ManageSettingsUseCase(sl<SettingsRepository>()));
+  sl.registerSingleton<ManageStylePresetsUseCase>(ManageStylePresetsUseCase(sl<StylePresetRepository>()));
   sl.registerSingleton<ManageLlmChatUseCase>(ManageLlmChatUseCase(sl<LlmChatRepository>()));
   sl.registerSingleton<SaveImageUseCase>(SaveImageUseCase(sl<HistoryRepository>()));
   sl.registerSingleton<CalibrateWithDanbooruUseCase>(
       CalibrateWithDanbooruUseCase(sl<DanbooruApiService>()));
+  sl.registerSingleton<ExtractKeywordsUseCase>(
+      ExtractKeywordsUseCase(sl<LlmApiService>()));
+  sl.registerSingleton<SearchDanbooruTagsUseCase>(
+      SearchDanbooruTagsUseCase(sl<DanbooruApiService>()));
 
   sl.registerFactory<GenerationViewModel>(() => GenerationViewModel(
     generateImage: sl<GenerateImageUseCase>(),
@@ -102,14 +120,17 @@ Future<void> configureDependencies() async {
     saveImage: sl<SaveImageUseCase>(),
     queue: sl<GenerationQueue>(),
   ));
-  sl.registerFactory<HistoryViewModel>(() => HistoryViewModel(sl<GetHistoryUseCase>()));
+  sl.registerLazySingleton<HistoryViewModel>(() => HistoryViewModel(sl<GetHistoryUseCase>(), sl<GenerationQueue>()));
   sl.registerFactory<PresetViewModel>(() => PresetViewModel(sl<ManagePresetsUseCase>()));
+  sl.registerFactory<PromptMemoryViewModel>(() => PromptMemoryViewModel(sl<ManagePromptMemoriesUseCase>()));
   sl.registerFactory<PromptTemplateViewModel>(() => PromptTemplateViewModel(sl<ManagePromptTemplatesUseCase>()));
   sl.registerLazySingleton<SettingsViewModel>(() => SettingsViewModel(sl<ManageSettingsUseCase>()));
+  sl.registerFactory<StylePresetViewModel>(() => StylePresetViewModel(sl<ManageStylePresetsUseCase>()));
   sl.registerFactory<LlmChatViewModel>(() => LlmChatViewModel(
     manageChat: sl<ManageLlmChatUseCase>(),
     manageSettings: sl<ManageSettingsUseCase>(),
-    bingSearch: sl<BingSearchService>(),
-    calibrate: sl<CalibrateWithDanbooruUseCase>(),
+    extract: sl<ExtractKeywordsUseCase>(),
+    searchTags: sl<SearchDanbooruTagsUseCase>(),
+    memories: sl<ManagePromptMemoriesUseCase>(),
   ));
 }

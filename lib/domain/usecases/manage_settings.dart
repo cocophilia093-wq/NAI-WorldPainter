@@ -83,6 +83,12 @@ class ManageSettingsUseCase {
   Future<int> getLlmActiveProfile() => _repo.getLlmActiveProfile();
   Future<void> setLlmActiveProfile(int index) => _repo.setLlmActiveProfile(index);
 
+  Future<int> getLlmExtractProfile() => _repo.getLlmExtractProfile();
+  Future<void> setLlmExtractProfile(int index) => _repo.setLlmExtractProfile(index);
+
+  Future<int> getLlmComposeProfile() => _repo.getLlmComposeProfile();
+  Future<void> setLlmComposeProfile(int index) => _repo.setLlmComposeProfile(index);
+
   Future<int> getLlmContextLimit() => _repo.getLlmContextLimit();
   Future<void> setLlmContextLimit(int value) => _repo.setLlmContextLimit(value);
 

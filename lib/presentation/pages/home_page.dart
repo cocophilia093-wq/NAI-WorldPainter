@@ -6,6 +6,7 @@ import 'package:nai_huishi/presentation/pages/generate_page.dart';
 import 'package:nai_huishi/presentation/pages/history_page.dart';
 import 'package:nai_huishi/presentation/pages/settings_page.dart';
 import 'package:nai_huishi/presentation/viewmodels/generation_viewmodel.dart';
+import 'package:nai_huishi/presentation/viewmodels/history_viewmodel.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -23,6 +24,10 @@ class _HomePageState extends State<HomePage> {
       // 切到生成页时刷新模型列表（用户可能刚在设置页保存了供应商配置）
       if (index == 1) {
         sl<GenerationViewModel>().loadModels();
+      }
+      // 切到历史页时主动刷新一次（IndexedStack 不会触发子页 didChangeDependencies）
+      if (index == 0) {
+        sl<HistoryViewModel>().loadHistory(refresh: true);
       }
     }
   }

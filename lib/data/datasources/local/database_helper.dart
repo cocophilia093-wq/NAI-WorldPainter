@@ -96,6 +96,7 @@ class DatabaseHelper {
     await db.execute('CREATE INDEX idx_templates_category ON prompt_templates(category)');
 
     await _createLlmTables(db);
+    await _createPromptAssistantTables(db);
   }
 
   Future<void> _createLlmTables(Database db) async {
@@ -121,6 +122,34 @@ class DatabaseHelper {
     await db.execute('CREATE INDEX idx_llm_sessions_updated ON llm_sessions(updated_at)');
   }
 
+  Future<void> _createPromptAssistantTables(Database db) async {
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS prompt_memories (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        trigger TEXT NOT NULL,
+        content TEXT NOT NULL,
+        type TEXT NOT NULL,
+        source TEXT NOT NULL,
+        created_at INTEGER NOT NULL,
+        updated_at INTEGER NOT NULL
+      )
+    ''');
+    await db.execute('CREATE INDEX IF NOT EXISTS idx_prompt_memories_trigger ON prompt_memories(trigger)');
+    await db.execute('CREATE INDEX IF NOT EXISTS idx_prompt_memories_updated ON prompt_memories(updated_at)');
+
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS style_presets (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT NOT NULL,
+        prompt TEXT NOT NULL,
+        image_path TEXT NOT NULL,
+        created_at INTEGER NOT NULL,
+        updated_at INTEGER NOT NULL
+      )
+    ''');
+    await db.execute('CREATE INDEX IF NOT EXISTS idx_style_presets_updated ON style_presets(updated_at)');
+  }
+
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
     if (oldVersion < 2) {
       await db.execute('ALTER TABLE generation_history ADD COLUMN seed INTEGER');
@@ -132,6 +161,9 @@ class DatabaseHelper {
     }
     if (oldVersion < 4) {
       await _createLlmTables(db);
+    }
+    if (oldVersion < 5) {
+      await _createPromptAssistantTables(db);
     }
   }
 }

@@ -6,10 +6,11 @@ class AppConstants {
 
   // 数据库
   static const String dbName = 'nai_huishi.db';
-  static const int dbVersion = 4;
+  static const int dbVersion = 5;
 
   // 本地存储
   static const String imagesDirName = 'generated_images';
+  static const String stylePresetsDirName = 'style_presets';
 
   // 设置 key
   static const String keyApiKey = 'api_key';
@@ -47,6 +48,10 @@ class AppConstants {
   static String keyLlmProfileBaseUrl(int i) => 'llm_profile_${i}_base_url';
   static String keyLlmProfileModel(int i) => 'llm_profile_${i}_model';
   static String keyLlmProfileName(int i) => 'llm_profile_${i}_name';
+
+  // 双模型分配：抽取用 / 编排用 Profile 索引（0~3，复用 keyLlmProfileXxx 4 个 Profile）
+  static const String keyLlmExtractProfile = 'llm_extract_profile';
+  static const String keyLlmComposeProfile = 'llm_compose_profile';
 
   // 知识库
   static const String keyNsfwBookPath = 'nsfw_book_path';
@@ -201,6 +206,33 @@ class AppConstants {
       '```\n'
       '\n'
       '注意：所有提示词内容必须放在 ``` 代码块内，代码块上方用中文标注用途（正向/负向/通用底模词/角色N）。禁止把tag写在代码块外面。';
+
+  /// 关键词抽取小模型用的内置系统提示词。用户不可改。
+  /// 目标：从用户原文中切出"用于 Danbooru 检索的种子词"。
+  static const String builtinExtractSystemPrompt =
+      '你是 Danbooru 标签检索的"种子词抽取器"。任务是把用户用中文/英文写的画面描述拆成若干个用于 Danbooru 语义搜索的关键词。\n'
+      '\n'
+      '【输出格式（必须严格遵守）】\n'
+      '只输出一个 JSON 对象，不要任何解释、不要 markdown 代码块包裹、不要前后空行。结构：\n'
+      '{\n'
+      '  "characters": ["角色1的描述", "角色2的描述"],\n'
+      '  "scene": ["场景/动作/表情等关键词"],\n'
+      '  "style": ["画风/构图/镜头等关键词"],\n'
+      '  "nsfw": ["nsfw 关键词，无则空数组"]\n'
+      '}\n'
+      '\n'
+      '【拆分规则】\n'
+      '1. characters：每个角色一项，包含外貌、服装、姿势的简短描述。单角色就一项；多角色就分别列出。如果是有名作品角色，写上"角色名 (作品名)"格式。\n'
+      '2. scene：环境、地点、动作、表情、互动关键词，每条一个独立短语。\n'
+      '3. style：画质偏好、画风、构图、镜头、光影。用户没说就给空数组。\n'
+      '4. nsfw：仅当用户明确要求 NSFW 时才填，其他情况空数组。\n'
+      '\n'
+      '【关键约束】\n'
+      '- 中英文都行，Danbooru 服务支持中文语义检索。\n'
+      '- 不要凭空补充用户没写的元素（不加戏）。\n'
+      '- 每条短语 1-4 个词，过长会降低检索精度。\n'
+      '- 用户文字模糊时（如"画一个少女"），最少给出 characters: ["少女"]，其他可空。\n'
+      '- 严禁输出 JSON 之外的任何文字。';
 
   // 图像 API 供应商配置
   static const String keyImageProviderNovelAiBaseUrl = 'image_provider_novelai_base_url';

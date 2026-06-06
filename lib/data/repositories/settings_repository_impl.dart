@@ -168,6 +168,18 @@ class SettingsRepositoryImpl implements SettingsRepository {
   Future<void> setLlmActiveProfile(int index) => _local.setLlmActiveProfile(index);
 
   @override
+  Future<int> getLlmExtractProfile() async => _local.getLlmExtractProfile();
+
+  @override
+  Future<void> setLlmExtractProfile(int index) => _local.setLlmExtractProfile(index);
+
+  @override
+  Future<int> getLlmComposeProfile() async => _local.getLlmComposeProfile();
+
+  @override
+  Future<void> setLlmComposeProfile(int index) => _local.setLlmComposeProfile(index);
+
+  @override
   Future<int> getLlmContextLimit() async => _local.getLlmContextLimit();
 
   @override

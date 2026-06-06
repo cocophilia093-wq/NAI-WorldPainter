@@ -1,12 +1,27 @@
+import 'dart:async';
 import 'package:flutter/foundation.dart';
+import 'package:nai_huishi/core/queue/generation_queue.dart';
 import 'package:nai_huishi/domain/entities/generation_task.dart';
 import 'package:nai_huishi/domain/usecases/get_history.dart';
 
 /// 历史记录 ViewModel
 class HistoryViewModel extends ChangeNotifier {
   final GetHistoryUseCase _getHistory;
+  final GenerationQueue _queue;
 
-  HistoryViewModel(this._getHistory);
+  StreamSubscription<GenerationTask>? _taskSub;
+  StreamSubscription<QueueState>? _queueSub;
+
+  HistoryViewModel(this._getHistory, this._queue) {
+    // 入队时立即刷新（让 pending 行可见）
+    _queueSub = _queue.queueStream.listen((_) {
+      loadHistory(refresh: true);
+    });
+    // 任务状态变化时刷新（generating / success / failed + imagePath）
+    _taskSub = _queue.taskStream.listen((_) {
+      loadHistory(refresh: true);
+    });
+  }
 
   List<GenerationTask> _history = [];
   List<GenerationTask> _favorites = [];
@@ -104,5 +119,12 @@ class HistoryViewModel extends ChangeNotifier {
       errorMessage = '删除失败: $e';
       notifyListeners();
     }
+  }
+
+  @override
+  void dispose() {
+    _taskSub?.cancel();
+    _queueSub?.cancel();
+    super.dispose();
   }
 }

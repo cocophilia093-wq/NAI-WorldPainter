@@ -80,6 +80,12 @@ abstract class SettingsRepository {
   Future<int> getLlmActiveProfile();
   Future<void> setLlmActiveProfile(int index);
 
+  Future<int> getLlmExtractProfile();
+  Future<void> setLlmExtractProfile(int index);
+
+  Future<int> getLlmComposeProfile();
+  Future<void> setLlmComposeProfile(int index);
+
   Future<int> getLlmContextLimit();
   Future<void> setLlmContextLimit(int value);
 

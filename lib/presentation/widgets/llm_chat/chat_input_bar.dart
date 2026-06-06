@@ -8,16 +8,18 @@ import 'package:image_picker/image_picker.dart';
 
 class ChatInputBar extends StatefulWidget {
   final bool isSending;
-  final bool webSearchEnabled;
-  final VoidCallback onToggleWebSearch;
+  final bool danbooruSearchEnabled;
+  final VoidCallback onToggleDanbooruSearch;
   final void Function(String text, {String? imageBase64}) onSend;
+  final TextEditingController? controller;
 
   const ChatInputBar({
     super.key,
     required this.isSending,
-    required this.webSearchEnabled,
-    required this.onToggleWebSearch,
+    required this.danbooruSearchEnabled,
+    required this.onToggleDanbooruSearch,
     required this.onSend,
+    this.controller,
   });
 
   @override
@@ -26,6 +28,7 @@ class ChatInputBar extends StatefulWidget {
 
 class _ChatInputBarState extends State<ChatInputBar> {
   late final TextEditingController _controller;
+  bool _ownsController = false;
   bool _hasText = false;
   String? _pendingImageBase64;
   String? _pendingImagePath;
@@ -33,18 +36,24 @@ class _ChatInputBarState extends State<ChatInputBar> {
   @override
   void initState() {
     super.initState();
-    _controller = TextEditingController();
-    _controller.addListener(() {
-      final has = _controller.text.trim().isNotEmpty;
-      if (has != _hasText) {
-        setState(() => _hasText = has);
-      }
-    });
+    _controller = widget.controller ?? TextEditingController();
+    _ownsController = widget.controller == null;
+    _controller.addListener(_onTextChanged);
+  }
+
+  void _onTextChanged() {
+    final has = _controller.text.trim().isNotEmpty;
+    if (has != _hasText) {
+      setState(() => _hasText = has);
+    }
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _controller.removeListener(_onTextChanged);
+    if (_ownsController) {
+      _controller.dispose();
+    }
     super.dispose();
   }
 
@@ -124,12 +133,14 @@ class _ChatInputBarState extends State<ChatInputBar> {
                   constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
                 ),
                 IconButton(
-                  onPressed: widget.isSending ? null : widget.onToggleWebSearch,
-                  tooltip: widget.webSearchEnabled ? '联网搜索：开（点击关闭）' : '联网搜索：关（点击开启）',
+                  onPressed: widget.isSending ? null : widget.onToggleDanbooruSearch,
+                  tooltip: widget.danbooruSearchEnabled
+                      ? 'Danbooru 搜索：开（点击关闭）'
+                      : 'Danbooru 搜索：关（点击开启）',
                   icon: Icon(
-                    CupertinoIcons.globe,
+                    CupertinoIcons.tag,
                     size: 20,
-                    color: widget.webSearchEnabled
+                    color: widget.danbooruSearchEnabled
                         ? const Color(0xFFF5D57A)
                         : Colors.white54,
                   ),

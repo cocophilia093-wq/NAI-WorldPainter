@@ -22,4 +22,14 @@ abstract class LlmChatRepository {
 
   /// 删除指定消息及其之后的所有消息
   Future<void> deleteMessagesFrom(int messageId, String sessionId);
+
+  /// 不落库的轻量调用：直接调 LLM chat completions，返回 assistant 文本。
+  /// 用于"关键词抽取"等不需要进入会话历史的中间步骤。
+  Future<String> chatCompletionsRaw({
+    required String apiKey,
+    required String baseUrl,
+    required String model,
+    required String systemPrompt,
+    required String userText,
+  });
 }
