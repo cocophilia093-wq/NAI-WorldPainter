@@ -103,9 +103,6 @@ class GenerationRepositoryImpl implements GenerationRepository {
       throw ApiException(message: '请先在设置中配置 Nano Banana Base URL', code: 'NO_BASE_URL');
     }
 
-    if (task.mode == GenerationMode.inpainting) {
-      return _nanoApiService.editImage(task, creds.apiKey, creds.baseUrl);
-    }
     if (task.gptImagePaths != null && task.gptImagePaths!.isNotEmpty) {
       return _nanoApiService.editImage(task, creds.apiKey, creds.baseUrl);
     }

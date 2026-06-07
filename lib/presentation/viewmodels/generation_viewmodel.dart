@@ -288,6 +288,10 @@ class GenerationViewModel extends ChangeNotifier {
       selectedModel = options.first.modelId;
     }
     await _ensureResolutionForCurrentProvider();
+    // Nano Banana 不支持局部重绘，自动回退至文生图
+    if (isNanoProvider && generationMode == GenerationMode.inpainting) {
+      generationMode = GenerationMode.textToImage;
+    }
     notifyListeners();
   }
 
@@ -454,6 +458,10 @@ class GenerationViewModel extends ChangeNotifier {
       await _manageSettings.setActiveEndpointId(opt.first.provider, opt.first.endpointId);
     }
     await _ensureResolutionForCurrentProvider();
+    // Nano Banana 不支持局部重绘，自动回退至文生图
+    if (isNanoProvider && generationMode == GenerationMode.inpainting) {
+      generationMode = GenerationMode.textToImage;
+    }
     notifyListeners();
   }
 
@@ -840,7 +848,7 @@ class GenerationViewModel extends ChangeNotifier {
     await _manageSettings.setSelectedSamplerDraft(selectedSampler);
     await _manageSettings.setSelectedNoiseScheduleDraft(selectedNoiseSchedule);
 
-    if (task.mode == GenerationMode.inpainting) {
+    if (task.mode == GenerationMode.inpainting && !isNanoProvider) {
       generationMode = GenerationMode.inpainting;
       inpaintPrompt = task.prompt;
       inpaintNegativePrompt = task.negativePrompt ?? '';

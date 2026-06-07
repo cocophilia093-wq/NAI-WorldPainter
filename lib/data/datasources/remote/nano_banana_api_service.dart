@@ -45,18 +45,14 @@ class NanoBananaApiService {
     }
   }
 
-  /// 图生图 / 局部重绘（带参考图）
+  /// 图生图（带参考图）
   Future<GenerationTask> editImage(
       GenerationTask task, String apiKey, String baseUrl) async {
     _configureAuth(apiKey, baseUrl);
 
     // 收集所有参考图路径
     final imagePaths = <String>[];
-    if (task.mode == GenerationMode.inpainting) {
-      if (task.sourceImagePath != null) imagePaths.add(task.sourceImagePath!);
-    } else {
-      imagePaths.addAll(task.gptImagePaths ?? []);
-    }
+    imagePaths.addAll(task.gptImagePaths ?? []);
 
     if (imagePaths.isEmpty) {
       throw ApiException(message: '传图编辑缺少图片', code: 'MISSING_IMAGE');
@@ -70,13 +66,6 @@ class NanoBananaApiService {
       final mime = _guessMime(path);
       imageParts.add({
         'inline_data': {'mime_type': mime, 'data': b64},
-      });
-    }
-
-    if (task.mode == GenerationMode.inpainting && task.maskImagePath != null && task.maskImagePath!.isNotEmpty) {
-      final bytes = await File(task.maskImagePath!).readAsBytes();
-      imageParts.add({
-        'inline_data': {'mime_type': 'image/png', 'data': base64Encode(bytes)},
       });
     }
 
@@ -107,10 +96,7 @@ class NanoBananaApiService {
   }) {
     final aspectRatio = task.size ?? '1:1';
     final imageSize = task.nanoImageSize ?? '1K';
-    final editHint = task.mode == GenerationMode.inpainting
-        ? 'Edit only the transparent masked area in the provided image. Keep unmasked regions unchanged. '
-        : '';
-    final enrichedPrompt = '$editHint[aspect_ratio:$aspectRatio,image_size:$imageSize] ${task.prompt}';
+    final enrichedPrompt = '[aspect_ratio:$aspectRatio,image_size:$imageSize] ${task.prompt}';
 
     return {
       'contents': [
