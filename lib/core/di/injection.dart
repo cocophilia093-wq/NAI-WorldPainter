@@ -43,6 +43,10 @@ import 'package:nai_huishi/domain/usecases/save_image.dart';
 import 'package:nai_huishi/domain/usecases/calibrate_with_danbooru.dart';
 import 'package:nai_huishi/domain/usecases/extract_keywords.dart';
 import 'package:nai_huishi/domain/usecases/search_danbooru_tags.dart';
+import 'package:nai_huishi/domain/usecases/upscale_image.dart';
+import 'package:nai_huishi/domain/repositories/super_resolution_repository.dart';
+import 'package:nai_huishi/data/datasources/super_resolution_channel.dart';
+import 'package:nai_huishi/data/repositories/super_resolution_repository_impl.dart';
 import 'package:nai_huishi/core/queue/generation_queue.dart';
 import 'package:nai_huishi/core/network/robust_http_adapter.dart';
 import 'package:nai_huishi/presentation/viewmodels/artist_prompt_viewmodel.dart';
@@ -54,6 +58,7 @@ import 'package:nai_huishi/presentation/viewmodels/prompt_memory_viewmodel.dart'
 import 'package:nai_huishi/presentation/viewmodels/prompt_template_viewmodel.dart';
 import 'package:nai_huishi/presentation/viewmodels/settings_viewmodel.dart';
 import 'package:nai_huishi/presentation/viewmodels/style_preset_viewmodel.dart';
+import 'package:nai_huishi/presentation/viewmodels/super_resolution_viewmodel.dart';
 
 final sl = GetIt.instance;
 
@@ -120,11 +125,22 @@ Future<void> configureDependencies() async {
   sl.registerSingleton<SearchDanbooruTagsUseCase>(
       SearchDanbooruTagsUseCase(sl<DanbooruApiService>()));
 
+  // 图片超分
+  sl.registerSingleton<SuperResolutionChannel>(SuperResolutionChannel());
+  sl.registerSingleton<SuperResolutionRepository>(
+      SuperResolutionRepositoryImpl(sl<SuperResolutionChannel>()));
+  sl.registerSingleton<UpscaleImageUseCase>(
+      UpscaleImageUseCase(sl<SuperResolutionRepository>()));
+
   sl.registerFactory<GenerationViewModel>(() => GenerationViewModel(
     generateImage: sl<GenerateImageUseCase>(),
     manageSettings: sl<ManageSettingsUseCase>(),
     saveImage: sl<SaveImageUseCase>(),
     queue: sl<GenerationQueue>(),
+  ));
+  sl.registerFactory<SuperResolutionViewModel>(() => SuperResolutionViewModel(
+    sl<UpscaleImageUseCase>(),
+    sl<SaveImageUseCase>(),
   ));
   sl.registerLazySingleton<HistoryViewModel>(() => HistoryViewModel(sl<GetHistoryUseCase>(), sl<GenerationQueue>()));
   sl.registerFactory<PresetViewModel>(() => PresetViewModel(sl<ManagePresetsUseCase>()));

@@ -140,6 +140,46 @@ class SettingsLocalDatasource {
   Future<void> setLlmProfileModel(int i, String value) async =>
       _prefs.setString(AppConstants.keyLlmProfileModel(i), value);
 
+  // 多模型列表（JSON-encoded List<String>）
+  List<String> getLlmProfileModels(int i) {
+    final raw = _prefs.getString(AppConstants.keyLlmProfileModels(i));
+    if (raw == null || raw.isEmpty) {
+      // 自动迁移：旧单模型有值时，包装成单元素列表
+      final single = getLlmProfileModel(i);
+      return single.isEmpty ? const [] : [single];
+    }
+    try {
+      final list = jsonDecode(raw) as List;
+      return list.map((e) => e as String).toList();
+    } catch (_) {
+      return const [];
+    }
+  }
+
+  Future<void> setLlmProfileModels(int i, List<String> value) async =>
+      _prefs.setString(AppConstants.keyLlmProfileModels(i), jsonEncode(value));
+
+  // 抽取/编排具体选中的模型名
+  String? getLlmExtractProfileModel() =>
+      _prefs.getString(AppConstants.keyLlmExtractProfileModel);
+  Future<void> setLlmExtractProfileModel(String? value) async {
+    if (value == null) {
+      await _prefs.remove(AppConstants.keyLlmExtractProfileModel);
+    } else {
+      await _prefs.setString(AppConstants.keyLlmExtractProfileModel, value);
+    }
+  }
+
+  String? getLlmComposeProfileModel() =>
+      _prefs.getString(AppConstants.keyLlmComposeProfileModel);
+  Future<void> setLlmComposeProfileModel(String? value) async {
+    if (value == null) {
+      await _prefs.remove(AppConstants.keyLlmComposeProfileModel);
+    } else {
+      await _prefs.setString(AppConstants.keyLlmComposeProfileModel, value);
+    }
+  }
+
   String getLlmProfileName(int i) =>
       _prefs.getString(AppConstants.keyLlmProfileName(i)) ?? '配置 ${i + 1}';
   Future<void> setLlmProfileName(int i, String value) async =>

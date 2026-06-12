@@ -98,6 +98,15 @@ abstract class SettingsRepository {
   Future<String> getLlmProfileModel(int i);
   Future<void> setLlmProfileModel(int i, String value);
 
+  Future<List<String>> getLlmProfileModels(int i);
+  Future<void> setLlmProfileModels(int i, List<String> value);
+
+  Future<String?> getLlmExtractProfileModel();
+  Future<void> setLlmExtractProfileModel(String? value);
+
+  Future<String?> getLlmComposeProfileModel();
+  Future<void> setLlmComposeProfileModel(String? value);
+
   Future<String> getLlmProfileName(int i);
   Future<void> setLlmProfileName(int i, String value);
 

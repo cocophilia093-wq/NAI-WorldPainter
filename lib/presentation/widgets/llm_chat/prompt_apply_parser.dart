@@ -194,12 +194,33 @@ String? _stringOrNull(dynamic value) {
 
 String _stringOrEmpty(dynamic value) => _stringOrNull(value) ?? '';
 
-int? _characterIndex(String label) {
-  final m = RegExp(r'角色\s*(\d+)').firstMatch(label);
-  if (m == null) return null;
-  final n = int.tryParse(m.group(1) ?? '');
-  if (n == null || n <= 0) return null;
-  return n - 1;
+/// 从标签中提取角色索引（0-based），支持多种格式：
+/// - "角色1" / "角色 2" (阿拉伯数字)
+/// - "角色一" ~ "角色六" (中文数字)
+/// - "角色A" ~ "角色F" (字母)
+/// 返回 null 表示标签不含可识别的角色编号。
+int? characterIndex(String label) {
+  // 1) 阿拉伯数字
+  var m = RegExp(r'角色\s*(\d+)').firstMatch(label);
+  if (m != null) {
+    final n = int.tryParse(m.group(1)!);
+    if (n != null && n > 0) return n - 1;
+  }
+  // 2) 中文数字
+  const cnDigits = ['一', '二', '三', '四', '五', '六'];
+  m = RegExp(r'角色\s*([一二三四五六])').firstMatch(label);
+  if (m != null) {
+    final idx = cnDigits.indexOf(m.group(1)!);
+    if (idx >= 0) return idx;
+  }
+  // 3) 字母序号
+  m = RegExp(r'角色\s*([A-Fa-f])').firstMatch(label);
+  if (m != null) {
+    final ch = m.group(1)!.toUpperCase();
+    final idx = ch.codeUnitAt(0) - 'A'.codeUnitAt(0);
+    if (idx >= 0 && idx < 6) return idx;
+  }
+  return null;
 }
 
 AppliedSegments _aggregateSegments(List<PromptSegment> segments) {
@@ -207,19 +228,42 @@ AppliedSegments _aggregateSegments(List<PromptSegment> segments) {
   String? negative;
   final charPrompts = <int, String>{};
   final charNegatives = <int, String>{};
+  int nextUnindexedChar = 0;
+  // 用于追踪无标签代码块的分配位置
+  // 单角色场景：第1个无标签→正向，第2个无标签→负向
+  // 多角色场景：按顺序分配给角色或通用/负向
+  int unlabeledCodeIndex = 0;
+  bool hasCharacterBlock = false;
+
+  // 先扫描一遍，判断是否存在角色块
+  for (final seg in segments) {
+    if (!seg.isCode || seg.text.trim().isEmpty) continue;
+    if (isCharacterLabel(seg.label)) {
+      hasCharacterBlock = true;
+      break;
+    }
+  }
 
   for (final seg in segments) {
     if (!seg.isCode || seg.text.trim().isEmpty) continue;
     final label = seg.label;
     final text = seg.text.trim();
 
-    final charIdx = _characterIndex(label);
+    var charIdx = characterIndex(label);
+    // 含"角色"但无编号 → 分配递增序号
+    if (charIdx == null && isCharacterLabel(label)) {
+      charIdx = nextUnindexedChar;
+      nextUnindexedChar++;
+    }
+
     if (charIdx != null) {
       if (isNegativeLabel(label)) {
         charNegatives[charIdx] = text;
       } else {
         charPrompts[charIdx] = text;
       }
+      // 更新 nextUnindexedChar 避免与显式编号冲突
+      if (charIdx >= nextUnindexedChar) nextUnindexedChar = charIdx + 1;
       continue;
     }
     if (isNegativeLabel(label)) {
@@ -230,6 +274,26 @@ AppliedSegments _aggregateSegments(List<PromptSegment> segments) {
       positive = positive == null ? text : '$positive, $text';
       continue;
     }
+    // ===== 无标签代码块：根据上下文智能分配 =====
+    if (hasCharacterBlock) {
+      // 多角色场景下，无标签代码块按顺序：
+      // 第1个 → 通用底模词(positive)，中间的 → 角色，最后1个 → 负向
+      // 但实际上如果有角色块，无标签块不应该出现。
+      // 安全策略：归为正向
+      positive = positive == null ? text : '$positive, $text';
+    } else {
+      // 单角色场景：无标签代码块按顺序分配
+      // 第1个 → 正向，第2个 → 负向
+      if (unlabeledCodeIndex == 0) {
+        positive = positive == null ? text : '$positive, $text';
+      } else if (unlabeledCodeIndex == 1) {
+        negative = negative == null ? text : '$negative, $text';
+      } else {
+        // 超过2个无标签代码块，后续都追加到正向
+        positive = positive == null ? text : '$positive, $text';
+      }
+    }
+    unlabeledCodeIndex++;
   }
 
   final maxIdx = [...charPrompts.keys, ...charNegatives.keys]

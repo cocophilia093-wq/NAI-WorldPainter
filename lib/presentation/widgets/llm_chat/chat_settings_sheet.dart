@@ -43,15 +43,18 @@ class _ChatSettingsSheetState extends State<_ChatSettingsSheet>
   bool _danbooruEnabled = true;
   late final TextEditingController _danbooruBaseUrlController;
 
-  // 双模型分配（抽取 / 编排）
+  // 双模型分配（抽取 / 编排）—— 索引 + 模型名
   int _extractProfileIndex = 0;
+  String _extractModelName = '';
   int _composeProfileIndex = 0;
+  String _composeModelName = '';
 
   // 每个 profile 的 controllers
   late final List<TextEditingController> _nameControllers;
   late final List<TextEditingController> _apiKeyControllers;
   late final List<TextEditingController> _baseUrlControllers;
-  late final List<TextEditingController> _modelControllers;
+  // 多模型：每个 profile 保存一组 TextEditingController
+  late final List<List<TextEditingController>> _modelControllersList;
 
   // 测试连接状态（每个 profile 独立）
   late final List<bool> _isTesting;
@@ -85,9 +88,11 @@ class _ChatSettingsSheetState extends State<_ChatSettingsSheet>
       AppConstants.llmProfileCount,
       (i) => TextEditingController(text: vm.profiles[i].baseUrl),
     );
-    _modelControllers = List.generate(
+    _modelControllersList = List.generate(
       AppConstants.llmProfileCount,
-      (i) => TextEditingController(text: vm.profiles[i].model),
+      (i) => vm.profiles[i].models
+          .map((m) => TextEditingController(text: m))
+          .toList(),
     );
     _isTesting = List.filled(AppConstants.llmProfileCount, false);
     _latencyMs = List.filled(AppConstants.llmProfileCount, null);
@@ -102,13 +107,17 @@ class _ChatSettingsSheetState extends State<_ChatSettingsSheet>
     final enabled = await settings.getDanbooruCalibrationEnabled();
     final baseUrl = await settings.getDanbooruBaseUrl();
     final extractIdx = await settings.getLlmExtractProfile();
+    final extractModel = await settings.getLlmExtractProfileModel() ?? '';
     final composeIdx = await settings.getLlmComposeProfile();
+    final composeModel = await settings.getLlmComposeProfileModel() ?? '';
     if (!mounted) return;
     setState(() {
       _danbooruEnabled = enabled;
       _danbooruBaseUrlController.text = baseUrl;
       _extractProfileIndex = extractIdx;
+      _extractModelName = extractModel;
       _composeProfileIndex = composeIdx;
+      _composeModelName = composeModel;
     });
   }
 
@@ -143,8 +152,10 @@ class _ChatSettingsSheetState extends State<_ChatSettingsSheet>
     for (final c in _baseUrlControllers) {
       c.dispose();
     }
-    for (final c in _modelControllers) {
-      c.dispose();
+    for (final list in _modelControllersList) {
+      for (final c in list) {
+        c.dispose();
+      }
     }
     super.dispose();
   }
@@ -153,6 +164,10 @@ class _ChatSettingsSheetState extends State<_ChatSettingsSheet>
     final vm = widget.vm;
     // 保存所有 profile
     for (int i = 0; i < AppConstants.llmProfileCount; i++) {
+      final models = _modelControllersList[i]
+          .map((c) => c.text.trim())
+          .where((m) => m.isNotEmpty)
+          .toList();
       await vm.saveProfile(
         i,
         name: _nameControllers[i].text.trim().isEmpty
@@ -160,7 +175,7 @@ class _ChatSettingsSheetState extends State<_ChatSettingsSheet>
             : _nameControllers[i].text.trim(),
         apiKey: _apiKeyControllers[i].text.trim(),
         baseUrl: _baseUrlControllers[i].text.trim(),
-        model: _modelControllers[i].text.trim(),
+        models: models,
       );
     }
     // 保存通用设置
@@ -185,9 +200,9 @@ class _ChatSettingsSheetState extends State<_ChatSettingsSheet>
     // 保存 Danbooru 校准设置
     await settings.setDanbooruCalibrationEnabled(_danbooruEnabled);
     await settings.setDanbooruBaseUrl(_danbooruBaseUrlController.text.trim());
-    // 保存双模型分配
-    await vm.setExtractProfile(_extractProfileIndex);
-    await vm.setComposeProfile(_composeProfileIndex);
+    // 保存双模型分配（带具体模型名）
+    await vm.setExtractProfile(_extractProfileIndex, modelName: _extractModelName);
+    await vm.setComposeProfile(_composeProfileIndex, modelName: _composeModelName);
     if (mounted) {
       showFloatingToast(context, '已保存配置', icon: CupertinoIcons.checkmark_circle_fill);
     }
@@ -233,7 +248,9 @@ class _ChatSettingsSheetState extends State<_ChatSettingsSheet>
               tabAlignment: TabAlignment.start,
               tabs: [
                 for (int i = 0; i < AppConstants.llmProfileCount; i++)
-                  Tab(text: '配置 ${i + 1}'),
+                  Tab(text: _nameControllers[i].text.trim().isEmpty
+                      ? '配置 ${i + 1}'
+                      : _nameControllers[i].text.trim()),
                 const Tab(text: '通用'),
               ],
             ),
@@ -385,14 +402,24 @@ class _ChatSettingsSheetState extends State<_ChatSettingsSheet>
               hintText: '例如 https://api.openai.com',
             ),
           ),
-          SizedBox(height: 12),
-          TextField(
-            controller: _modelControllers[i],
-            decoration: const InputDecoration(
-              labelText: '模型名',
-              hintText: '例如 gpt-4.1-mini / gemini-2.5-pro',
-            ),
+          SizedBox(height: 16),
+          Row(
+            children: [
+              Text('模型列表', style: TextStyle(fontSize: 14, color: Theme.of(context).colorScheme.onSurfaceVariant)),
+              Spacer(),
+              TextButton.icon(
+                onPressed: () {
+                  setState(() {
+                    _modelControllersList[i].add(TextEditingController());
+                  });
+                },
+                icon: Icon(CupertinoIcons.plus_circle, size: 16),
+                label: Text('添加模型'),
+              ),
+            ],
           ),
+          SizedBox(height: 4),
+          ..._buildModelList(i),
           SizedBox(height: 16),
           OutlinedButton.icon(
             onPressed: _isTesting[i] ? null : () => _testProfileConnection(i),
@@ -451,6 +478,51 @@ class _ChatSettingsSheetState extends State<_ChatSettingsSheet>
         ],
       ),
     );
+  }
+
+  /// 构建某个 profile 的多模型列表
+  List<Widget> _buildModelList(int i) {
+    final controllers = _modelControllersList[i];
+    final widgets = <Widget>[];
+    for (int j = 0; j < controllers.length; j++) {
+      widgets.add(
+        Padding(
+          padding: const EdgeInsets.only(bottom: 8),
+          child: Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: controllers[j],
+                  decoration: InputDecoration(
+                    labelText: '模型 ${j + 1}',
+                    hintText: '例如 gpt-4.1-mini / gemini-2.5-pro',
+                    isDense: true,
+                    contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  ),
+                ),
+              ),
+              if (controllers.length > 1) ...[
+                SizedBox(width: 4),
+                IconButton(
+                  onPressed: () {
+                    setState(() {
+                      controllers[j].dispose();
+                      controllers.removeAt(j);
+                    });
+                  },
+                  icon: Icon(CupertinoIcons.minus_circle_fill,
+                      size: 20,
+                      color: Theme.of(context).colorScheme.error),
+                  padding: EdgeInsets.zero,
+                  constraints: BoxConstraints(minWidth: 36, minHeight: 36),
+                ),
+              ],
+            ],
+          ),
+        ),
+      );
+    }
+    return widgets;
   }
 
   Widget _buildGeneralTab() {
@@ -563,10 +635,14 @@ class _ChatSettingsSheetState extends State<_ChatSettingsSheet>
                 child: Text('关键词抽取模型',
                     style: TextStyle(fontSize: 14, color: Theme.of(context).colorScheme.onSurfaceVariant)),
               ),
-              _buildProfileDropdown(
-                value: _extractProfileIndex,
-                onChanged: (v) {
-                  if (v != null) setState(() => _extractProfileIndex = v);
+              _buildProfileModelDropdown(
+                profileIndex: _extractProfileIndex,
+                modelName: _extractModelName,
+                onChanged: (profileIdx, model) {
+                  setState(() {
+                    _extractProfileIndex = profileIdx;
+                    _extractModelName = model;
+                  });
                 },
               ),
             ],
@@ -578,10 +654,14 @@ class _ChatSettingsSheetState extends State<_ChatSettingsSheet>
                 child: Text('提示词编排模型',
                     style: TextStyle(fontSize: 14, color: Theme.of(context).colorScheme.onSurfaceVariant)),
               ),
-              _buildProfileDropdown(
-                value: _composeProfileIndex,
-                onChanged: (v) {
-                  if (v != null) setState(() => _composeProfileIndex = v);
+              _buildProfileModelDropdown(
+                profileIndex: _composeProfileIndex,
+                modelName: _composeModelName,
+                onChanged: (profileIdx, model) {
+                  setState(() {
+                    _composeProfileIndex = profileIdx;
+                    _composeModelName = model;
+                  });
                 },
               ),
             ],
@@ -633,28 +713,61 @@ class _ChatSettingsSheetState extends State<_ChatSettingsSheet>
     );
   }
 
-  Widget _buildProfileDropdown({
-    required int value,
-    required ValueChanged<int?> onChanged,
+  /// 构建 [站点名] 模型名 下拉选择器。
+  /// 遍历所有 profile 及其模型，生成 DropdownItem；值为 "$profileIndex|$modelName"。
+  Widget _buildProfileModelDropdown({
+    required int profileIndex,
+    required String modelName,
+    required void Function(int profileIdx, String model) onChanged,
   }) {
-    return DropdownButton<int>(
-      value: value,
+    final dropdownValue = '$profileIndex|$modelName';
+    final allItems = <String>[];
+    final itemLabels = <String, String>{};
+
+    for (int i = 0; i < AppConstants.llmProfileCount; i++) {
+      final profileName = _nameControllers[i].text.trim().isEmpty
+          ? '配置 ${i + 1}'
+          : _nameControllers[i].text.trim();
+      final models = _modelControllersList[i]
+          .map((c) => c.text.trim())
+          .where((m) => m.isNotEmpty)
+          .toList();
+      if (models.isEmpty) {
+        // 空模型列表也显示站点名（方便用户知道有哪些站点）
+        final key = '$i|';
+        allItems.add(key);
+        itemLabels[key] = '$profileName（未配置模型）';
+      }
+      for (final m in models) {
+        final key = '$i|$m';
+        allItems.add(key);
+        itemLabels[key] = '$profileName $m';
+      }
+    }
+
+    // 当前选中的值必须在 items 中存在，否则用第一个
+    final effectiveValue = allItems.contains(dropdownValue) ? dropdownValue : (allItems.isNotEmpty ? allItems.first : null);
+
+    return DropdownButton<String>(
+      value: effectiveValue,
       dropdownColor: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1C1C21) : Colors.white,
       borderRadius: BorderRadius.circular(18),
       underline: const SizedBox.shrink(),
       style: TextStyle(fontSize: 13, color: Theme.of(context).colorScheme.onSurface),
       items: [
-        for (int i = 0; i < AppConstants.llmProfileCount; i++)
-          DropdownMenuItem<int>(
-            value: i,
-            child: Text(
-              _nameControllers[i].text.trim().isEmpty
-                  ? '配置 ${i + 1}'
-                  : _nameControllers[i].text.trim(),
-            ),
+        for (final key in allItems)
+          DropdownMenuItem<String>(
+            value: key,
+            child: Text(itemLabels[key] ?? key),
           ),
       ],
-      onChanged: onChanged,
+      onChanged: effectiveValue == null ? null : (v) {
+        if (v == null) return;
+        final parts = v.split('|');
+        final idx = int.tryParse(parts[0]) ?? 0;
+        final model = parts.length > 1 ? parts.sublist(1).join('|') : '';
+        onChanged(idx, model);
+      },
     );
   }
 }

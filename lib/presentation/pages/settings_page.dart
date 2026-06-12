@@ -4,6 +4,7 @@ import 'package:nai_huishi/core/di/injection.dart';
 import 'package:nai_huishi/presentation/pages/api_config_page.dart';
 import 'package:nai_huishi/presentation/pages/artist_prompt_manager_page.dart';
 import 'package:nai_huishi/presentation/pages/danbooru_tag_search_page.dart';
+import 'package:nai_huishi/presentation/pages/image_enhance_page.dart';
 import 'package:nai_huishi/presentation/viewmodels/settings_viewmodel.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -90,6 +91,14 @@ class _SettingsPageState extends State<SettingsPage> {
                   subtitle: '分类管理画师、调权重并生成 NAI 画师串',
                   onTap: () => Navigator.of(context).push(
                     CupertinoPageRoute(builder: (_) => const ArtistPromptManagerPage()),
+                  ),
+                ),
+                _SettingsTile(
+                  icon: CupertinoIcons.wand_stars,
+                  title: '图像增强',
+                  subtitle: '本地超分放大，Real-ESRGAN / RealCUGAN',
+                  onTap: () => Navigator.of(context).push(
+                    CupertinoPageRoute(builder: (_) => const ImageEnhancePage()),
                   ),
                 ),
               ],

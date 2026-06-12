@@ -101,6 +101,15 @@ class ManageSettingsUseCase {
   Future<String> getLlmProfileModel(int i) => _repo.getLlmProfileModel(i);
   Future<void> setLlmProfileModel(int i, String value) => _repo.setLlmProfileModel(i, value);
 
+  Future<List<String>> getLlmProfileModels(int i) => _repo.getLlmProfileModels(i);
+  Future<void> setLlmProfileModels(int i, List<String> value) => _repo.setLlmProfileModels(i, value);
+
+  Future<String?> getLlmExtractProfileModel() => _repo.getLlmExtractProfileModel();
+  Future<void> setLlmExtractProfileModel(String? value) => _repo.setLlmExtractProfileModel(value);
+
+  Future<String?> getLlmComposeProfileModel() => _repo.getLlmComposeProfileModel();
+  Future<void> setLlmComposeProfileModel(String? value) => _repo.setLlmComposeProfileModel(value);
+
   Future<String> getLlmProfileName(int i) => _repo.getLlmProfileName(i);
   Future<void> setLlmProfileName(int i, String value) => _repo.setLlmProfileName(i, value);
 

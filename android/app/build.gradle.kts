@@ -37,6 +37,15 @@ android {
             signingConfig = signingConfigs.getByName("debug")
         }
     }
+
+    // 超分功能：把 jniLibs 里的可执行文件(librealsr.so/librealcugan.so)及依赖库
+    // 解压到 nativeLibraryDir。Android 10+ 的 W^X 策略只允许从该目录执行 ELF，
+    // 因此必须 useLegacyPackaging=true 强制解压，否则 .so 留在 APK 内无法 exec。
+    packaging {
+        jniLibs {
+            useLegacyPackaging = true
+        }
+    }
 }
 
 flutter {

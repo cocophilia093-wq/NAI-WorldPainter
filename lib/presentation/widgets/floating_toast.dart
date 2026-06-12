@@ -11,6 +11,12 @@ void showFloatingToast(
   final overlay = Overlay.maybeOf(context, rootOverlay: true);
   if (overlay == null) return;
 
+  final isDark = Theme.of(context).brightness == Brightness.dark;
+  final bgColor = isDark ? Colors.black.withValues(alpha: 0.78) : Colors.black.withValues(alpha: 0.72);
+  final borderColor = isDark ? Colors.white.withValues(alpha: 0.08) : Colors.white.withValues(alpha: 0.12);
+  final textColor = Colors.white;
+  final iconColor = Colors.white;
+
   late OverlayEntry entry;
   final notifier = ValueNotifier<double>(0);
   entry = OverlayEntry(
@@ -26,22 +32,22 @@ void showFloatingToast(
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
                 decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.78),
+                  color: bgColor,
                   borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+                  border: Border.all(color: borderColor),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     if (icon != null) ...[
-                      Icon(icon, size: 16, color: Theme.of(context).colorScheme.onSurface),
+                      Icon(icon, size: 16, color: iconColor),
                       SizedBox(width: 8),
                     ],
                     Text(
                       text,
                       style: TextStyle(
                         fontSize: 14,
-                        color: Theme.of(context).colorScheme.onSurface,
+                        color: textColor,
                         fontWeight: FontWeight.w500,
                       ),
                     ),

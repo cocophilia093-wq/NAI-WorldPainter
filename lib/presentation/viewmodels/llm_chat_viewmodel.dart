@@ -15,24 +15,27 @@ class LlmProfile {
   final String name;
   final String apiKey;
   final String baseUrl;
-  final String model;
+  final List<String> models;
 
   const LlmProfile({
     required this.name,
     required this.apiKey,
     required this.baseUrl,
-    required this.model,
+    required this.models,
   });
 
-  bool get isConfigured =>
-      apiKey.trim().isNotEmpty && baseUrl.trim().isNotEmpty && model.trim().isNotEmpty;
+  /// 兼容旧的单 model 接口
+  String get model => models.isNotEmpty ? models.first : '';
 
-  LlmProfile copyWith({String? name, String? apiKey, String? baseUrl, String? model}) {
+  bool get isConfigured =>
+      apiKey.trim().isNotEmpty && baseUrl.trim().isNotEmpty && models.isNotEmpty;
+
+  LlmProfile copyWith({String? name, String? apiKey, String? baseUrl, List<String>? models}) {
     return LlmProfile(
       name: name ?? this.name,
       apiKey: apiKey ?? this.apiKey,
       baseUrl: baseUrl ?? this.baseUrl,
-      model: model ?? this.model,
+      models: models ?? this.models,
     );
   }
 }
@@ -65,14 +68,16 @@ class LlmChatViewModel extends ChangeNotifier {
   // 多配置位
   List<LlmProfile> _profiles = List.generate(
     AppConstants.llmProfileCount,
-    (i) => LlmProfile(name: '配置 ${i + 1}', apiKey: '', baseUrl: '', model: ''),
+    (i) => LlmProfile(name: '配置 ${i + 1}', apiKey: '', baseUrl: '', models: const []),
   );
   int _activeProfileIndex = 0;
   int _contextLimit = AppConstants.defaultLlmContextLimit;
 
-  // 双模型分配（抽取 / 编排）
+  // 双模型分配（抽取 / 编排）：profile 索引 + 该 profile 内选中的模型名
   int _extractProfileIndex = 0;
+  String _extractProfileModel = '';
   int _composeProfileIndex = 0;
+  String _composeProfileModel = '';
 
   // 会话
   List<LlmSession> _sessions = [];
@@ -101,7 +106,9 @@ class LlmChatViewModel extends ChangeNotifier {
   List<LlmProfile> get profiles => List.unmodifiable(_profiles);
   int get activeProfileIndex => _activeProfileIndex;
   int get extractProfileIndex => _extractProfileIndex;
+  String get extractProfileModel => _extractProfileModel;
   int get composeProfileIndex => _composeProfileIndex;
+  String get composeProfileModel => _composeProfileModel;
   int get contextLimit => _contextLimit;
 
   List<LlmSession> get sessions => List.unmodifiable(_sessions);
@@ -142,7 +149,9 @@ class LlmChatViewModel extends ChangeNotifier {
     _systemPrompt = await _manageSettings.getLlmSystemPrompt();
     _activeProfileIndex = await _manageSettings.getLlmActiveProfile();
     _extractProfileIndex = await _manageSettings.getLlmExtractProfile();
+    _extractProfileModel = await _manageSettings.getLlmExtractProfileModel() ?? '';
     _composeProfileIndex = await _manageSettings.getLlmComposeProfile();
+    _composeProfileModel = await _manageSettings.getLlmComposeProfileModel() ?? '';
     _contextLimit = await _manageSettings.getLlmContextLimit();
     _danbooruSearchEnabled = await _manageSettings.getDanbooruCalibrationEnabled();
 
@@ -159,7 +168,7 @@ class LlmChatViewModel extends ChangeNotifier {
         name: await _manageSettings.getLlmProfileName(i),
         apiKey: await _manageSettings.getLlmProfileApiKey(i) ?? '',
         baseUrl: await _manageSettings.getLlmProfileBaseUrl(i),
-        model: await _manageSettings.getLlmProfileModel(i),
+        models: await _manageSettings.getLlmProfileModels(i),
       ));
     }
     _profiles = profiles;
@@ -232,17 +241,21 @@ class LlmChatViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> setExtractProfile(int index) async {
+  Future<void> setExtractProfile(int index, {String? modelName}) async {
     if (index < 0 || index >= AppConstants.llmProfileCount) return;
     _extractProfileIndex = index;
+    _extractProfileModel = modelName ?? _profiles[index].model;
     await _manageSettings.setLlmExtractProfile(index);
+    await _manageSettings.setLlmExtractProfileModel(_extractProfileModel);
     notifyListeners();
   }
 
-  Future<void> setComposeProfile(int index) async {
+  Future<void> setComposeProfile(int index, {String? modelName}) async {
     if (index < 0 || index >= AppConstants.llmProfileCount) return;
     _composeProfileIndex = index;
+    _composeProfileModel = modelName ?? _profiles[index].model;
     await _manageSettings.setLlmComposeProfile(index);
+    await _manageSettings.setLlmComposeProfileModel(_composeProfileModel);
     notifyListeners();
   }
 
@@ -250,14 +263,18 @@ class LlmChatViewModel extends ChangeNotifier {
     required String name,
     required String apiKey,
     required String baseUrl,
-    required String model,
+    required List<String> models,
   }) async {
     await _manageSettings.setLlmProfileName(index, name);
     await _manageSettings.setLlmProfileApiKey(index, apiKey);
     await _manageSettings.setLlmProfileBaseUrl(index, baseUrl);
-    await _manageSettings.setLlmProfileModel(index, model);
+    await _manageSettings.setLlmProfileModels(index, models);
+    // 旧单模型字段也保留一份（迁移兼容）
+    if (models.isNotEmpty) {
+      await _manageSettings.setLlmProfileModel(index, models.first);
+    }
     final updated = List<LlmProfile>.from(_profiles);
-    updated[index] = LlmProfile(name: name, apiKey: apiKey, baseUrl: baseUrl, model: model);
+    updated[index] = LlmProfile(name: name, apiKey: apiKey, baseUrl: baseUrl, models: models);
     _profiles = updated;
     notifyListeners();
   }
@@ -423,11 +440,22 @@ class LlmChatViewModel extends ChangeNotifier {
     // 决定走哪条流程：含图 / 关闭 Danbooru / 抽取或编排 profile 未配置 → 旧单次流程
     final extractProfile = _profiles[_extractProfileIndex];
     final composeProfile = _profiles[_composeProfileIndex];
+    // 实际使用的模型名：优先选中的具体模型，否则回退到 profile 的第一个模型
+    final extractModelName = _extractProfileModel.isNotEmpty
+        ? _extractProfileModel
+        : extractProfile.model;
+    final composeModelName = _composeProfileModel.isNotEmpty
+        ? _composeProfileModel
+        : composeProfile.model;
     final useDanbooruPipeline = imageBase64 == null &&
         _danbooruSearchEnabled &&
         trimmed.isNotEmpty &&
-        extractProfile.isConfigured &&
-        composeProfile.isConfigured;
+        extractProfile.apiKey.trim().isNotEmpty &&
+        extractProfile.baseUrl.trim().isNotEmpty &&
+        extractModelName.isNotEmpty &&
+        composeProfile.apiKey.trim().isNotEmpty &&
+        composeProfile.baseUrl.trim().isNotEmpty &&
+        composeModelName.isNotEmpty;
 
     if (!useDanbooruPipeline) {
       await _runLegacySingleShot(
@@ -481,7 +509,7 @@ class LlmChatViewModel extends ChangeNotifier {
         userText: trimmed,
         apiKey: extractProfile.apiKey,
         baseUrl: extractProfile.baseUrl,
-        model: extractProfile.model,
+        model: extractModelName,
       );
 
       // 阶段 2：调 Danbooru 检索
@@ -532,7 +560,7 @@ class LlmChatViewModel extends ChangeNotifier {
         systemPrompt: augmented,
         apiKey: composeProfile.apiKey,
         baseUrl: composeProfile.baseUrl,
-        model: composeProfile.model,
+        model: composeModelName,
         contextLimit: _contextLimit,
       );
       await _captureLlmMemoryCandidate(assistantMessage.content);
@@ -597,6 +625,9 @@ class LlmChatViewModel extends ChangeNotifier {
       final useProfile = _profiles[_composeProfileIndex].isConfigured
           ? _profiles[_composeProfileIndex]
           : _activeProfile;
+      final useModelName = (useProfile == _profiles[_composeProfileIndex] && _composeProfileModel.isNotEmpty)
+          ? _composeProfileModel
+          : useProfile.model.isNotEmpty ? useProfile.model : llmModel;
       final assistantMessage = await _manageChat.sendUserMessage(
         sessionId: sessionId,
         userText: trimmed,
@@ -604,7 +635,7 @@ class LlmChatViewModel extends ChangeNotifier {
         systemPrompt: augmented,
         apiKey: useProfile.apiKey.isNotEmpty ? useProfile.apiKey : llmApiKey,
         baseUrl: useProfile.baseUrl.isNotEmpty ? useProfile.baseUrl : llmBaseUrl,
-        model: useProfile.model.isNotEmpty ? useProfile.model : llmModel,
+        model: useModelName,
         contextLimit: _contextLimit,
       );
       await _captureLlmMemoryCandidate(assistantMessage.content);

@@ -372,13 +372,23 @@ class GenerationViewModel extends ChangeNotifier {
 
   /// 替换指定角色的 prompt
   void replaceCharacterPrompt(int index, String value) {
-    if (index < 0 || index >= characters.length) return;
+    if (index < 0) return;
+    while (characters.length <= index) {
+      characters = [...characters, const CharacterSpec(
+        prompt: '', uc: null, centerX: 0.5, centerY: 0.5,
+      )];
+    }
     updateCharacter(index, characters[index].copyWith(prompt: value.trim()));
   }
 
   /// 替换指定角色的负向（uc）
   void replaceCharacterNegative(int index, String value) {
-    if (index < 0 || index >= characters.length) return;
+    if (index < 0) return;
+    while (characters.length <= index) {
+      characters = [...characters, const CharacterSpec(
+        prompt: '', uc: null, centerX: 0.5, centerY: 0.5,
+      )];
+    }
     updateCharacter(index, characters[index].copyWith(uc: value.trim()));
   }
 

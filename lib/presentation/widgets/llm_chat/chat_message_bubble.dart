@@ -33,15 +33,20 @@ class ChatMessageBubble extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
     final segments = splitPromptContent(message.content);
     final aggregated = isUser ? null : parseAppliedSegments(message.content);
-    final showApplyAll = !isUser && onApplyAll != null && aggregated != null && !aggregated.isEmpty;
+    final showApplyAll = !isUser &&
+        onApplyAll != null &&
+        aggregated != null &&
+        !aggregated.isEmpty;
     // 占位消息：纯 pipeline 状态，无正文
-    final isPlaceholder = !isUser && message.content.trim().isEmpty &&
+    final isPlaceholder = !isUser &&
+        message.content.trim().isEmpty &&
         message.pipelineStage != null;
 
     Widget bubble = Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
-        mainAxisAlignment: isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+        mainAxisAlignment:
+            isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Flexible(
@@ -50,10 +55,12 @@ class ChatMessageBubble extends StatelessWidget {
                 maxWidth: MediaQuery.sizeOf(context).width * 0.72,
               ),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                 decoration: BoxDecoration(
                   color: isUser
-                      ? theme.colorScheme.primary.withValues(alpha: isDark ? 0.18 : 0.14)
+                      ? theme.colorScheme.primary
+                          .withValues(alpha: isDark ? 0.18 : 0.14)
                       : isDark
                           ? const Color(0xFF1C1C21).withValues(alpha: 0.6)
                           : Colors.white.withValues(alpha: 0.92),
@@ -103,7 +110,9 @@ class ChatMessageBubble extends StatelessWidget {
                                     style: TextStyle(
                                       fontSize: 14,
                                       height: 1.5,
-                                      color: Theme.of(context).colorScheme.onSurface,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurface,
                                     ),
                                   )
                                 : SelectableText(
@@ -111,7 +120,9 @@ class ChatMessageBubble extends StatelessWidget {
                                     style: TextStyle(
                                       fontSize: 14,
                                       height: 1.5,
-                                      color: Theme.of(context).colorScheme.onSurface,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurface,
                                     ),
                                   ),
                           ),
@@ -172,7 +183,8 @@ class ChatMessageBubble extends StatelessWidget {
       } else if (value == 'edit' && onEditAndResend != null) {
         _showEditDialog(context);
       } else if (value == 'copy') {
-        Clipboard.setData(ClipboardData(text: message.content.replaceAll(RegExp(r'\n\[图片\]$'), '')));
+        Clipboard.setData(ClipboardData(
+            text: message.content.replaceAll(RegExp(r'\n\[图片\]$'), '')));
       }
     });
   }
@@ -209,7 +221,7 @@ class ChatMessageBubble extends StatelessWidget {
             child: Text('发送'),
           ),
         ],
-),
+      ),
     );
   }
 }
@@ -237,9 +249,15 @@ class _CodeBlock extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 6),
       decoration: BoxDecoration(
-        color: isDark ? Colors.black.withValues(alpha: 0.45) : const Color(0xFFF8FAFC),
+        color: isDark
+            ? Colors.black.withValues(alpha: 0.45)
+            : const Color(0xFFF8FAFC),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08)),
+        border: Border.all(
+            color: Theme.of(context)
+                .colorScheme
+                .onSurface
+                .withValues(alpha: 0.08)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -248,14 +266,23 @@ class _CodeBlock extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.04),
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                color: Theme.of(context)
+                    .colorScheme
+                    .onSurface
+                    .withValues(alpha: 0.04),
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(12)),
               ),
               child: Text(
                 label.isNotEmpty
-                    ? (lang.isNotEmpty ? '$label · ${lang.toLowerCase()}' : label)
+                    ? (lang.isNotEmpty
+                        ? '$label · ${lang.toLowerCase()}'
+                        : label)
                     : lang.toLowerCase(),
-                style: TextStyle(fontSize: 11, color: Theme.of(context).colorScheme.onSurfaceVariant, fontFamily: 'monospace'),
+                style: TextStyle(
+                    fontSize: 11,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    fontFamily: 'monospace'),
               ),
             ),
           Padding(
@@ -274,8 +301,12 @@ class _CodeBlock extends StatelessWidget {
             Container(
               padding: const EdgeInsets.fromLTRB(8, 6, 8, 8),
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.03),
-                borderRadius: const BorderRadius.vertical(bottom: Radius.circular(12)),
+                color: Theme.of(context)
+                    .colorScheme
+                    .onSurface
+                    .withValues(alpha: 0.03),
+                borderRadius:
+                    const BorderRadius.vertical(bottom: Radius.circular(12)),
               ),
               child: Wrap(
                 spacing: 6,
@@ -346,6 +377,14 @@ class _MiniBtnState extends State<_MiniBtn> {
     final overlay = Overlay.of(context);
     final renderBox = context.findRenderObject() as RenderBox;
     final offset = renderBox.localToGlobal(Offset.zero);
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final bgColor = isDark
+        ? Colors.black.withValues(alpha: 0.86)
+        : Colors.white.withValues(alpha: 0.96);
+    final borderColor =
+        theme.colorScheme.onSurface.withValues(alpha: isDark ? 0.10 : 0.12);
+    final textColor = isDark ? Colors.white : theme.colorScheme.onSurface;
 
     _overlayEntry = OverlayEntry(
       builder: (_) => Positioned(
@@ -356,12 +395,22 @@ class _MiniBtnState extends State<_MiniBtn> {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
-              color: Colors.black87,
+              color: bgColor,
               borderRadius: BorderRadius.circular(6),
+              border: Border.all(color: borderColor),
+              boxShadow: isDark
+                  ? null
+                  : [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.10),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
             ),
             child: Text(
               widget.feedback,
-              style: TextStyle(fontSize: 11, color: Theme.of(context).colorScheme.onSurface),
+              style: TextStyle(fontSize: 11, color: textColor),
             ),
           ),
         ),
@@ -392,16 +441,26 @@ class _MiniBtnState extends State<_MiniBtn> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.06),
+          color:
+              Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.06),
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08)),
+          border: Border.all(
+              color: Theme.of(context)
+                  .colorScheme
+                  .onSurface
+                  .withValues(alpha: 0.08)),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(widget.icon, size: 13, color: Theme.of(context).colorScheme.onSurfaceVariant),
+            Icon(widget.icon,
+                size: 13,
+                color: Theme.of(context).colorScheme.onSurfaceVariant),
             SizedBox(width: 4),
-            Text(widget.label, style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurface)),
+            Text(widget.label,
+                style: TextStyle(
+                    fontSize: 12,
+                    color: Theme.of(context).colorScheme.onSurface)),
           ],
         ),
       ),
@@ -423,69 +482,69 @@ class _ApplyAllButton extends StatelessWidget {
     if (aggregated.negative != null && aggregated.negative!.isNotEmpty) {
       parts.add('负向');
     }
-    final charCount = aggregated.characterPrompts
-        .where((p) => p.trim().isNotEmpty)
-        .length;
+    final charCount =
+        aggregated.characterPrompts.where((p) => p.trim().isNotEmpty).length;
     if (charCount > 0) parts.add('$charCount 个角色');
     return parts.isEmpty ? '' : '（${parts.join(' · ')}）';
+  }
+
+  /// 检查解析结果是否看起来不完整（可能模型输出格式不对）
+  bool get _looksIncomplete {
+    // 正向和负向都为空，但有角色块 → 可能缺少通用底模词
+    if ((aggregated.positive == null || aggregated.positive!.isEmpty) &&
+        (aggregated.negative == null || aggregated.negative!.isEmpty) &&
+        aggregated.characterPrompts.isNotEmpty) {
+      return true;
+    }
+    return false;
   }
 
   @override
   Widget build(BuildContext context) {
     final summary = _summary();
+    final disabled = _looksIncomplete;
     return InkWell(
       borderRadius: BorderRadius.circular(12),
-      onTap: () async {
+      onTap: disabled ? null : () async {
         HapticFeedback.mediumImpact();
-        final confirmed = await showDialog<bool>(
-          context: context,
-          builder: (ctx) => AlertDialog(
-            title: Text('一键替换全部'),
-            content: Text(
-              '此操作会先清空当前所有提示词（正向、负向、所有角色），'
-              '然后写入本条消息中的内容$summary。无法撤销，是否继续？',
-              style: TextStyle(fontSize: 14, height: 1.5),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(ctx, false),
-                child: Text('取消'),
-              ),
-              FilledButton(
-                onPressed: () => Navigator.pop(ctx, true),
-                child: Text('确认替换'),
-              ),
-            ],
-          ),
-        );
+        final confirmed = await _showPreviewDialog(context);
         if (confirmed == true) onApplyAll(aggregated);
       },
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         decoration: BoxDecoration(
-          gradient: LinearGradient(
+          gradient: disabled ? null : LinearGradient(
             colors: [
               Theme.of(context).colorScheme.primary.withValues(alpha: 0.32),
               Theme.of(context).colorScheme.primary.withValues(alpha: 0.18),
             ],
           ),
+          color: disabled ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.06) : null,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
+            color: disabled
+                ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12)
+                : Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
           ),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(CupertinoIcons.wand_stars, size: 16, color: Theme.of(context).colorScheme.onSurface),
+            Icon(CupertinoIcons.wand_stars,
+                size: 16,
+                color: disabled
+                    ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3)
+                    : Theme.of(context).colorScheme.onSurface),
             SizedBox(width: 8),
             Flexible(
               child: Text(
-                '一键替换全部$summary',
+                disabled ? '解析不完整，请手动应用' : '一键替换全部$summary',
                 style: TextStyle(
                   fontSize: 13,
-                  color: Theme.of(context).colorScheme.onSurface,
+                  color: disabled
+                      ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4)
+                      : Theme.of(context).colorScheme.onSurface,
                   fontWeight: FontWeight.w600,
                 ),
                 overflow: TextOverflow.ellipsis,
@@ -493,6 +552,80 @@ class _ApplyAllButton extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Future<bool?> _showPreviewDialog(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final bgColor = isDark ? const Color(0xFF1C1C21) : Colors.white;
+
+    Widget section(String title, String content) {
+      if (content.isEmpty) return const SizedBox.shrink();
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(bottom: 4),
+            child: Text(title,
+                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600,
+                    color: theme.colorScheme.primary)),
+          ),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: isDark ? Colors.black.withValues(alpha: 0.3) : const Color(0xFFF5F5F5),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Text(content,
+                style: TextStyle(fontSize: 12, height: 1.4, fontFamily: 'monospace',
+                    color: theme.colorScheme.onSurface)),
+          ),
+          SizedBox(height: 10),
+        ],
+      );
+    }
+
+    return showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('确认替换'),
+        backgroundColor: bgColor,
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '以下内容将替换当前所有提示词，无法撤销：',
+                style: TextStyle(fontSize: 13, color: theme.colorScheme.onSurfaceVariant),
+              ),
+              SizedBox(height: 12),
+              section('正向', aggregated.positive ?? ''),
+              for (int i = 0; i < aggregated.characterPrompts.length; i++) ...[
+                if (aggregated.characterPrompts[i].isNotEmpty)
+                  section('角色${i + 1}', aggregated.characterPrompts[i]),
+                if (aggregated.characterNegatives.isNotEmpty &&
+                    i < aggregated.characterNegatives.length &&
+                    aggregated.characterNegatives[i].isNotEmpty)
+                  section('角色${i + 1} 负向', aggregated.characterNegatives[i]),
+              ],
+              section('负向', aggregated.negative ?? ''),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text('取消'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text('确认替换'),
+          ),
+        ],
       ),
     );
   }
@@ -527,11 +660,16 @@ class _PipelineStatusLine extends StatelessWidget {
       );
     } else if (_isDone) {
       color = Colors.greenAccent.shade400;
-      leading = Icon(CupertinoIcons.checkmark_seal_fill, size: 12, color: color);
+      leading =
+          Icon(CupertinoIcons.checkmark_seal_fill, size: 12, color: color);
     } else {
       // fallback / unknown
-      color = Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.55);
-      leading = Icon(CupertinoIcons.exclamationmark_circle, size: 12, color: color);
+      color = Theme.of(context)
+          .colorScheme
+          .onSurfaceVariant
+          .withValues(alpha: 0.55);
+      leading =
+          Icon(CupertinoIcons.exclamationmark_circle, size: 12, color: color);
     }
     return Row(
       children: [

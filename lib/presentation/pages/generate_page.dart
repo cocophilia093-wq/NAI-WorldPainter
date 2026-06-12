@@ -10,7 +10,7 @@ import 'package:nai_huishi/domain/entities/generation_task.dart';
 import 'package:nai_huishi/presentation/viewmodels/generation_viewmodel.dart';
 import 'package:nai_huishi/presentation/widgets/llm_chat/chat_drawer.dart';
 import 'package:nai_huishi/presentation/widgets/fullscreen_image_preview.dart';
-
+import 'package:nai_huishi/presentation/widgets/llm_chat/prompt_apply_parser.dart';
 
 class _MaskStroke {
   final List<Offset> points;
@@ -24,9 +24,11 @@ class _MaskPainter extends CustomPainter {
   final List<_MaskStroke>? erasedStrokes;
   final bool preview;
 
-  const _MaskPainter({required this.strokes, required this.preview, this.erasedStrokes});
+  const _MaskPainter(
+      {required this.strokes, required this.preview, this.erasedStrokes});
 
-  void _drawStrokes(Canvas canvas, Size size, List<_MaskStroke> strokeList, Paint paint) {
+  void _drawStrokes(
+      Canvas canvas, Size size, List<_MaskStroke> strokeList, Paint paint) {
     for (final stroke in strokeList) {
       if (stroke.points.isEmpty) continue;
       final pixelStrokeWidth = stroke.strokeWidth * size.width;
@@ -43,7 +45,8 @@ class _MaskPainter extends CustomPainter {
         continue;
       }
       final path = Path()
-        ..moveTo(stroke.points.first.dx * size.width, stroke.points.first.dy * size.height);
+        ..moveTo(stroke.points.first.dx * size.width,
+            stroke.points.first.dy * size.height);
       for (final point in stroke.points.skip(1)) {
         path.lineTo(point.dx * size.width, point.dy * size.height);
       }
@@ -104,7 +107,9 @@ class _MaskPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _MaskPainter oldDelegate) {
-    return oldDelegate.strokes != strokes || oldDelegate.preview != preview || oldDelegate.erasedStrokes != erasedStrokes;
+    return oldDelegate.strokes != strokes ||
+        oldDelegate.preview != preview ||
+        oldDelegate.erasedStrokes != erasedStrokes;
   }
 }
 
@@ -169,7 +174,9 @@ class _MaskEditor extends StatelessWidget {
           canvasHeight = maxWidth / aspectRatio;
         } else {
           // 纵向图
-          canvasHeight = maxWidth / aspectRatio > constraints.maxHeight ? constraints.maxHeight : maxWidth / aspectRatio;
+          canvasHeight = maxWidth / aspectRatio > constraints.maxHeight
+              ? constraints.maxHeight
+              : maxWidth / aspectRatio;
           canvasWidth = canvasHeight * aspectRatio;
         }
         final size = Size(canvasWidth, canvasHeight);
@@ -181,7 +188,10 @@ class _MaskEditor extends StatelessWidget {
             children: [
               Image.file(File(imagePath), fit: BoxFit.fill),
               CustomPaint(
-                painter: _MaskPainter(strokes: strokes, preview: true, erasedStrokes: erasedStrokes),
+                painter: _MaskPainter(
+                    strokes: strokes,
+                    preview: true,
+                    erasedStrokes: erasedStrokes),
               ),
               if (editable)
                 IgnorePointer(
@@ -189,14 +199,18 @@ class _MaskEditor extends StatelessWidget {
                     alignment: Alignment.topRight,
                     child: Container(
                       margin: const EdgeInsets.all(10),
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 6),
                       decoration: BoxDecoration(
                         color: Colors.black.withValues(alpha: 0.45),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
                         '笔刷 ${strokeWidth.toStringAsFixed(0)}',
-                        style: TextStyle(fontSize: 11, color: Theme.of(context).colorScheme.onSurfaceVariant),
+                        style: TextStyle(
+                            fontSize: 11,
+                            color:
+                                Theme.of(context).colorScheme.onSurfaceVariant),
                       ),
                     ),
                   ),
@@ -205,7 +219,10 @@ class _MaskEditor extends StatelessWidget {
           ),
         );
 
-        if (editable && onPanStart != null && onPanUpdate != null && onPanEnd != null) {
+        if (editable &&
+            onPanStart != null &&
+            onPanUpdate != null &&
+            onPanEnd != null) {
           canvas = Listener(
             behavior: HitTestBehavior.opaque,
             onPointerDown: (event) {
@@ -275,7 +292,8 @@ class _GeneratePageState extends State<GeneratePage> {
   }
 
   Future<void> _loadSourceImageAspect() async {
-    if (_vm.sourceImagePath != null && File(_vm.sourceImagePath!).existsSync()) {
+    if (_vm.sourceImagePath != null &&
+        File(_vm.sourceImagePath!).existsSync()) {
       final bytes = await File(_vm.sourceImagePath!).readAsBytes();
       final image = img.decodeImage(bytes);
       if (image != null && mounted) {
@@ -285,9 +303,12 @@ class _GeneratePageState extends State<GeneratePage> {
   }
 
   late final TextEditingController _promptController = TextEditingController();
-  late final TextEditingController _negativeController = TextEditingController();
-  late final TextEditingController _inpaintPromptController = TextEditingController();
-  late final TextEditingController _inpaintNegativeController = TextEditingController();
+  late final TextEditingController _negativeController =
+      TextEditingController();
+  late final TextEditingController _inpaintPromptController =
+      TextEditingController();
+  late final TextEditingController _inpaintNegativeController =
+      TextEditingController();
   final GlobalKey _maskPreviewKey = GlobalKey();
 
   void _syncPromptControllers() {
@@ -298,16 +319,20 @@ class _GeneratePageState extends State<GeneratePage> {
   }
 
   void _onVmChanged() {
-    if (_promptController.text != _vm.prompt && FocusManager.instance.primaryFocus?.context?.widget is! EditableText) {
+    if (_promptController.text != _vm.prompt &&
+        FocusManager.instance.primaryFocus?.context?.widget is! EditableText) {
       _promptController.text = _vm.prompt;
     }
-    if (_negativeController.text != _vm.negativePrompt && FocusManager.instance.primaryFocus?.context?.widget is! EditableText) {
+    if (_negativeController.text != _vm.negativePrompt &&
+        FocusManager.instance.primaryFocus?.context?.widget is! EditableText) {
       _negativeController.text = _vm.negativePrompt;
     }
-    if (_inpaintPromptController.text != _vm.inpaintPrompt && FocusManager.instance.primaryFocus?.context?.widget is! EditableText) {
+    if (_inpaintPromptController.text != _vm.inpaintPrompt &&
+        FocusManager.instance.primaryFocus?.context?.widget is! EditableText) {
       _inpaintPromptController.text = _vm.inpaintPrompt;
     }
-    if (_inpaintNegativeController.text != _vm.inpaintNegativePrompt && FocusManager.instance.primaryFocus?.context?.widget is! EditableText) {
+    if (_inpaintNegativeController.text != _vm.inpaintNegativePrompt &&
+        FocusManager.instance.primaryFocus?.context?.widget is! EditableText) {
       _inpaintNegativeController.text = _vm.inpaintNegativePrompt;
     }
     if (mounted) setState(() {});
@@ -328,13 +353,17 @@ class _GeneratePageState extends State<GeneratePage> {
 
   void _startMaskStroke(DragStartDetails details, Size size) {
     final point = details.localPosition;
-    if (point.dx < 0 || point.dy < 0 || point.dx > size.width || point.dy > size.height) return;
+    if (point.dx < 0 ||
+        point.dy < 0 ||
+        point.dx > size.width ||
+        point.dy > size.height) return;
     final normalized = Offset(point.dx / size.width, point.dy / size.height);
     final normalizedBrush = _maskBrushSize / size.width;
     setState(() {
       _isDrawingMask = true;
       _activeStroke = [normalized];
-      final stroke = _MaskStroke(points: _activeStroke, strokeWidth: normalizedBrush);
+      final stroke =
+          _MaskStroke(points: _activeStroke, strokeWidth: normalizedBrush);
       if (_isEraserMode) {
         _maskErasedStrokes.add(stroke);
         _strokeHistory.add(false);
@@ -347,12 +376,16 @@ class _GeneratePageState extends State<GeneratePage> {
 
   void _updateMaskStroke(DragUpdateDetails details, Size size) {
     final point = details.localPosition;
-    if (point.dx < 0 || point.dy < 0 || point.dx > size.width || point.dy > size.height) return;
+    if (point.dx < 0 ||
+        point.dy < 0 ||
+        point.dx > size.width ||
+        point.dy > size.height) return;
     if (_activeStroke.isEmpty) return;
     final normalized = Offset(point.dx / size.width, point.dy / size.height);
     setState(() {
       _activeStroke = [..._activeStroke, normalized];
-      final stroke = _MaskStroke(points: _activeStroke, strokeWidth: _maskBrushSize / size.width);
+      final stroke = _MaskStroke(
+          points: _activeStroke, strokeWidth: _maskBrushSize / size.width);
       if (_isEraserMode) {
         _maskErasedStrokes[_maskErasedStrokes.length - 1] = stroke;
       } else {
@@ -430,10 +463,12 @@ class _GeneratePageState extends State<GeneratePage> {
                     leading: CircleAvatar(
                       radius: 14,
                       backgroundColor: i >= characters.length
-                          ? Theme.of(ctx).colorScheme.primary.withValues(alpha: 0.2)
+                          ? Theme.of(ctx)
+                              .colorScheme
+                              .primary
+                              .withValues(alpha: 0.2)
                           : null,
-                      child: Text('${i + 1}',
-                          style: TextStyle(fontSize: 12)),
+                      child: Text('${i + 1}', style: TextStyle(fontSize: 12)),
                     ),
                     title: i >= characters.length
                         ? Text('角色 ${i + 1}（新建）',
@@ -502,7 +537,8 @@ class _GeneratePageState extends State<GeneratePage> {
   }
 
   Future<void> _applyDrawnMask() async {
-    if (_vm.sourceImagePath == null || (_maskStrokes.isEmpty && _maskErasedStrokes.isEmpty)) {
+    if (_vm.sourceImagePath == null ||
+        (_maskStrokes.isEmpty && _maskErasedStrokes.isEmpty)) {
       return;
     }
 
@@ -524,7 +560,8 @@ class _GeneratePageState extends State<GeneratePage> {
         ? img.ColorRgba8(0, 0, 0, 0)
         : img.ColorRgba8(255, 255, 255, 255);
 
-    final mask = img.Image(width: sourceWidth, height: sourceHeight, numChannels: 4);
+    final mask =
+        img.Image(width: sourceWidth, height: sourceHeight, numChannels: 4);
     img.fill(mask, color: retainColor); // 初始全部保留区域
 
     // 画重绘区域——画笔笔迹
@@ -536,7 +573,8 @@ class _GeneratePageState extends State<GeneratePage> {
         final p = stroke.points.first;
         final cx = (p.dx * sourceWidth).round();
         final cy = (p.dy * sourceHeight).round();
-        img.fillCircle(mask, x: cx, y: cy, radius: pixelStrokeWidth ~/ 2, color: repaintColor);
+        img.fillCircle(mask,
+            x: cx, y: cy, radius: pixelStrokeWidth ~/ 2, color: repaintColor);
         continue;
       }
 
@@ -547,7 +585,13 @@ class _GeneratePageState extends State<GeneratePage> {
         final y1 = (p1.dy * sourceHeight).round();
         final x2 = (p2.dx * sourceWidth).round();
         final y2 = (p2.dy * sourceHeight).round();
-        img.drawLine(mask, x1: x1, y1: y1, x2: x2, y2: y2, color: repaintColor, thickness: pixelStrokeWidth);
+        img.drawLine(mask,
+            x1: x1,
+            y1: y1,
+            x2: x2,
+            y2: y2,
+            color: repaintColor,
+            thickness: pixelStrokeWidth);
       }
     }
 
@@ -560,7 +604,8 @@ class _GeneratePageState extends State<GeneratePage> {
         final p = stroke.points.first;
         final cx = (p.dx * sourceWidth).round();
         final cy = (p.dy * sourceHeight).round();
-        img.fillCircle(mask, x: cx, y: cy, radius: pixelStrokeWidth ~/ 2, color: retainColor);
+        img.fillCircle(mask,
+            x: cx, y: cy, radius: pixelStrokeWidth ~/ 2, color: retainColor);
         continue;
       }
 
@@ -571,7 +616,13 @@ class _GeneratePageState extends State<GeneratePage> {
         final y1 = (p1.dy * sourceHeight).round();
         final x2 = (p2.dx * sourceWidth).round();
         final y2 = (p2.dy * sourceHeight).round();
-        img.drawLine(mask, x1: x1, y1: y1, x2: x2, y2: y2, color: retainColor, thickness: pixelStrokeWidth);
+        img.drawLine(mask,
+            x1: x1,
+            y1: y1,
+            x2: x2,
+            y2: y2,
+            color: retainColor,
+            thickness: pixelStrokeWidth);
       }
     }
 
@@ -588,7 +639,8 @@ class _GeneratePageState extends State<GeneratePage> {
       }
     }
     final totalPixels = mask.width * mask.height;
-    print('[NAI] mask: ${mask.width}x${mask.height}, white pixels: $whitePixelCount / $totalPixels (${(whitePixelCount / totalPixels * 100).toStringAsFixed(2)}%)');
+    print(
+        '[NAI] mask: ${mask.width}x${mask.height}, white pixels: $whitePixelCount / $totalPixels (${(whitePixelCount / totalPixels * 100).toStringAsFixed(2)}%)');
     print('[NAI] mask PNG size: ${pngBytes.length} bytes');
 
     final dir = await Directory.systemTemp.createTemp('nai_mask_');
@@ -652,7 +704,8 @@ class _GeneratePageState extends State<GeneratePage> {
         children: [
           ListView(
             controller: _scrollController,
-            physics: _isDrawingMask ? const NeverScrollableScrollPhysics() : null,
+            physics:
+                _isDrawingMask ? const NeverScrollableScrollPhysics() : null,
             padding: EdgeInsets.only(
               top: MediaQuery.paddingOf(context).top + kToolbarHeight + 16,
               bottom: 120 + MediaQuery.paddingOf(context).bottom, // 给底部悬浮栏留出空间
@@ -675,7 +728,8 @@ class _GeneratePageState extends State<GeneratePage> {
               ],
 
               // GPT / Nano 文生图参考图（可选）
-              if (_vm.isNonNovelAiProvider && _vm.generationMode == GenerationMode.textToImage) ...[
+              if (_vm.isNonNovelAiProvider &&
+                  _vm.generationMode == GenerationMode.textToImage) ...[
                 _buildGptReferenceImageSection(),
                 SizedBox(height: 16),
               ],
@@ -690,7 +744,8 @@ class _GeneratePageState extends State<GeneratePage> {
                 SizedBox(height: 16),
               ],
 
-              if (!_vm.isNonNovelAiProvider && _vm.generationMode == GenerationMode.textToImage) ...[
+              if (!_vm.isNonNovelAiProvider &&
+                  _vm.generationMode == GenerationMode.textToImage) ...[
                 // 角色控制
                 _CharacterControlSection(vm: _vm),
                 SizedBox(height: 16),
@@ -713,14 +768,32 @@ class _GeneratePageState extends State<GeneratePage> {
           if (_isFullscreenMask && _vm.sourceImagePath != null)
             _buildFullscreenMaskEditor(),
 
-
           if (_isChatDrawerOpen)
             ChatDrawer(
               onClose: () => setState(() => _isChatDrawerOpen = false),
               onApplyPrompt: (text, replace, label) async {
                 FocusManager.instance.primaryFocus?.unfocus();
+                // 尝试从标签中提取角色编号 → 自动定位
+                final charIdx = label != null ? characterIndex(label) : null;
+                if (charIdx != null) {
+                  while (_vm.characters.length <= charIdx) {
+                    _vm.addCharacter();
+                  }
+                  if (replace) {
+                    _vm.replaceCharacterPrompt(charIdx, text);
+                  } else {
+                    _vm.appendToCharacterPrompt(charIdx, text);
+                  }
+                  _syncPromptControllers();
+                  _showToast(replace
+                      ? '已替换角色 ${charIdx + 1} 提示词'
+                      : '已追加到角色 ${charIdx + 1} 提示词');
+                  return;
+                }
                 // 有明确标签且非角色标签 → 直接写入全局正向
-                if (label != null && label.isNotEmpty && !_isCharacterLabelStr(label)) {
+                if (label != null &&
+                    label.isNotEmpty &&
+                    !_isCharacterLabelStr(label)) {
                   if (replace) {
                     await _vm.replacePrompt(text);
                   } else {
@@ -730,7 +803,7 @@ class _GeneratePageState extends State<GeneratePage> {
                   _showToast(replace ? '已替换全局正向提示词' : '已追加到全局正向提示词');
                   return;
                 }
-                // 角色标签或无标签 → 弹选择器
+                // 含"角色"但无编号 或 无标签 → 弹选择器
                 final target = await _showApplyTargetPicker(isNegative: false);
                 if (target == null || !mounted) return;
                 if (target == -1) {
@@ -757,8 +830,30 @@ class _GeneratePageState extends State<GeneratePage> {
               },
               onApplyNegative: (text, replace, label) async {
                 FocusManager.instance.primaryFocus?.unfocus();
+                // 尝试从标签中提取角色编号 → 自动定位
+                final charIdx = label != null ? characterIndex(label) : null;
+                if (charIdx != null) {
+                  while (_vm.characters.length <= charIdx) {
+                    _vm.addCharacter();
+                  }
+                  final c = _vm.characters[charIdx];
+                  final newUc = replace
+                      ? text.trim()
+                      : (c.uc == null || c.uc!.trim().isEmpty)
+                          ? text.trim()
+                          : '${c.uc!.trimRight()}, ${text.trim()}';
+                  _vm.updateCharacter(charIdx, c.copyWith(uc: newUc));
+                  _syncPromptControllers();
+                  _showToast(replace
+                      ? '已替换角色 ${charIdx + 1} 负向提示词'
+                      : '已追加到角色 ${charIdx + 1} 负向提示词');
+                  return;
+                }
                 // 有明确标签且是负向/非角色 → 直接写入全局负向
-                if (label != null && label.isNotEmpty && (_isNegativeLabelStr(label) || !_isCharacterLabelStr(label))) {
+                if (label != null &&
+                    label.isNotEmpty &&
+                    (_isNegativeLabelStr(label) ||
+                        !_isCharacterLabelStr(label))) {
                   if (replace) {
                     await _vm.replaceNegativePrompt(text);
                   } else {
@@ -768,7 +863,7 @@ class _GeneratePageState extends State<GeneratePage> {
                   _showToast(replace ? '已替换全局负向提示词' : '已追加到全局负向提示词');
                   return;
                 }
-                // 角色标签或无标签 → 弹选择器
+                // 含"角色"但无编号 或 无标签 → 弹选择器
                 final target = await _showApplyTargetPicker(isNegative: true);
                 if (target == null || !mounted) return;
                 if (target == -1) {
@@ -818,24 +913,43 @@ class _GeneratePageState extends State<GeneratePage> {
                 child: AnimatedOpacity(
                   opacity: _toastVisible ? 1.0 : 0.0,
                   duration: const Duration(milliseconds: 300),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                    decoration: BoxDecoration(
-                      color: Colors.black.withValues(alpha: 0.75),
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(CupertinoIcons.checkmark_circle, size: 18, color: Theme.of(context).colorScheme.primary),
-                        SizedBox(width: 8),
-                        Text(
-                          _toastMessage!,
-                          style: TextStyle(fontSize: 14, color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.w500),
+                  child: Builder(
+                    builder: (ctx) {
+                      final isDark =
+                          Theme.of(ctx).brightness == Brightness.dark;
+                      final bgColor = isDark
+                          ? Colors.black.withValues(alpha: 0.75)
+                          : Colors.black.withValues(alpha: 0.72);
+                      final borderColor = isDark
+                          ? Colors.white.withValues(alpha: 0.1)
+                          : Colors.white.withValues(alpha: 0.12);
+                      final textColor = Colors.white;
+                      return Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 24, vertical: 12),
+                        decoration: BoxDecoration(
+                          color: bgColor,
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: borderColor),
                         ),
-                      ],
-                    ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(CupertinoIcons.checkmark_circle,
+                                size: 18,
+                                color: Theme.of(ctx).colorScheme.primary),
+                            SizedBox(width: 8),
+                            Text(
+                              _toastMessage!,
+                              style: TextStyle(
+                                  fontSize: 14,
+                                  color: textColor,
+                                  fontWeight: FontWeight.w500),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
                   ),
                 ),
               ),
@@ -864,29 +978,47 @@ class _GeneratePageState extends State<GeneratePage> {
                 children: [
                   IconButton(
                     onPressed: () => setState(() => _isFullscreenMask = false),
-                    icon: Icon(CupertinoIcons.xmark_circle_fill, color: Theme.of(context).colorScheme.onSurface, size: 28),
+                    icon: Icon(CupertinoIcons.xmark_circle_fill,
+                        color: Theme.of(context).colorScheme.onSurface,
+                        size: 28),
                   ),
                   // 画笔/橡皮擦切换
                   SizedBox(width: 4),
                   GestureDetector(
                     onTap: () => setState(() => _isEraserMode = false),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 6),
                       decoration: BoxDecoration(
                         color: !_isEraserMode
                             ? const Color(0xAAFF3333).withValues(alpha: 0.3)
                             : Colors.white.withValues(alpha: 0.08),
                         borderRadius: BorderRadius.circular(10),
                         border: Border.all(
-                          color: !_isEraserMode ? const Color(0xAAFF3333) : Colors.transparent,
+                          color: !_isEraserMode
+                              ? const Color(0xAAFF3333)
+                              : Colors.transparent,
                         ),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(CupertinoIcons.paintbrush, size: 14, color: !_isEraserMode ? const Color(0xAAFF3333) : Theme.of(context).colorScheme.onSurfaceVariant),
+                          Icon(CupertinoIcons.paintbrush,
+                              size: 14,
+                              color: !_isEraserMode
+                                  ? const Color(0xAAFF3333)
+                                  : Theme.of(context)
+                                      .colorScheme
+                                      .onSurfaceVariant),
                           SizedBox(width: 4),
-                          Text('画笔', style: TextStyle(fontSize: 12, color: !_isEraserMode ? const Color(0xAAFF3333) : Theme.of(context).colorScheme.onSurfaceVariant)),
+                          Text('画笔',
+                              style: TextStyle(
+                                  fontSize: 12,
+                                  color: !_isEraserMode
+                                      ? const Color(0xAAFF3333)
+                                      : Theme.of(context)
+                                          .colorScheme
+                                          .onSurfaceVariant)),
                         ],
                       ),
                     ),
@@ -895,22 +1027,38 @@ class _GeneratePageState extends State<GeneratePage> {
                   GestureDetector(
                     onTap: () => setState(() => _isEraserMode = true),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 6),
                       decoration: BoxDecoration(
                         color: _isEraserMode
                             ? const Color(0xAA3399FF).withValues(alpha: 0.3)
                             : Colors.white.withValues(alpha: 0.08),
                         borderRadius: BorderRadius.circular(10),
                         border: Border.all(
-                          color: _isEraserMode ? const Color(0xAA3399FF) : Colors.transparent,
+                          color: _isEraserMode
+                              ? const Color(0xAA3399FF)
+                              : Colors.transparent,
                         ),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(CupertinoIcons.pencil_ellipsis_rectangle, size: 14, color: _isEraserMode ? const Color(0xAA3399FF) : Theme.of(context).colorScheme.onSurfaceVariant),
+                          Icon(CupertinoIcons.pencil_ellipsis_rectangle,
+                              size: 14,
+                              color: _isEraserMode
+                                  ? const Color(0xAA3399FF)
+                                  : Theme.of(context)
+                                      .colorScheme
+                                      .onSurfaceVariant),
                           SizedBox(width: 4),
-                          Text('橡皮擦', style: TextStyle(fontSize: 12, color: _isEraserMode ? const Color(0xAA3399FF) : Theme.of(context).colorScheme.onSurfaceVariant)),
+                          Text('橡皮擦',
+                              style: TextStyle(
+                                  fontSize: 12,
+                                  color: _isEraserMode
+                                      ? const Color(0xAA3399FF)
+                                      : Theme.of(context)
+                                          .colorScheme
+                                          .onSurfaceVariant)),
                         ],
                       ),
                     ),
@@ -919,21 +1067,35 @@ class _GeneratePageState extends State<GeneratePage> {
                   // 撤销按钮
                   IconButton(
                     onPressed: hasStrokes ? _undoLastStroke : null,
-                    icon: Icon(CupertinoIcons.arrow_uturn_left, color: hasStrokes ? Theme.of(context).colorScheme.onSurfaceVariant : Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.25), size: 20),
+                    icon: Icon(CupertinoIcons.arrow_uturn_left,
+                        color: hasStrokes
+                            ? Theme.of(context).colorScheme.onSurfaceVariant
+                            : Theme.of(context)
+                                .colorScheme
+                                .onSurfaceVariant
+                                .withValues(alpha: 0.25),
+                        size: 20),
                   ),
                   IconButton(
                     onPressed: _clearMaskStroke,
-                    icon: Icon(CupertinoIcons.trash, color: Theme.of(context).colorScheme.onSurfaceVariant, size: 20),
+                    icon: Icon(CupertinoIcons.trash,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        size: 20),
                   ),
                   SizedBox(width: 4),
                   FilledButton(
-                    onPressed: hasStrokes ? () async {
-                      await _applyDrawnMask();
-                      if (mounted) setState(() => _isFullscreenMask = false);
-                    } : null,
+                    onPressed: hasStrokes
+                        ? () async {
+                            await _applyDrawnMask();
+                            if (mounted)
+                              setState(() => _isFullscreenMask = false);
+                          }
+                        : null,
                     style: FilledButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 8),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)),
                     ),
                     child: Text('应用遮罩'),
                   ),
@@ -945,7 +1107,11 @@ class _GeneratePageState extends State<GeneratePage> {
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
               child: Row(
                 children: [
-                  Text('笔刷 ', style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurfaceVariant)),
+                  Text('笔刷 ',
+                      style: TextStyle(
+                          fontSize: 12,
+                          color:
+                              Theme.of(context).colorScheme.onSurfaceVariant)),
                   for (final size in [8.0, 16.0, 28.0, 40.0, 60.0])
                     Padding(
                       padding: const EdgeInsets.only(left: 6),
@@ -956,7 +1122,10 @@ class _GeneratePageState extends State<GeneratePage> {
                           height: 32,
                           decoration: BoxDecoration(
                             color: (_maskBrushSize - size).abs() < 0.1
-                                ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.3)
+                                ? Theme.of(context)
+                                    .colorScheme
+                                    .primary
+                                    .withValues(alpha: 0.3)
                                 : Colors.white.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(10),
                             border: Border.all(
@@ -969,7 +1138,10 @@ class _GeneratePageState extends State<GeneratePage> {
                             child: Container(
                               width: size / 3,
                               height: size / 3,
-                              decoration: BoxDecoration(color: Theme.of(context).colorScheme.onSurface, shape: BoxShape.circle),
+                              decoration: BoxDecoration(
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface,
+                                  shape: BoxShape.circle),
                             ),
                           ),
                         ),
@@ -1030,9 +1202,13 @@ class _GeneratePageState extends State<GeneratePage> {
                     child: Stack(
                       fit: StackFit.expand,
                       children: [
-                        Image.file(File(_vm.sourceImagePath!), fit: BoxFit.fill),
+                        Image.file(File(_vm.sourceImagePath!),
+                            fit: BoxFit.fill),
                         CustomPaint(
-                          painter: _MaskPainter(strokes: _maskStrokes, preview: true, erasedStrokes: _maskErasedStrokes),
+                          painter: _MaskPainter(
+                              strokes: _maskStrokes,
+                              preview: true,
+                              erasedStrokes: _maskErasedStrokes),
                         ),
                       ],
                     ),
@@ -1046,7 +1222,6 @@ class _GeneratePageState extends State<GeneratePage> {
     );
   }
 
-
   Widget _buildModeSection() {
     // 局部重绘仅 NovelAI 和 GPT 可用
     final allowInpainting = !_vm.isNanoProvider;
@@ -1055,17 +1230,22 @@ class _GeneratePageState extends State<GeneratePage> {
       decoration: BoxDecoration(
         color: Theme.of(context).cardTheme.color,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.08), width: 0.5),
+        border:
+            Border.all(color: Colors.white.withValues(alpha: 0.08), width: 0.5),
       ),
       padding: const EdgeInsets.all(16),
       child: allowInpainting
           ? CupertinoSlidingSegmentedControl<GenerationMode>(
               groupValue: _vm.generationMode,
               backgroundColor: Colors.black.withValues(alpha: 0.2),
-              thumbColor: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.8),
+              thumbColor: Theme.of(context)
+                  .colorScheme
+                  .surfaceContainerHighest
+                  .withValues(alpha: 0.8),
               children: {
                 GenerationMode.textToImage: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
                   child: Text(
                     '文生图',
                     style: TextStyle(
@@ -1078,7 +1258,8 @@ class _GeneratePageState extends State<GeneratePage> {
                   ),
                 ),
                 GenerationMode.inpainting: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
                   child: Text(
                     '局部重绘',
                     style: TextStyle(
@@ -1100,7 +1281,10 @@ class _GeneratePageState extends State<GeneratePage> {
           : Container(
               padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.8),
+                color: Theme.of(context)
+                    .colorScheme
+                    .surfaceContainerHighest
+                    .withValues(alpha: 0.8),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
@@ -1116,23 +1300,29 @@ class _GeneratePageState extends State<GeneratePage> {
   }
 
   Widget _buildInpaintingSection() {
-    final hasSourceImage = _vm.sourceImagePath != null && File(_vm.sourceImagePath!).existsSync();
+    final hasSourceImage =
+        _vm.sourceImagePath != null && File(_vm.sourceImagePath!).existsSync();
 
     return Container(
       decoration: BoxDecoration(
         color: Theme.of(context).cardTheme.color,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.08), width: 0.5),
+        border:
+            Border.all(color: Colors.white.withValues(alpha: 0.08), width: 0.5),
       ),
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text('局部重绘', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
+          Text('局部重绘',
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
           SizedBox(height: 8),
           Text(
             '选择原图，用手指涂抹需要重绘的区域（红色标记区域将被重绘）。',
-            style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurfaceVariant, height: 1.5),
+            style: TextStyle(
+                fontSize: 12,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+                height: 1.5),
           ),
           SizedBox(height: 16),
           OutlinedButton.icon(
@@ -1141,8 +1331,13 @@ class _GeneratePageState extends State<GeneratePage> {
             label: Text(_vm.sourceImagePath == null ? '选择原图' : '更换原图'),
             style: OutlinedButton.styleFrom(
               foregroundColor: Theme.of(context).colorScheme.primary,
-              side: BorderSide(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.45)),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              side: BorderSide(
+                  color: Theme.of(context)
+                      .colorScheme
+                      .primary
+                      .withValues(alpha: 0.45)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16)),
               padding: const EdgeInsets.symmetric(vertical: 12),
             ),
           ),
@@ -1150,13 +1345,18 @@ class _GeneratePageState extends State<GeneratePage> {
             SizedBox(height: 16),
             Row(
               children: [
-                Text('手绘遮罩', style: TextStyle(fontSize: 13, color: Theme.of(context).colorScheme.onSurfaceVariant, fontWeight: FontWeight.w600)),
+                Text('手绘遮罩',
+                    style: TextStyle(
+                        fontSize: 13,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        fontWeight: FontWeight.w600)),
                 const Spacer(),
                 TextButton.icon(
                   onPressed: () => setState(() => _isFullscreenMask = true),
                   icon: Icon(CupertinoIcons.fullscreen, size: 16),
                   label: Text('放大涂抹', style: TextStyle(fontSize: 12)),
-                  style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.primary),
+                  style: TextButton.styleFrom(
+                      foregroundColor: Theme.of(context).colorScheme.primary),
                 ),
               ],
             ),
@@ -1180,8 +1380,13 @@ class _GeneratePageState extends State<GeneratePage> {
                     onPressed: _clearMaskStroke,
                     style: OutlinedButton.styleFrom(
                       foregroundColor: Theme.of(context).colorScheme.primary,
-                      side: BorderSide(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.45)),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      side: BorderSide(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .primary
+                              .withValues(alpha: 0.45)),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16)),
                     ),
                     child: Text('清空手绘'),
                   ),
@@ -1189,9 +1394,13 @@ class _GeneratePageState extends State<GeneratePage> {
                 SizedBox(width: 12),
                 Expanded(
                   child: FilledButton(
-                    onPressed: (_maskStrokes.isEmpty && _maskErasedStrokes.isEmpty) ? null : _applyDrawnMask,
+                    onPressed:
+                        (_maskStrokes.isEmpty && _maskErasedStrokes.isEmpty)
+                            ? null
+                            : _applyDrawnMask,
                     style: FilledButton.styleFrom(
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16)),
                     ),
                     child: Text('应用手绘遮罩'),
                   ),
@@ -1201,7 +1410,10 @@ class _GeneratePageState extends State<GeneratePage> {
             SizedBox(height: 12),
             Row(
               children: [
-                Text('笔刷大小', style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurfaceVariant)),
+                Text('笔刷大小',
+                    style: TextStyle(
+                        fontSize: 12,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant)),
                 const Spacer(),
                 for (final size in [8.0, 16.0, 28.0, 40.0, 60.0])
                   Padding(
@@ -1213,12 +1425,18 @@ class _GeneratePageState extends State<GeneratePage> {
                         height: 34,
                         decoration: BoxDecoration(
                           color: (_maskBrushSize - size).abs() < 0.1
-                              ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.2)
+                              ? Theme.of(context)
+                                  .colorScheme
+                                  .primary
+                                  .withValues(alpha: 0.2)
                               : Theme.of(context).colorScheme.surface,
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
                             color: (_maskBrushSize - size).abs() < 0.1
-                                ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.5)
+                                ? Theme.of(context)
+                                    .colorScheme
+                                    .primary
+                                    .withValues(alpha: 0.5)
                                 : Colors.transparent,
                           ),
                         ),
@@ -1259,7 +1477,8 @@ class _GeneratePageState extends State<GeneratePage> {
       decoration: BoxDecoration(
         color: Theme.of(context).cardTheme.color,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.08), width: 0.5),
+        border:
+            Border.all(color: Colors.white.withValues(alpha: 0.08), width: 0.5),
       ),
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -1267,11 +1486,16 @@ class _GeneratePageState extends State<GeneratePage> {
         children: [
           Row(
             children: [
-              Icon(CupertinoIcons.photo_on_rectangle, size: 16, color: Theme.of(context).colorScheme.onSurfaceVariant),
+              Icon(CupertinoIcons.photo_on_rectangle,
+                  size: 16,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant),
               SizedBox(width: 8),
               Text(
                 '参考图（可选，${images.length}/16）',
-                style: TextStyle(fontSize: 13, color: Theme.of(context).colorScheme.onSurfaceVariant, fontWeight: FontWeight.w600),
+                style: TextStyle(
+                    fontSize: 13,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    fontWeight: FontWeight.w600),
               ),
               const Spacer(),
               if (images.isNotEmpty)
@@ -1279,14 +1503,22 @@ class _GeneratePageState extends State<GeneratePage> {
                   onPressed: _vm.clearGptImages,
                   icon: Icon(CupertinoIcons.xmark_circle, size: 14),
                   label: Text('清空', style: TextStyle(fontSize: 12)),
-                  style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.onSurfaceVariant),
+                  style: TextButton.styleFrom(
+                      foregroundColor:
+                          Theme.of(context).colorScheme.onSurfaceVariant),
                 ),
             ],
           ),
           SizedBox(height: 4),
           Text(
             '上传参考图后走图像编辑接口，提示词描述修改意图。最多16张。',
-            style: TextStyle(fontSize: 11, color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.5), height: 1.5),
+            style: TextStyle(
+                fontSize: 11,
+                color: Theme.of(context)
+                    .colorScheme
+                    .onSurfaceVariant
+                    .withValues(alpha: 0.5),
+                height: 1.5),
           ),
           if (images.isNotEmpty) ...[
             SizedBox(height: 12),
@@ -1319,7 +1551,9 @@ class _GeneratePageState extends State<GeneratePage> {
                             color: Colors.black.withValues(alpha: 0.6),
                             shape: BoxShape.circle,
                           ),
-                          child: Icon(CupertinoIcons.xmark, size: 12, color: Theme.of(context).colorScheme.onSurface),
+                          child: Icon(CupertinoIcons.xmark,
+                              size: 12,
+                              color: Theme.of(context).colorScheme.onSurface),
                         ),
                       ),
                     ),
@@ -1332,7 +1566,8 @@ class _GeneratePageState extends State<GeneratePage> {
           if (canAdd)
             OutlinedButton.icon(
               onPressed: () async {
-                final file = await _imagePicker.pickImage(source: ImageSource.gallery);
+                final file =
+                    await _imagePicker.pickImage(source: ImageSource.gallery);
                 if (file != null) _vm.addGptImage(file.path);
               },
               icon: Icon(CupertinoIcons.plus, size: 16),
@@ -1340,7 +1575,8 @@ class _GeneratePageState extends State<GeneratePage> {
               style: OutlinedButton.styleFrom(
                 foregroundColor: Colors.white,
                 side: BorderSide(color: Colors.white.withValues(alpha: 0.2)),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16)),
                 padding: const EdgeInsets.symmetric(vertical: 12),
               ),
             ),
@@ -1371,7 +1607,8 @@ class _GeneratePageState extends State<GeneratePage> {
         decoration: BoxDecoration(
           color: Theme.of(context).cardTheme.color,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.08), width: 0.5),
+          border: Border.all(
+              color: Colors.white.withValues(alpha: 0.08), width: 0.5),
         ),
         padding: const EdgeInsets.all(16),
         child: TextField(
@@ -1381,7 +1618,11 @@ class _GeneratePageState extends State<GeneratePage> {
           style: TextStyle(fontSize: 14, height: 1.5),
           decoration: InputDecoration(
             hintText: '描述你想要的画面...',
-            hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.55)),
+            hintStyle: TextStyle(
+                color: Theme.of(context)
+                    .colorScheme
+                    .onSurfaceVariant
+                    .withValues(alpha: 0.55)),
             fillColor: Colors.transparent,
             border: InputBorder.none,
             focusedBorder: InputBorder.none,
@@ -1397,7 +1638,8 @@ class _GeneratePageState extends State<GeneratePage> {
       decoration: BoxDecoration(
         color: Theme.of(context).cardTheme.color,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.08), width: 0.5),
+        border:
+            Border.all(color: Colors.white.withValues(alpha: 0.08), width: 0.5),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -1407,7 +1649,10 @@ class _GeneratePageState extends State<GeneratePage> {
             child: CupertinoSlidingSegmentedControl<int>(
               groupValue: _promptSegmentIndex,
               backgroundColor: Colors.black.withValues(alpha: 0.2),
-              thumbColor: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.8),
+              thumbColor: Theme.of(context)
+                  .colorScheme
+                  .surfaceContainerHighest
+                  .withValues(alpha: 0.8),
               children: {
                 0: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 8),
@@ -1457,7 +1702,11 @@ class _GeneratePageState extends State<GeneratePage> {
                   ),
                   decoration: InputDecoration(
                     hintText: '描述你想要的画面...',
-                    hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.55)),
+                    hintStyle: TextStyle(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurfaceVariant
+                            .withValues(alpha: 0.55)),
                     fillColor: Colors.transparent,
                     border: InputBorder.none,
                     focusedBorder: InputBorder.none,
@@ -1477,7 +1726,11 @@ class _GeneratePageState extends State<GeneratePage> {
                   ),
                   decoration: InputDecoration(
                     hintText: '描述你不想要的画面...',
-                    hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.55)),
+                    hintStyle: TextStyle(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurfaceVariant
+                            .withValues(alpha: 0.55)),
                     fillColor: Colors.transparent,
                     border: InputBorder.none,
                     focusedBorder: InputBorder.none,
@@ -1502,7 +1755,8 @@ class _GeneratePageState extends State<GeneratePage> {
         decoration: BoxDecoration(
           color: Theme.of(context).cardTheme.color,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.08), width: 0.5),
+          border: Border.all(
+              color: Colors.white.withValues(alpha: 0.08), width: 0.5),
         ),
         padding: const EdgeInsets.all(16),
         child: TextField(
@@ -1512,7 +1766,11 @@ class _GeneratePageState extends State<GeneratePage> {
           style: TextStyle(fontSize: 14, height: 1.5),
           decoration: InputDecoration(
             hintText: '描述编辑后想要的画面...',
-            hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.55)),
+            hintStyle: TextStyle(
+                color: Theme.of(context)
+                    .colorScheme
+                    .onSurfaceVariant
+                    .withValues(alpha: 0.55)),
             fillColor: Colors.transparent,
             border: InputBorder.none,
             focusedBorder: InputBorder.none,
@@ -1537,9 +1795,15 @@ class _GeneratePageState extends State<GeneratePage> {
             padding: EdgeInsets.fromLTRB(16, 16, 16, 8),
             child: Row(
               children: [
-                Icon(CupertinoIcons.paintbrush, size: 16, color: Theme.of(context).colorScheme.onSurfaceVariant),
+                Icon(CupertinoIcons.paintbrush,
+                    size: 16,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant),
                 SizedBox(width: 8),
-                Text('重绘提示词', style: TextStyle(fontSize: 13, color: Theme.of(context).colorScheme.onSurfaceVariant, fontWeight: FontWeight.w600)),
+                Text('重绘提示词',
+                    style: TextStyle(
+                        fontSize: 13,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        fontWeight: FontWeight.w600)),
               ],
             ),
           ),
@@ -1548,7 +1812,10 @@ class _GeneratePageState extends State<GeneratePage> {
             child: CupertinoSlidingSegmentedControl<int>(
               groupValue: _inpaintPromptSegmentIndex,
               backgroundColor: Colors.black.withValues(alpha: 0.2),
-              thumbColor: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.8),
+              thumbColor: Theme.of(context)
+                  .colorScheme
+                  .surfaceContainerHighest
+                  .withValues(alpha: 0.8),
               children: {
                 0: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 8),
@@ -1598,7 +1865,11 @@ class _GeneratePageState extends State<GeneratePage> {
                   ),
                   decoration: InputDecoration(
                     hintText: '描述重绘区域想要的画面...',
-                    hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.55)),
+                    hintStyle: TextStyle(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurfaceVariant
+                            .withValues(alpha: 0.55)),
                     fillColor: Colors.transparent,
                     border: InputBorder.none,
                     focusedBorder: InputBorder.none,
@@ -1618,7 +1889,11 @@ class _GeneratePageState extends State<GeneratePage> {
                   ),
                   decoration: InputDecoration(
                     hintText: '描述重绘区域不想要的画面...',
-                    hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.55)),
+                    hintStyle: TextStyle(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurfaceVariant
+                            .withValues(alpha: 0.55)),
                     fillColor: Colors.transparent,
                     border: InputBorder.none,
                     focusedBorder: InputBorder.none,
@@ -1638,7 +1913,9 @@ class _GeneratePageState extends State<GeneratePage> {
   BoxDecoration _selectBoxDecoration(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return BoxDecoration(
-      color: isDark ? Colors.white.withValues(alpha: 0.06) : Colors.white.withValues(alpha: 0.92),
+      color: isDark
+          ? Colors.white.withValues(alpha: 0.06)
+          : Colors.white.withValues(alpha: 0.92),
       borderRadius: BorderRadius.circular(18),
       border: Border.all(
         color: isDark
@@ -1685,7 +1962,10 @@ class _GeneratePageState extends State<GeneratePage> {
       icon: CupertinoIcons.cube_box,
       initiallyExpanded: true,
       children: [
-        Text('AI 模型', style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurfaceVariant)),
+        Text('AI 模型',
+            style: TextStyle(
+                fontSize: 12,
+                color: Theme.of(context).colorScheme.onSurfaceVariant)),
         SizedBox(height: 8),
         _dropdownShell(
           child: Builder(
@@ -1703,7 +1983,7 @@ class _GeneratePageState extends State<GeneratePage> {
               return DropdownButtonHideUnderline(
                 child: DropdownButton<String>(
                   isExpanded: true,
-              borderRadius: BorderRadius.circular(22),
+                  borderRadius: BorderRadius.circular(22),
                   value: selectedModel,
                   icon: Icon(CupertinoIcons.chevron_down, size: 16),
                   dropdownColor: _dropdownColor(context),
@@ -1718,12 +1998,14 @@ class _GeneratePageState extends State<GeneratePage> {
                       case ImageProviderType.novelAi:
                         tag = '';
                     }
-                    final epName = (opt.endpointName != null && opt.endpointName!.isNotEmpty)
+                    final epName = (opt.endpointName != null &&
+                            opt.endpointName!.isNotEmpty)
                         ? '[${opt.endpointName}] '
                         : '';
                     return DropdownMenuItem(
                       value: opt.modelId,
-                      child: Text('$tag$epName${opt.displayName}', style: TextStyle(fontWeight: FontWeight.w600)),
+                      child: Text('$tag$epName${opt.displayName}',
+                          style: TextStyle(fontWeight: FontWeight.w600)),
                     );
                   }).toList(),
                   onChanged: (v) {
@@ -1737,9 +2019,16 @@ class _GeneratePageState extends State<GeneratePage> {
         SizedBox(height: 20),
         Row(
           children: [
-            Text('图像尺寸', style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurfaceVariant)),
+            Text('图像尺寸',
+                style: TextStyle(
+                    fontSize: 12,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant)),
             const Spacer(),
-            Text(_vm.selectedResolution, style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.bold)),
+            Text(_vm.selectedResolution,
+                style: TextStyle(
+                    fontSize: 12,
+                    color: Theme.of(context).colorScheme.primary,
+                    fontWeight: FontWeight.bold)),
           ],
         ),
         SizedBox(height: 8),
@@ -1753,7 +2042,8 @@ class _GeneratePageState extends State<GeneratePage> {
               dropdownColor: _dropdownColor(context),
               style: _dropdownTextStyle(context),
               items: _vm.availableResolutions
-                  .map((r) => DropdownMenuItem(value: r, child: Text(_vm.resolutionLabel(r))))
+                  .map((r) => DropdownMenuItem(
+                      value: r, child: Text(_vm.resolutionLabel(r))))
                   .toList(),
               onChanged: (v) {
                 if (v != null) _vm.updateSelectedResolution(v);
@@ -1765,9 +2055,16 @@ class _GeneratePageState extends State<GeneratePage> {
           SizedBox(height: 16),
           Row(
             children: [
-              Text('图片质量', style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurfaceVariant)),
+              Text('图片质量',
+                  style: TextStyle(
+                      fontSize: 12,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant)),
               const Spacer(),
-              Text(_vm.selectedNanoImageSize, style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.bold)),
+              Text(_vm.selectedNanoImageSize,
+                  style: TextStyle(
+                      fontSize: 12,
+                      color: Theme.of(context).colorScheme.primary,
+                      fontWeight: FontWeight.bold)),
             ],
           ),
           SizedBox(height: 8),
@@ -1775,13 +2072,14 @@ class _GeneratePageState extends State<GeneratePage> {
             child: DropdownButtonHideUnderline(
               child: DropdownButton<String>(
                 isExpanded: true,
-              borderRadius: BorderRadius.circular(22),
+                borderRadius: BorderRadius.circular(22),
                 value: _vm.selectedNanoImageSize,
                 icon: Icon(CupertinoIcons.chevron_down, size: 16),
                 dropdownColor: _dropdownColor(context),
                 style: _dropdownTextStyle(context),
                 items: ApiConstants.nanoImageSizes
-                    .map((s) => DropdownMenuItem(value: s, child: Text(_vm.nanoImageSizeLabel(s))))
+                    .map((s) => DropdownMenuItem(
+                        value: s, child: Text(_vm.nanoImageSizeLabel(s))))
                     .toList(),
                 onChanged: (v) {
                   if (v != null) _vm.updateSelectedNanoImageSize(v);
@@ -1793,11 +2091,17 @@ class _GeneratePageState extends State<GeneratePage> {
         SizedBox(height: 20),
         Row(
           children: [
-            Text('批量生成', style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurfaceVariant)),
+            Text('批量生成',
+                style: TextStyle(
+                    fontSize: 12,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant)),
             const Spacer(),
             Text(
               '${_vm.batchCount} 张',
-              style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                  fontSize: 12,
+                  color: Theme.of(context).colorScheme.primary,
+                  fontWeight: FontWeight.bold),
             ),
           ],
         ),
@@ -1808,7 +2112,8 @@ class _GeneratePageState extends State<GeneratePage> {
             activeTrackColor: Theme.of(context).colorScheme.primary,
             inactiveTrackColor: Colors.black.withValues(alpha: 0.3),
             thumbColor: Colors.white,
-            overlayColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
+            overlayColor:
+                Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
             thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 10),
             overlayShape: const RoundSliderOverlayShape(overlayRadius: 20),
             showValueIndicator: ShowValueIndicator.never,
@@ -1818,14 +2123,21 @@ class _GeneratePageState extends State<GeneratePage> {
             min: 1,
             max: 15,
             divisions: 14,
-            onChanged: _vm.isGenerating ? null : (v) => _vm.updateBatchCount(v.round()),
+            onChanged: _vm.isGenerating
+                ? null
+                : (v) => _vm.updateBatchCount(v.round()),
           ),
         ),
         Padding(
           padding: EdgeInsets.only(left: 4),
           child: Text(
             '同一组提示词连续出图，每张间隔 1 秒',
-            style: TextStyle(fontSize: 11, color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.5)),
+            style: TextStyle(
+                fontSize: 11,
+                color: Theme.of(context)
+                    .colorScheme
+                    .onSurfaceVariant
+                    .withValues(alpha: 0.5)),
           ),
         ),
       ],
@@ -1856,7 +2168,10 @@ class _GeneratePageState extends State<GeneratePage> {
           onChanged: _vm.updateCfgRescale,
         ),
         SizedBox(height: 20),
-        Text('采样算法', style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurfaceVariant)),
+        Text('采样算法',
+            style: TextStyle(
+                fontSize: 12,
+                color: Theme.of(context).colorScheme.onSurfaceVariant)),
         SizedBox(height: 8),
         _dropdownShell(
           child: DropdownButtonHideUnderline(
@@ -1867,7 +2182,9 @@ class _GeneratePageState extends State<GeneratePage> {
               icon: Icon(CupertinoIcons.chevron_down, size: 16),
               dropdownColor: _dropdownColor(context),
               style: _dropdownTextStyle(context),
-              items: ApiConstants.supportedSamplers.map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(),
+              items: ApiConstants.supportedSamplers
+                  .map((s) => DropdownMenuItem(value: s, child: Text(s)))
+                  .toList(),
               onChanged: (v) {
                 if (v != null) _vm.updateSelectedSampler(v);
               },
@@ -1875,7 +2192,10 @@ class _GeneratePageState extends State<GeneratePage> {
           ),
         ),
         SizedBox(height: 20),
-        Text('噪声调度', style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurfaceVariant)),
+        Text('噪声调度',
+            style: TextStyle(
+                fontSize: 12,
+                color: Theme.of(context).colorScheme.onSurfaceVariant)),
         SizedBox(height: 8),
         _dropdownShell(
           child: DropdownButtonHideUnderline(
@@ -1886,7 +2206,9 @@ class _GeneratePageState extends State<GeneratePage> {
               icon: Icon(CupertinoIcons.chevron_down, size: 16),
               dropdownColor: _dropdownColor(context),
               style: _dropdownTextStyle(context),
-              items: ApiConstants.supportedNoiseSchedules.map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(),
+              items: ApiConstants.supportedNoiseSchedules
+                  .map((s) => DropdownMenuItem(value: s, child: Text(s)))
+                  .toList(),
               onChanged: (v) {
                 if (v != null) _vm.updateSelectedNoiseSchedule(v);
               },
@@ -1923,7 +2245,8 @@ class _GeneratePageState extends State<GeneratePage> {
               ),
               child: IconButton(
                 onPressed: () {
-                  final random = DateTime.now().microsecondsSinceEpoch % 0xFFFFFFFF;
+                  final random =
+                      DateTime.now().microsecondsSinceEpoch % 0xFFFFFFFF;
                   _vm.updateSeed(random);
                 },
                 icon: Icon(CupertinoIcons.shuffle, size: 20),
@@ -1938,33 +2261,44 @@ class _GeneratePageState extends State<GeneratePage> {
 
   Widget _buildResultSection() {
     final displayTask = _vm.selectedResult ?? _vm.lastCompletedTask;
-    if (displayTask == null && _vm.errorMessage == null) return const SizedBox.shrink();
+    if (displayTask == null && _vm.errorMessage == null)
+      return const SizedBox.shrink();
 
     final results = _vm.sessionResults;
     final showStrip = results.length > 1;
-    final headerLabel = results.length > 1 ? '本次结果 (${results.length})' : '最新结果';
+    final headerLabel =
+        results.length > 1 ? '本次结果 (${results.length})' : '最新结果';
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
           padding: const EdgeInsets.only(left: 8, bottom: 8),
-          child: Text(headerLabel, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurfaceVariant)),
+          child: Text(headerLabel,
+              style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant)),
         ),
         Container(
           decoration: BoxDecoration(
             color: Theme.of(context).cardTheme.color,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.08), width: 0.5),
+            border: Border.all(
+                color: Colors.white.withValues(alpha: 0.08), width: 0.5),
           ),
           padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               if (_vm.errorMessage != null)
-                Text(_vm.errorMessage!, style: TextStyle(color: Theme.of(context).colorScheme.error, fontSize: 13))
+                Text(_vm.errorMessage!,
+                    style: TextStyle(
+                        color: Theme.of(context).colorScheme.error,
+                        fontSize: 13))
               else if (displayTask != null) ...[
-                if (displayTask.imagePath != null && File(displayTask.imagePath!).existsSync())
+                if (displayTask.imagePath != null &&
+                    File(displayTask.imagePath!).existsSync())
                   ClipRRect(
                     borderRadius: BorderRadius.circular(16),
                     child: GestureDetector(
@@ -1973,7 +2307,8 @@ class _GeneratePageState extends State<GeneratePage> {
                         imagePath: displayTask.imagePath,
                         imageUrl: displayTask.imageUrl,
                       ),
-                      child: Image.file(File(displayTask.imagePath!), fit: BoxFit.cover),
+                      child: Image.file(File(displayTask.imagePath!),
+                          fit: BoxFit.cover),
                     ),
                   )
                 else if (displayTask.imageUrl != null)
@@ -1985,7 +2320,8 @@ class _GeneratePageState extends State<GeneratePage> {
                         imagePath: displayTask.imagePath,
                         imageUrl: displayTask.imageUrl,
                       ),
-                      child: Image.network(displayTask.imageUrl!, fit: BoxFit.cover),
+                      child: Image.network(displayTask.imageUrl!,
+                          fit: BoxFit.cover),
                     ),
                   ),
                 if (showStrip) ...[
@@ -1994,23 +2330,34 @@ class _GeneratePageState extends State<GeneratePage> {
                     height: 72,
                     child: ListView.separated(
                       scrollDirection: Axis.horizontal,
-                      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 4, vertical: 4),
                       itemCount: results.length,
                       separatorBuilder: (_, __) => SizedBox(width: 8),
                       itemBuilder: (context, index) {
                         final t = results[index];
-                        final isSelected = t.taskId == (_vm.selectedResultTaskId ?? _vm.lastCompletedTask?.taskId);
+                        final isSelected = t.taskId ==
+                            (_vm.selectedResultTaskId ??
+                                _vm.lastCompletedTask?.taskId);
                         Widget thumb;
-                        if (t.imagePath != null && File(t.imagePath!).existsSync()) {
-                          thumb = Image.file(File(t.imagePath!), fit: BoxFit.cover, width: 64, height: 64);
+                        if (t.imagePath != null &&
+                            File(t.imagePath!).existsSync()) {
+                          thumb = Image.file(File(t.imagePath!),
+                              fit: BoxFit.cover, width: 64, height: 64);
                         } else if (t.imageUrl != null) {
-                          thumb = Image.network(t.imageUrl!, fit: BoxFit.cover, width: 64, height: 64);
+                          thumb = Image.network(t.imageUrl!,
+                              fit: BoxFit.cover, width: 64, height: 64);
                         } else {
                           thumb = Container(
                             width: 64,
                             height: 64,
                             color: Colors.black26,
-                            child: Icon(CupertinoIcons.photo, size: 24, color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.25)),
+                            child: Icon(CupertinoIcons.photo,
+                                size: 24,
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onSurfaceVariant
+                                    .withValues(alpha: 0.25)),
                           );
                         }
                         return GestureDetector(
@@ -2030,7 +2377,10 @@ class _GeneratePageState extends State<GeneratePage> {
                               boxShadow: isSelected
                                   ? [
                                       BoxShadow(
-                                        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.35),
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primary
+                                            .withValues(alpha: 0.35),
                                         blurRadius: 10,
                                         spreadRadius: 0,
                                       ),
@@ -2047,14 +2397,21 @@ class _GeneratePageState extends State<GeneratePage> {
                                     right: 2,
                                     bottom: 2,
                                     child: Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 5, vertical: 1),
                                       decoration: BoxDecoration(
-                                        color: Colors.black.withValues(alpha: 0.55),
+                                        color: Colors.black
+                                            .withValues(alpha: 0.55),
                                         borderRadius: BorderRadius.circular(6),
                                       ),
                                       child: Text(
                                         '${index + 1}',
-                                        style: TextStyle(fontSize: 10, color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold),
+                                        style: TextStyle(
+                                            fontSize: 10,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onSurface,
+                                            fontWeight: FontWeight.bold),
                                       ),
                                     ),
                                   ),
@@ -2077,12 +2434,14 @@ class _GeneratePageState extends State<GeneratePage> {
                       _showToast('已保存到相册');
                     },
                     icon: Icon(CupertinoIcons.square_arrow_down, size: 18),
-                    label: Text('保存到相册', style: TextStyle(fontWeight: FontWeight.bold)),
+                    label: Text('保存到相册',
+                        style: TextStyle(fontWeight: FontWeight.bold)),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.black.withValues(alpha: 0.3),
                       foregroundColor: Colors.white,
                       elevation: 0,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16)),
                     ),
                   ),
                 ),
@@ -2094,7 +2453,8 @@ class _GeneratePageState extends State<GeneratePage> {
     );
   }
 
-  void _openImagePreview(BuildContext context, {String? imagePath, String? imageUrl}) {
+  void _openImagePreview(BuildContext context,
+      {String? imagePath, String? imageUrl}) {
     showFullscreenImagePreview(
       context,
       imagePath: imagePath,
@@ -2146,7 +2506,10 @@ class _GeneratePageState extends State<GeneratePage> {
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
                           colors: _vm.isGenerating
-                              ? [primary.withValues(alpha: 0.28), primary.withValues(alpha: 0.16)]
+                              ? [
+                                  primary.withValues(alpha: 0.28),
+                                  primary.withValues(alpha: 0.16)
+                                ]
                               : idleButtonColors,
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
@@ -2167,20 +2530,33 @@ class _GeneratePageState extends State<GeneratePage> {
                             ? Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Theme.of(context).colorScheme.onSurface)),
+                                  SizedBox(
+                                      width: 16,
+                                      height: 16,
+                                      child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurface)),
                                   SizedBox(width: 12),
                                   Text(
                                     _vm.batchCount > 1
                                         ? '生成中… ${(_vm.batchCount - _vm.batchRemaining + 1).clamp(1, _vm.batchCount)}/${_vm.batchCount}'
                                         : 'Generating...',
-                                    style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.w600, fontSize: 16),
+                                    style: TextStyle(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurface,
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 16),
                                   ),
                                 ],
                               )
                             : Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Icon(CupertinoIcons.wand_rays, color: buttonTextColor, size: 20),
+                                  Icon(CupertinoIcons.wand_rays,
+                                      color: buttonTextColor, size: 20),
                                   SizedBox(width: 8),
                                   Text(
                                     'Generate',
@@ -2194,14 +2570,19 @@ class _GeneratePageState extends State<GeneratePage> {
                                   if (_vm.pendingCount > 0) ...[
                                     SizedBox(width: 8),
                                     Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 6, vertical: 2),
                                       decoration: BoxDecoration(
-                                        color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.16),
+                                        color: Colors.black.withValues(
+                                            alpha: isDark ? 0.2 : 0.16),
                                         borderRadius: BorderRadius.circular(10),
                                       ),
                                       child: Text(
                                         '${_vm.pendingCount} in queue',
-                                        style: TextStyle(color: buttonTextColor, fontSize: 10, fontWeight: FontWeight.bold),
+                                        style: TextStyle(
+                                            color: buttonTextColor,
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.bold),
                                       ),
                                     ),
                                   ],
@@ -2227,7 +2608,6 @@ class _GeneratePageState extends State<GeneratePage> {
   }
 }
 
-
 class _PremiumAccordion extends StatefulWidget {
   final String title;
   final IconData icon;
@@ -2245,7 +2625,8 @@ class _PremiumAccordion extends StatefulWidget {
   State<_PremiumAccordion> createState() => _PremiumAccordionState();
 }
 
-class _PremiumAccordionState extends State<_PremiumAccordion> with SingleTickerProviderStateMixin {
+class _PremiumAccordionState extends State<_PremiumAccordion>
+    with SingleTickerProviderStateMixin {
   late bool _isExpanded;
   late AnimationController _controller;
   late Animation<double> _iconTurns;
@@ -2254,8 +2635,10 @@ class _PremiumAccordionState extends State<_PremiumAccordion> with SingleTickerP
   void initState() {
     super.initState();
     _isExpanded = widget.initiallyExpanded;
-    _controller = AnimationController(duration: const Duration(milliseconds: 300), vsync: this);
-    _iconTurns = Tween<double>(begin: 0.0, end: 0.5).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOutCubic));
+    _controller = AnimationController(
+        duration: const Duration(milliseconds: 300), vsync: this);
+    _iconTurns = Tween<double>(begin: 0.0, end: 0.5).animate(
+        CurvedAnimation(parent: _controller, curve: Curves.easeInOutCubic));
     if (_isExpanded) _controller.value = 1.0;
   }
 
@@ -2282,7 +2665,8 @@ class _PremiumAccordionState extends State<_PremiumAccordion> with SingleTickerP
       decoration: BoxDecoration(
         color: Theme.of(context).cardTheme.color,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.08), width: 0.5),
+        border:
+            Border.all(color: Colors.white.withValues(alpha: 0.08), width: 0.5),
       ),
       clipBehavior: Clip.antiAlias,
       child: Column(
@@ -2294,17 +2678,21 @@ class _PremiumAccordionState extends State<_PremiumAccordion> with SingleTickerP
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
               child: Row(
                 children: [
-                  Icon(widget.icon, size: 20, color: Theme.of(context).colorScheme.primary),
+                  Icon(widget.icon,
+                      size: 20, color: Theme.of(context).colorScheme.primary),
                   SizedBox(width: 12),
                   Expanded(
                     child: Text(
                       widget.title,
-                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+                      style:
+                          TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
                     ),
                   ),
                   RotationTransition(
                     turns: _iconTurns,
-                    child: Icon(CupertinoIcons.chevron_down, size: 16, color: Theme.of(context).colorScheme.onSurfaceVariant),
+                    child: Icon(CupertinoIcons.chevron_down,
+                        size: 16,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant),
                   ),
                 ],
               ),
@@ -2319,7 +2707,9 @@ class _PremiumAccordionState extends State<_PremiumAccordion> with SingleTickerP
                 children: widget.children,
               ),
             ),
-            crossFadeState: _isExpanded ? CrossFadeState.showSecond : CrossFadeState.showFirst,
+            crossFadeState: _isExpanded
+                ? CrossFadeState.showSecond
+                : CrossFadeState.showFirst,
             duration: const Duration(milliseconds: 300),
             sizeCurve: Curves.easeInOutCubic,
           ),
@@ -2353,9 +2743,16 @@ class _PremiumSlider extends StatelessWidget {
       children: [
         Row(
           children: [
-            Text(label, style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurfaceVariant)),
+            Text(label,
+                style: TextStyle(
+                    fontSize: 12,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant)),
             const Spacer(),
-            Text(value.toStringAsFixed(2), style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.bold)),
+            Text(value.toStringAsFixed(2),
+                style: TextStyle(
+                    fontSize: 12,
+                    color: Theme.of(context).colorScheme.primary,
+                    fontWeight: FontWeight.bold)),
           ],
         ),
         SizedBox(height: 8),
@@ -2365,7 +2762,8 @@ class _PremiumSlider extends StatelessWidget {
             activeTrackColor: Theme.of(context).colorScheme.primary,
             inactiveTrackColor: Colors.black.withValues(alpha: 0.3),
             thumbColor: Colors.white,
-            overlayColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
+            overlayColor:
+                Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
             thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 10),
             overlayShape: const RoundSliderOverlayShape(overlayRadius: 20),
             showValueIndicator: ShowValueIndicator.never, // 移除丑陋气泡
@@ -2389,10 +2787,12 @@ class _CharacterControlSection extends StatefulWidget {
   const _CharacterControlSection({required this.vm});
 
   @override
-  State<_CharacterControlSection> createState() => _CharacterControlSectionState();
+  State<_CharacterControlSection> createState() =>
+      _CharacterControlSectionState();
 }
 
-class _CharacterControlSectionState extends State<_CharacterControlSection> with SingleTickerProviderStateMixin {
+class _CharacterControlSectionState extends State<_CharacterControlSection>
+    with SingleTickerProviderStateMixin {
   bool _expanded = false;
   late AnimationController _controller;
   late Animation<double> _iconTurns;
@@ -2402,8 +2802,10 @@ class _CharacterControlSectionState extends State<_CharacterControlSection> with
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(duration: const Duration(milliseconds: 300), vsync: this);
-    _iconTurns = Tween<double>(begin: 0.0, end: 0.5).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOutCubic));
+    _controller = AnimationController(
+        duration: const Duration(milliseconds: 300), vsync: this);
+    _iconTurns = Tween<double>(begin: 0.0, end: 0.5).animate(
+        CurvedAnimation(parent: _controller, curve: Curves.easeInOutCubic));
   }
 
   void _toggle() {
@@ -2444,24 +2846,37 @@ class _CharacterControlSectionState extends State<_CharacterControlSection> with
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
               child: Row(
                 children: [
-                  Icon(CupertinoIcons.person_3, size: 20, color: Theme.of(context).colorScheme.primary),
+                  Icon(CupertinoIcons.person_3,
+                      size: 20, color: Theme.of(context).colorScheme.primary),
                   SizedBox(width: 12),
                   const Expanded(
-                    child: Text('角色控制', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
+                    child: Text('角色控制',
+                        style: TextStyle(
+                            fontSize: 15, fontWeight: FontWeight.w600)),
                   ),
                   if (enabledCount > 0)
                     Container(
                       margin: const EdgeInsets.only(right: 8),
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 6, vertical: 2),
                       decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
+                        color: Theme.of(context)
+                            .colorScheme
+                            .primary
+                            .withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: Text('$enabledCount', style: TextStyle(fontSize: 10, color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.bold)),
+                      child: Text('$enabledCount',
+                          style: TextStyle(
+                              fontSize: 10,
+                              color: Theme.of(context).colorScheme.primary,
+                              fontWeight: FontWeight.bold)),
                     ),
                   RotationTransition(
                     turns: _iconTurns,
-                    child: Icon(CupertinoIcons.chevron_down, size: 16, color: Theme.of(context).colorScheme.onSurfaceVariant),
+                    child: Icon(CupertinoIcons.chevron_down,
+                        size: 16,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant),
                   ),
                 ],
               ),
@@ -2476,50 +2891,94 @@ class _CharacterControlSectionState extends State<_CharacterControlSection> with
                 children: [
                   Text(
                     '精确定义图像中人物的外观、表情和姿势，最多支持 6 个角色。',
-                    style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurfaceVariant, height: 1.5),
+                    style: TextStyle(
+                        fontSize: 12,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        height: 1.5),
                   ),
                   SizedBox(height: 16),
                   Row(
                     children: [
                       Expanded(
                         child: OutlinedButton.icon(
-                          onPressed: characters.length >= 6 ? null : () {
-                            widget.vm.addCharacter();
-                            final newIndex = widget.vm.characters.length - 1;
-                            if (_autoPositionDefault) widget.vm.setCharacterPositionAuto(newIndex);
-                            setState(() => _expandedCards.add(newIndex));
-                          },
+                          onPressed: characters.length >= 6
+                              ? null
+                              : () {
+                                  widget.vm.addCharacter();
+                                  final newIndex =
+                                      widget.vm.characters.length - 1;
+                                  if (_autoPositionDefault)
+                                    widget.vm
+                                        .setCharacterPositionAuto(newIndex);
+                                  setState(() => _expandedCards.add(newIndex));
+                                },
                           icon: Icon(CupertinoIcons.add, size: 16),
                           label: Text('添加角色'),
                           style: OutlinedButton.styleFrom(
-                            foregroundColor: Theme.of(context).colorScheme.primary,
-                            side: BorderSide(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.45)),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                            foregroundColor:
+                                Theme.of(context).colorScheme.primary,
+                            side: BorderSide(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .primary
+                                    .withValues(alpha: 0.45)),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16)),
                             padding: const EdgeInsets.symmetric(vertical: 12),
                           ),
                         ),
                       ),
                       SizedBox(width: 12),
                       GestureDetector(
-                        onTap: () => setState(() => _autoPositionDefault = !_autoPositionDefault),
+                        onTap: () => setState(
+                            () => _autoPositionDefault = !_autoPositionDefault),
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 10),
                           decoration: BoxDecoration(
                             color: _autoPositionDefault
-                                ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.2)
+                                ? Theme.of(context)
+                                    .colorScheme
+                                    .primary
+                                    .withValues(alpha: 0.2)
                                 : Theme.of(context).colorScheme.surface,
                             borderRadius: BorderRadius.circular(16),
                             border: Border.all(
                               color: _autoPositionDefault
-                                  ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.5)
-                                  : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.10),
+                                  ? Theme.of(context)
+                                      .colorScheme
+                                      .primary
+                                      .withValues(alpha: 0.5)
+                                  : Theme.of(context)
+                                      .colorScheme
+                                      .onSurface
+                                      .withValues(alpha: 0.10),
                             ),
                           ),
                           child: Row(
                             children: [
-                              Icon(_autoPositionDefault ? CupertinoIcons.checkmark_square_fill : CupertinoIcons.square, size: 16, color: _autoPositionDefault ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onSurfaceVariant),
+                              Icon(
+                                  _autoPositionDefault
+                                      ? CupertinoIcons.checkmark_square_fill
+                                      : CupertinoIcons.square,
+                                  size: 16,
+                                  color: _autoPositionDefault
+                                      ? Theme.of(context).colorScheme.primary
+                                      : Theme.of(context)
+                                          .colorScheme
+                                          .onSurfaceVariant),
                               SizedBox(width: 6),
-                              Text('AI位置', style: TextStyle(fontSize: 12, color: _autoPositionDefault ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onSurfaceVariant, fontWeight: FontWeight.bold)),
+                              Text('AI位置',
+                                  style: TextStyle(
+                                      fontSize: 12,
+                                      color: _autoPositionDefault
+                                          ? Theme.of(context)
+                                              .colorScheme
+                                              .primary
+                                          : Theme.of(context)
+                                              .colorScheme
+                                              .onSurfaceVariant,
+                                      fontWeight: FontWeight.bold)),
                             ],
                           ),
                         ),
@@ -2543,21 +3002,31 @@ class _CharacterControlSectionState extends State<_CharacterControlSection> with
                             }
                           });
                         },
-                        onMoveUp: entry.key == 0 ? null : () => widget.vm.moveCharacterUp(entry.key),
-                        onMoveDown: entry.key == characters.length - 1 ? null : () => widget.vm.moveCharacterDown(entry.key),
-                        onToggleEnabled: () => widget.vm.toggleCharacterEnabled(entry.key),
+                        onMoveUp: entry.key == 0
+                            ? null
+                            : () => widget.vm.moveCharacterUp(entry.key),
+                        onMoveDown: entry.key == characters.length - 1
+                            ? null
+                            : () => widget.vm.moveCharacterDown(entry.key),
+                        onToggleEnabled: () =>
+                            widget.vm.toggleCharacterEnabled(entry.key),
                         onDelete: () {
                           widget.vm.removeCharacter(entry.key);
                           setState(() => _expandedCards.remove(entry.key));
                         },
-                        onChanged: (character) => widget.vm.updateCharacter(entry.key, character),
-                        onAutoPosition: () => widget.vm.setCharacterPositionAuto(entry.key),
-                        onGridPosition: (row, col) => widget.vm.setCharacterGridPosition(entry.key, row, col),
+                        onChanged: (character) =>
+                            widget.vm.updateCharacter(entry.key, character),
+                        onAutoPosition: () =>
+                            widget.vm.setCharacterPositionAuto(entry.key),
+                        onGridPosition: (row, col) => widget.vm
+                            .setCharacterGridPosition(entry.key, row, col),
                       ),
                 ],
               ),
             ),
-            crossFadeState: _expanded ? CrossFadeState.showSecond : CrossFadeState.showFirst,
+            crossFadeState: _expanded
+                ? CrossFadeState.showSecond
+                : CrossFadeState.showFirst,
             duration: const Duration(milliseconds: 300),
             sizeCurve: Curves.easeInOutCubic,
           ),
@@ -2618,7 +3087,8 @@ class _CharacterCardState extends State<_CharacterCard> {
   @override
   void didUpdateWidget(covariant _CharacterCard oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (!_promptFocusNode.hasFocus && _promptController.text != widget.character.prompt) {
+    if (!_promptFocusNode.hasFocus &&
+        _promptController.text != widget.character.prompt) {
       _promptController.text = widget.character.prompt;
     }
     final uc = widget.character.uc ?? '';
@@ -2639,7 +3109,8 @@ class _CharacterCardState extends State<_CharacterCard> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final positionLabel = _positionLabel(widget.character.centerX, widget.character.centerY);
+    final positionLabel =
+        _positionLabel(widget.character.centerX, widget.character.centerY);
     final bool isEnabled = widget.character.enabled;
 
     return Container(
@@ -2671,7 +3142,12 @@ class _CharacterCardState extends State<_CharacterCard> {
                       height: 8,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: isEnabled ? theme.colorScheme.primary : Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.25),
+                        color: isEnabled
+                            ? theme.colorScheme.primary
+                            : Theme.of(context)
+                                .colorScheme
+                                .onSurfaceVariant
+                                .withValues(alpha: 0.25),
                       ),
                     ),
                     SizedBox(width: 12),
@@ -2682,34 +3158,66 @@ class _CharacterCardState extends State<_CharacterCard> {
                           Text(
                             '未命名角色',
                             style: TextStyle(
-                              color: isEnabled ? theme.colorScheme.onSurface : Theme.of(context).colorScheme.onSurfaceVariant,
+                              color: isEnabled
+                                  ? theme.colorScheme.onSurface
+                                  : Theme.of(context)
+                                      .colorScheme
+                                      .onSurfaceVariant,
                               fontWeight: FontWeight.bold,
                               fontSize: 14,
                             ),
                           ),
                           SizedBox(height: 2),
                           Text(
-                            positionLabel == null ? 'AI决定位置' : '位置 $positionLabel',
-                            style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant, fontSize: 11),
+                            positionLabel == null
+                                ? 'AI决定位置'
+                                : '位置 $positionLabel',
+                            style: TextStyle(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onSurfaceVariant,
+                                fontSize: 11),
                           ),
                         ],
                       ),
                     ),
                     IconButton(
                       onPressed: widget.onToggleEnabled,
-                      icon: Icon(isEnabled ? CupertinoIcons.eye : CupertinoIcons.eye_slash, size: 18),
-                      color: isEnabled ? Theme.of(context).colorScheme.onSurfaceVariant : Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.35),
+                      icon: Icon(
+                          isEnabled
+                              ? CupertinoIcons.eye
+                              : CupertinoIcons.eye_slash,
+                          size: 18),
+                      color: isEnabled
+                          ? Theme.of(context).colorScheme.onSurfaceVariant
+                          : Theme.of(context)
+                              .colorScheme
+                              .onSurfaceVariant
+                              .withValues(alpha: 0.35),
                       padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                      constraints:
+                          const BoxConstraints(minWidth: 32, minHeight: 32),
                     ),
                     IconButton(
                       onPressed: widget.onDelete,
                       icon: Icon(CupertinoIcons.trash, size: 18),
-                      color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.35),
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurfaceVariant
+                          .withValues(alpha: 0.35),
                       padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                      constraints:
+                          const BoxConstraints(minWidth: 32, minHeight: 32),
                     ),
-                    Icon(widget.expanded ? CupertinoIcons.chevron_up : CupertinoIcons.chevron_down, size: 16, color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.35)),
+                    Icon(
+                        widget.expanded
+                            ? CupertinoIcons.chevron_up
+                            : CupertinoIcons.chevron_down,
+                        size: 16,
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurfaceVariant
+                            .withValues(alpha: 0.35)),
                     SizedBox(width: 8),
                   ],
                 ),
@@ -2746,11 +3254,16 @@ class _CharacterCardState extends State<_CharacterCard> {
                         style: TextStyle(fontSize: 13, height: 1.5),
                         decoration: InputDecoration(
                           hintText: '描述该角色的外观...',
-                          hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.55)),
+                          hintStyle: TextStyle(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurfaceVariant
+                                  .withValues(alpha: 0.55)),
                           filled: true,
                           fillColor: Colors.black.withValues(alpha: 0.2),
                         ),
-                        onChanged: (value) => widget.onChanged(widget.character.copyWith(prompt: value)),
+                        onChanged: (value) => widget.onChanged(
+                            widget.character.copyWith(prompt: value)),
                       ),
                       TextField(
                         controller: _ucController,
@@ -2760,11 +3273,16 @@ class _CharacterCardState extends State<_CharacterCard> {
                         style: TextStyle(fontSize: 13, height: 1.5),
                         decoration: InputDecoration(
                           hintText: '描述该角色不需要的特征...',
-                          hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.55)),
+                          hintStyle: TextStyle(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurfaceVariant
+                                  .withValues(alpha: 0.55)),
                           filled: true,
                           fillColor: Colors.black.withValues(alpha: 0.2),
                         ),
-                        onChanged: (value) => widget.onChanged(widget.character.copyWith(
+                        onChanged: (value) =>
+                            widget.onChanged(widget.character.copyWith(
                           uc: value.isEmpty ? null : value,
                           clearUc: value.isEmpty,
                         )),
@@ -2781,31 +3299,45 @@ class _CharacterCardState extends State<_CharacterCard> {
                 // 排序控制栏
                 Container(
                   color: Colors.black.withValues(alpha: 0.1),
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   child: Row(
                     children: [
-                      Text('排序', style: TextStyle(fontSize: 11, color: Theme.of(context).colorScheme.onSurfaceVariant)),
+                      Text('排序',
+                          style: TextStyle(
+                              fontSize: 11,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurfaceVariant)),
                       const Spacer(),
                       IconButton(
                         onPressed: widget.onMoveUp,
                         icon: Icon(CupertinoIcons.arrow_up, size: 16),
-                        color: widget.onMoveUp == null ? Colors.white12 : Theme.of(context).colorScheme.onSurfaceVariant,
+                        color: widget.onMoveUp == null
+                            ? Colors.white12
+                            : Theme.of(context).colorScheme.onSurfaceVariant,
                         padding: EdgeInsets.zero,
-                        constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                        constraints:
+                            const BoxConstraints(minWidth: 32, minHeight: 32),
                       ),
                       IconButton(
                         onPressed: widget.onMoveDown,
                         icon: Icon(CupertinoIcons.arrow_down, size: 16),
-                        color: widget.onMoveDown == null ? Colors.white12 : Theme.of(context).colorScheme.onSurfaceVariant,
+                        color: widget.onMoveDown == null
+                            ? Colors.white12
+                            : Theme.of(context).colorScheme.onSurfaceVariant,
                         padding: EdgeInsets.zero,
-                        constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                        constraints:
+                            const BoxConstraints(minWidth: 32, minHeight: 32),
                       ),
                     ],
                   ),
                 )
               ],
             ),
-            crossFadeState: widget.expanded ? CrossFadeState.showSecond : CrossFadeState.showFirst,
+            crossFadeState: widget.expanded
+                ? CrossFadeState.showSecond
+                : CrossFadeState.showFirst,
             duration: const Duration(milliseconds: 300),
             sizeCurve: Curves.easeInOutCubic,
           ),
@@ -2823,7 +3355,9 @@ class _CharacterCardState extends State<_CharacterCard> {
           duration: const Duration(milliseconds: 200),
           padding: const EdgeInsets.symmetric(vertical: 8),
           decoration: BoxDecoration(
-            color: isSelected ? Colors.white.withValues(alpha: 0.1) : Colors.transparent,
+            color: isSelected
+                ? Colors.white.withValues(alpha: 0.1)
+                : Colors.transparent,
             borderRadius: BorderRadius.circular(12),
           ),
           child: Center(
@@ -2832,7 +3366,9 @@ class _CharacterCardState extends State<_CharacterCard> {
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                color: isSelected ? Colors.white : Theme.of(context).colorScheme.onSurfaceVariant,
+                color: isSelected
+                    ? Colors.white
+                    : Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ),
           ),
@@ -2868,16 +3404,24 @@ class _CharacterPositionGrid extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.symmetric(vertical: 10),
             decoration: BoxDecoration(
-              color: selected == null ? theme.colorScheme.primary.withValues(alpha: 0.2) : Colors.black.withValues(alpha: 0.2),
+              color: selected == null
+                  ? theme.colorScheme.primary.withValues(alpha: 0.2)
+                  : Colors.black.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: selected == null ? theme.colorScheme.primary.withValues(alpha: 0.5) : Colors.transparent),
+              border: Border.all(
+                  color: selected == null
+                      ? theme.colorScheme.primary.withValues(alpha: 0.5)
+                      : Colors.transparent),
             ),
             child: Center(
-              child: Text('AI决定位置', style: TextStyle(
-                color: selected == null ? theme.colorScheme.primary : Theme.of(context).colorScheme.onSurfaceVariant,
-                fontWeight: FontWeight.bold,
-                fontSize: 13,
-              )),
+              child: Text('AI决定位置',
+                  style: TextStyle(
+                    color: selected == null
+                        ? theme.colorScheme.primary
+                        : Theme.of(context).colorScheme.onSurfaceVariant,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13,
+                  )),
             ),
           ),
         ),
@@ -2894,14 +3438,28 @@ class _CharacterPositionGrid extends StatelessWidget {
                 children: [
                   SizedBox(width: 30),
                   for (final col in ['A', 'B', 'C', 'D', 'E'])
-                    Expanded(child: Center(child: Text(col, style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurfaceVariant)))),
+                    Expanded(
+                        child: Center(
+                            child: Text(col,
+                                style: TextStyle(
+                                    fontSize: 12,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurfaceVariant)))),
                 ],
               ),
               SizedBox(height: 8),
               for (var row = 0; row < 5; row++) ...[
                 Row(
                   children: [
-                    SizedBox(width: 30, child: Text('${row + 1}', style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurfaceVariant))),
+                    SizedBox(
+                        width: 30,
+                        child: Text('${row + 1}',
+                            style: TextStyle(
+                                fontSize: 12,
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onSurfaceVariant))),
                     for (var col = 0; col < 5; col++)
                       Expanded(
                         child: Padding(
@@ -2913,7 +3471,8 @@ class _CharacterPositionGrid extends StatelessWidget {
                               child: AnimatedContainer(
                                 duration: const Duration(milliseconds: 200),
                                 decoration: BoxDecoration(
-                                  color: selected?.$1 == row && selected?.$2 == col
+                                  color: selected?.$1 == row &&
+                                          selected?.$2 == col
                                       ? theme.colorScheme.primary
                                       : Colors.white.withValues(alpha: 0.05),
                                   borderRadius: BorderRadius.circular(8),
@@ -2924,7 +3483,13 @@ class _CharacterPositionGrid extends StatelessWidget {
                                     style: TextStyle(
                                       fontSize: 10,
                                       fontWeight: FontWeight.bold,
-                                      color: selected?.$1 == row && selected?.$2 == col ? Colors.black : Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.35),
+                                      color: selected?.$1 == row &&
+                                              selected?.$2 == col
+                                          ? Colors.black
+                                          : Theme.of(context)
+                                              .colorScheme
+                                              .onSurfaceVariant
+                                              .withValues(alpha: 0.35),
                                     ),
                                   ),
                                 ),
@@ -2944,7 +3509,8 @@ class _CharacterPositionGrid extends StatelessWidget {
   }
 }
 
-String _gridLabel(int row, int col) => '${String.fromCharCode(65 + col)}${row + 1}';
+String _gridLabel(int row, int col) =>
+    '${String.fromCharCode(65 + col)}${row + 1}';
 
 String? _positionLabel(double? x, double? y) {
   final index = _positionIndex(x, y);
